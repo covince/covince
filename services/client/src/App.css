@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rc-slider-track {
+  background-color: transparent;
+}
+
+.rc-slider-rail {
+  height: 8px;
+}
+
+.rc-slider-handle,
+.rc-slider-handle:active,
+.rc-slider-handle:focus,
+.rc-slider-handle:hover {
+  background-color: #007bff;
+  outline: none;
+  border: 2px solid #007bff;
+  box-shadow: none;
+  width: 13px;
+  height: 13px;
+  margin-left: -7px;
+  margin-top: -3px;
+}
+
+.gradient {
+  width: 100%;
+  white-space: nowrap;
+  position: relative;
+  display: inline-block;
+  top: 4px;
+  padding-bottom: 15px;
+}
+
+.gradient .domain-min {
+  position: absolute;
+  left: 0;
+  font-size: 11px;
+  bottom: 3px;
+}
+.gradient .domain-med {
+  position: absolute;
+  right: 25%;
+  left: 25%;
+  text-align: center;
+  font-size: 11px;
+  bottom: 3px;
+}
+.gradient .domain-max {
+  position: absolute;
+  right: 0;
+  font-size: 11px;
+  bottom: 3px;
+}
+
+.grad-step {
+  display: inline-block;
+  height: 20px;
+  width: 1%;
+}
