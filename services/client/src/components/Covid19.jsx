@@ -10,9 +10,12 @@ import moment from "moment";
 import "rc-slider/assets/index.css";
 
 import legendItems from "../entities/LegendItems";
-import { loadTiles, getColorScale } from "../utils/loadTiles";
+import { loadTiles } from "../utils/loadTiles";
+import { loadData } from "../utils/loadData";
 
 const Covid19 = () => {
+  const [data,indexed_by_date,unique_dates,min_val,max_val] = loadData();
+
   const [tiles, setTiles] = useState([]);
   const [lad, setLad] = useState({
     lad: "E08000006",
@@ -30,39 +33,26 @@ const Covid19 = () => {
   };
 
   const handleDateSlider = (e) => {
-    setDate({
-      ...date,
-      date: moment(date.range[e]).format("YYYY-MM-DD"),
-      data: null,
-    });
+    const set_to = unique_dates[e];
+   //console.log("date set to ", set_to)
+    setDate({date: set_to});
+    
+    
   };
 
   const requestLad = async (lad) => {
     //console.log(lad);
-    const { data } = await axios.get(
-      `${process.env.REACT_APP_SERVICE_URL}/data/location/${lad.lad}`
-    );
-
-    setLad({ ...lad, data });
-    const range = data.map((item) => item.date);
-    setDate({ ...date, range });
+  
+   // setLad({ ...lad, data });
+   // const range = data.map((item) => item.date);
+   // setDate({ ...date, range });
   };
 
-  const requestDate = async (date) => {
-    const { data } = await axios.get(
-      `${process.env.REACT_APP_SERVICE_URL}/data/date/${date.date}`
-    );
-    console.log(data);
-    const scale = getColorScale(
-      data.filter((item) => item.parameter === "lambda")
-    );
-    setDate({ ...date, data, scale });
-  };
+  
 
   useEffect(() => {
     if (tiles.length === 0) setTiles(loadTiles());
     if (lad.data === null) requestLad(lad);
-    if (date.data === null) requestDate(date);
     // if (date.range === null) setDate({ ...date, range: getDates() });vo
     // if ()
   }, [lad, date]);
@@ -79,10 +69,10 @@ const Covid19 = () => {
             <h2>Map</h2>
             <Chloropleth
               tiles={tiles}
-              data={
-                date.data &&
-                date.data.filter((item) => item.parameter === "lambda")
-              }
+              max_val={max_val}
+              min_val={min_val}
+              indexed_by_date = {indexed_by_date}
+              date={date.date}
               scale={date.scale}
               handleOnClick={handleOnClick}
             />
@@ -92,7 +82,7 @@ const Covid19 = () => {
             <p className="lead">Current date: {date.date}</p>
             <Slider
               min={0}
-              max={date.range && date.range.length}
+              max={unique_dates && unique_dates.length}
               onChange={handleDateSlider}
             />
             <hr />

@@ -1,28 +1,33 @@
-import papa from "papaparse"
-import data from '../data/data.csv';
+import { data } from "../assets/data_full.json"
+
+function loadData(){
+    const dates = data.map((item) => item.date)
+    const unique_dates = [...new Set(dates)]
+
+    let indexed_by_date = {};
+
+    const filtered_data = data.filter((item) => item.parameter === "lambda")
+
+    const meanArray = filtered_data.map((item) => item.mean);
+    const dmin = Math.min(...meanArray);
+    const dmax = Math.max(...meanArray);
 
 
-function loadData() {
-    //console.log(data)
-    let matchedData = null
-
-    papa.parse(data, {
-        download: true,
-        header: true,
-        complete: (result) => {
-            console.log(result.data)
-            matchedData = result.data
-        }
+    filtered_data.map((item) => {
+      if (item.parameter == "lambda"){
+      if(indexed_by_date[item.date]){
+        indexed_by_date[item.date][item.location] = item
+      }
+      else{
+        indexed_by_date[item.date]={}
+        indexed_by_date[item.date][item.location] = item
+        
+      }
+    }
     })
-    // const matchedData = this.lads.map(item => {
-    //     const matchingLad = data.find(lad => lad.lad19cd === item.properties.lad18cd)
-    //     //console.log(matchingLad)
-    //     item.properties = {...item.properties, ...matchingLad}
-    //     return item
-    // })
-    console.log(matchedData)
+    
+    return([data,indexed_by_date,unique_dates,dmin,dmax]);
+  }
 
-    // setState(matchedData);  
-}
 
-export default loadData
+export {loadData}

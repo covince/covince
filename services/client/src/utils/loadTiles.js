@@ -2,11 +2,9 @@ import { features } from "../assets/unitedKingdom.json"
 import chroma from "chroma-js"
 
 
-function getColorScale(data) {
-    const meanArray = data.map((item) => item.mean);
-    const dmin = Math.max(0, Math.min(...meanArray));
-    const dmax = Math.max(...meanArray);
-    console.log("chroma", dmin, dmax)
+function getColorScale(dmin,dmax) {
+
+    //console.log("chroma", dmin, dmax)
     const scale = chroma.scale("OrRd").domain([dmin, dmax]);
     return scale
 }

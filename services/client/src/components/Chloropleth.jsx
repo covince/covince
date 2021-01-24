@@ -1,23 +1,65 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, GeoJSON } from "react-leaflet";
+import { MapContainer, GeoJSON ,useMap} from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 import chroma from "chroma-js";
 import "./Chloropleth.css";
-import { loadTiles, colorTile } from "../utils/loadTiles";
+import { loadTiles, colorTile, getColorScale } from "../utils/loadTiles";
 import { kMaxLength } from "buffer";
 
 
+
+const MapUpdater = ({ date,indexed_by_date,data,scale,map_loaded }) => {
+  console.log("updating")
+  const map = useMap()
+ 
+  window.map =map
+  for(var i in map._layers){
+    
+    const layer = map._layers[i]
+    if(layer.setStyle && layer.feature){
+
+    const item = indexed_by_date[date][layer.feature.properties.lad18cd] ;
+    
+    const fillColor =
+      typeof item !== "undefined" ? scale(item.mean) : "#ffffff";
+    layer.setStyle({'fillColor':fillColor})
+    }
+  }
+  return(
+    <div >{date}</div>
+  )
+}
+
+
+
 class Chloropleth extends React.Component {
+
+  state = {
+    map_loaded: false
+  }
+
+
   shouldComponentUpdate(nextProps, nextState) {
-    console.log("yippee")
+    
     // TODO: return false and manually update map for updates
     return true;
 }
 
+whenReady = () => {
+  this.setState({map_loaded:true});
+  console.log("mount")
+}
+
+
 render(){
-  const { tiles, data, scale, handleOnClick } = this.props;
-  console.log("woo")
+  const { tiles, data,indexed_by_date,date, handleOnClick, min_val,max_val } = this.props;
+
+
+  
+  
+  const scale = getColorScale(min_val,max_val)
+
   const mapStyle = {
     fillColor: "white",
     weight: 1,
@@ -60,7 +102,7 @@ render(){
     return <div>{items}</div>;
   };
 
-  const colorScale = async (data, item) => {
+  const colorScale = async (data, item , min, max) => {
     const meanArray = data.map((item) => item.mean);
     const scale = chroma
       .scale("OrRd")
@@ -71,11 +113,10 @@ render(){
   const onEachLad = async (lad, layer) => {
     const name = lad.properties.lad18nm;
     const code = lad.properties.lad18cd;
-    const item = data.find((item) => item.location === code);
+
     // layer.options.fillColor =
     //   typeof item !== "undefined" ? await colorScale(data, item) : "#ffffff";
-    layer.options.fillColor =
-      typeof item !== "undefined" ? scale(item.mean) : "#ffffff";
+    
     layer.bindPopup(`${name} (${code})`);
     layer.on({
       click: (e) => handleOnClick(e, code),
@@ -85,12 +126,14 @@ render(){
   return (
     <div>
       <MapContainer style={{ height: "60vh" }} zoom={6} center={[55.5, -3]}>
-        {data && (
-          <GeoJSON style={mapStyle} data={tiles} onEachFeature={onEachLad} />
-        )}
+       
+          <GeoJSON  whenReady={this.whenReady} style={mapStyle} data={tiles}  eventHandlers={{
+    add:this.whenReady
+  }}/>
+          <MapUpdater date={date} indexed_by_date={indexed_by_date} data={data} scale={scale} map_loaded={this.state.map_loaded} />
       </MapContainer>
       <div className="gradient">
-        <center>{data && createColorBar(data, scale)}</center>
+        <center>{data && createColorBar(data, scale)}{date}</center>
       </div>
     </div>
   );
