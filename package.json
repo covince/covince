@@ -1,5 +1,6 @@
 {
   "name": "client",
+  "homepage": "{http://theosanderson.github.io/covid19-web}",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
