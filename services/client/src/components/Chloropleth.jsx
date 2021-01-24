@@ -67,11 +67,7 @@ render(){
     fillOpacity: 1,
   };
 
-  const createColorBar = (data, scale) => {
-    const meanArray = data.map((item) => item.mean);
-    const dmin = Math.min(...meanArray);
-    const dmax = Math.max(...meanArray);
-    // const scale = chroma.scale("OrRd").domain([dmin, dmax]);
+  const createColorBar = (dmin,dmax, scale) => {
 
     const items = [];
     for (let i = 0; i <= 100; i++) {
@@ -127,13 +123,13 @@ render(){
     <div>
       <MapContainer style={{ height: "60vh" }} zoom={6} center={[55.5, -3]}>
        
-          <GeoJSON  whenReady={this.whenReady} style={mapStyle} data={tiles}  eventHandlers={{
+          <GeoJSON  whenReady={this.whenReady} style={mapStyle} data={tiles}  onEachFeature={onEachLad} eventHandlers={{
     add:this.whenReady
   }}/>
           <MapUpdater date={date} indexed_by_date={indexed_by_date} data={data} scale={scale} map_loaded={this.state.map_loaded} />
       </MapContainer>
       <div className="gradient">
-        <center>{data && createColorBar(data, scale)}{date}</center>
+        <center> {createColorBar(min_val,max_val, scale)}</center>
       </div>
     </div>
   );

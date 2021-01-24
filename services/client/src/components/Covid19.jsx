@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Spinner from "./Spinner";
 import Chloropleth from "./Chloropleth";
+import LocalIncidence from "./LocalIncidence";
 
 import Slider from "rc-slider";
-import LineChart from "./LineChart";
-import LineChart2 from "./LineChart2";
-import axios from "axios";
+
 import moment from "moment";
 import "rc-slider/assets/index.css";
 
 import legendItems from "../entities/LegendItems";
-import { loadTiles } from "../utils/loadTiles";
+import { loadTiles, getLALookupTable } from "../utils/loadTiles";
 import { loadData } from "../utils/loadData";
 
 const Covid19 = () => {
   const [data,indexed_by_date,unique_dates,min_val,max_val] = loadData();
-
+  const LALookupTable = getLALookupTable()
   const [tiles, setTiles] = useState([]);
   const [lad, setLad] = useState({
     lad: "E08000006",
@@ -24,8 +23,7 @@ const Covid19 = () => {
   });
   const [date, setDate] = useState({
     date: "2020-09-01",
-    data: null,
-    range: null,
+    
   });
 
   const handleOnClick = (e, lad) => {
@@ -86,49 +84,9 @@ const Covid19 = () => {
               onChange={handleDateSlider}
             />
             <hr />
-            <h2>Local incidences</h2>
-            <p className="lead">Local Authority: {lad.lad}</p>
-            {/* {lad.data && (
-              <LineChart
-                x={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => moment(item.date).format("YYYY-MM-DD"))}
-                y={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.mean)}
-                upper={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.upper)}
-                lower={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.lower)}
-              />
-            )} */}
-            {lad.data && (
-              <LineChart2
-                x={lad.data
-                  .filter((item) => item.parameter === "yhat")
-                  .map((item) => moment(item.date).format("YYYY-MM-DD"))}
-                y={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.mean)}
-                upper={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.upper)}
-                lower={lad.data
-                  .filter((item) => item.parameter === "lambda")
-                  .map((item) => item.lower)}
-                y1={lad.data
-                  .filter((item) => item.parameter === "yhat")
-                  .map((item) => item.mean)}
-                upper1={lad.data
-                  .filter((item) => item.parameter === "yhat")
-                  .map((item) => item.upper)}
-                lower1={lad.data
-                  .filter((item) => item.parameter === "yhat")
-                  .map((item) => item.lower)}
-              />
-            )}
+
+            <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} data={data}/>
+            
           </div>
         </div>
       )}

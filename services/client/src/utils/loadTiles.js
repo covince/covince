@@ -18,4 +18,16 @@ function loadTiles() {
     return features
 }
 
-export {colorTile, loadTiles, getColorScale}
+
+function getLALookupTable() {
+    let lookup_table = {};
+    
+    features.map((item)=>{
+   
+        lookup_table[item.properties.lad18cd] = item.properties.lad18nm
+    })
+    return(lookup_table)
+}
+
+
+export {colorTile, loadTiles, getColorScale, getLALookupTable}
