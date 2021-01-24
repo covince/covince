@@ -1,6 +1,0 @@
-env
-.dockerignore
-Dockerfile
-Dockerfile.prod
-.coverage
-htmlcov

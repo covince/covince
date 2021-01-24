@@ -1,85 +1,76 @@
-# Covid-19 Web app
+# Getting Started with Create React App
 
-## Install the app (first time)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-1. Clone the repository
-2. Build the docker images
 
-```
-docker-compose up -d --build
-```
+##Install dependencies
 
-3. Initialise the databse
+`npm install`
+`npm update`
 
-```
-docker-compose exec web python app/config.py
-```
+## Available Scripts
 
-4. Populate the databse with example data
+In the project directory, you can run:
 
-Switch into the `services/populate` folder and execute
+### `npm start`
 
-```
-python populate.py
-```
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The react front end should run on `localhost:3007` and the FastAPI backend `localhost:8002`.
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-## Useful commands
+### `npm test`
 
-### General
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-Build the docker image(s)
+### `npm run build`
 
-```
-docker-compose build
-```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-Run the docker containers (the `-d` flag runs docker in the background)
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-```
-docker-compose up -d
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-Rebuild the image and run it
+### `npm run eject`
 
-```
-docker-compose up -d --build
-```
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-### Database
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Access the the database via `psql`
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-```
-docker-compose exec web-db psql -U postgres
-```
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-Initialise DB
+## Learn More
 
-```
-docker-compose exec web python app/config.py
-```
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### Testing
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-Run tests
+### Code Splitting
 
-```
-docker-compose exec web python -m pytest
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Linting
+### Analyzing the Bundle Size
 
-Flake8
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-```
-docker-compose exec web flake8 .
-```
+### Making a Progressive Web App
 
-Code formatting with Black
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-```
-docker-compose exec web black . --diff # just checks the code
-docker-compose exec web black . # formats code
-```
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
