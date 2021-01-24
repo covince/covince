@@ -7,19 +7,17 @@ import "./Chloropleth.css";
 import { loadTiles, colorTile } from "../utils/loadTiles";
 import { kMaxLength } from "buffer";
 
-const Chloropleth = ({ tiles, data, scale, handleOnClick }) => {
-  // const [scale, setScale] = useState(null);
 
-  // useEffect(() => {
-  //   if (data !== null) {
-  //     const meanArray = data.map((item) => item.mean);
-  //     const dmin = Math.min(...meanArray);
-  //     const dmax = Math.max(...meanArray);
-  //     const scale = chroma.scale("OrRd").domain([dmin, dmax]);
-  //     setScale(scale);
-  //   }
-  // }, []);
+class Chloropleth extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("yippee")
+    // TODO: return false and manually update map for updates
+    return true;
+}
 
+render(){
+  const { tiles, data, scale, handleOnClick } = this.props;
+  console.log("woo")
   const mapStyle = {
     fillColor: "white",
     weight: 1,
@@ -96,6 +94,8 @@ const Chloropleth = ({ tiles, data, scale, handleOnClick }) => {
       </div>
     </div>
   );
+
+        }
 };
 
 export default Chloropleth;
