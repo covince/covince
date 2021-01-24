@@ -27,6 +27,7 @@ function LocalIncidence({ data, lad, date, name }) {
             )} */}
 
     <LineChart2
+     lad={lad}
       date={date}
       x={lad_data
         .filter((item) => item.parameter === "yhat")

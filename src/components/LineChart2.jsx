@@ -10,9 +10,9 @@ import moment from "moment";
 
 
 
-const LineChart2 = ({ x, y, upper, lower, y1, upper1, lower1,date }) => {
+const LineChart2 = ({ x, y, upper, lower, y1, upper1, lower1, date,lad }) => {
 
-  const key = date;
+  const key = date+lad;
   const state = {
     labels: x,
     datasets: [
@@ -123,39 +123,39 @@ const LineChart2 = ({ x, y, upper, lower, y1, upper1, lower1,date }) => {
     ],
   };
 
-console.log(date)
+  console.log(date)
 
   const options = {
     animation: {
       duration: 0
-  },
+    },
     title: {
       display: true,
       text: "Daily incidence",
       fontSize: 14,
       maintainAspectRatio: false,
     },
-      annotation: {
-        annotations: [
-          {
-            drawTime: "afterDatasetsDraw",
-            id: "hline",
-            type: "line",
-            mode: "vertical",
-            scaleID: "x-axis-0",
-            value: date,
-            borderColor: "black",
-            borderWidth: 1,
-            /*label: {
-              backgroundColor: "gray",
-              content: date,
-              enabled: true
-            }*/
-          }
-        ]
-      }
-    
-   
+    annotation: {
+      annotations: [
+        {
+          drawTime: "afterDatasetsDraw",
+          id: "hline",
+          type: "line",
+          mode: "vertical",
+          scaleID: "x-axis-0",
+          value: date,
+          borderColor: "black",
+          borderWidth: 1,
+          /*label: {
+            backgroundColor: "gray",
+            content: date,
+            enabled: true
+          }*/
+        }
+      ]
+    }
+
+
     ,
     legend: {
       display: false,
@@ -167,7 +167,7 @@ console.log(date)
 
 
   return (
-    <Line  plugins={[ChartAnnotation]}
+    <Line plugins={[ChartAnnotation]}
       data={state}
       options={options}
       key={key}

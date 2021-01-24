@@ -62,8 +62,8 @@ class Chloropleth extends React.Component {
 
     const mapStyle = {
       fillColor: "white",
-      weight: 1,
-      color: "black",
+      weight: 0.5,
+      color: "#333333",
       fillOpacity: 1,
     };
 
@@ -123,7 +123,7 @@ class Chloropleth extends React.Component {
       <div>
         <MapContainer style={{ height: "60vh" }} zoom={6} center={[55.5, -3]}>
 
-          <GeoJSON whenReady={this.whenReady} style={mapStyle} data={tiles} onEachFeature={onEachLad} eventHandlers={{
+          <GeoJSON style={mapStyle} data={tiles} onEachFeature={onEachLad} eventHandlers={{
             add: this.whenReady
           }} />
           <MapUpdater date={date} indexed_by_date={indexed_by_date} data={data} scale={scale} map_loaded={this.state.map_loaded} />
