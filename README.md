@@ -3,10 +3,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 
-##Install dependencies
+## Install dependencies
 
-`npm install`
-`npm update`
+```npm install```
+```npm update```
 
 ## Available Scripts
 
