@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, GeoJSON, useMap } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
-import chroma from "chroma-js";
 import "./Chloropleth.css";
 import { loadTiles, colorTile, getColorScale } from "../utils/loadTiles";
 import { kMaxLength } from "buffer";
@@ -98,13 +97,7 @@ class Chloropleth extends React.Component {
       return <div>{items}</div>;
     };
 
-    const colorScale = async (data, item, min, max) => {
-      const meanArray = data.map((item) => item.mean);
-      const scale = chroma
-        .scale("OrRd")
-        .domain([Math.min(...meanArray), Math.max(...meanArray)]);
-      return scale(item.mean).hex();
-    };
+
 
     const onEachLad = async (lad, layer) => {
       const name = lad.properties.lad19nm;

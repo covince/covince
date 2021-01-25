@@ -1,18 +1,28 @@
 import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BGC.json" // Can change to BUC to reduce bundle size
-import chroma from "chroma-js"
-
+let colormap = require('colormap')
 
 function getColorScale(dmin,dmax) {
+    console.log("GCS")
 
-    //console.log("chroma", dmin, dmax)
-    const scale = chroma.scale("OrRd").domain([dmin, dmax]);
+    let nshades = 400;
+
+    let colors = colormap({
+    colormap: 'magma',
+    nshades: nshades,
+    format: 'hex',
+    alpha: 1
+    }).reverse()
+
+    let scale = function(number){
+
+        console.log("scale",)
+        return(colors[Math.round(nshades*(number-dmin)/(dmax-dmin))])
+        
+    }
     return scale
 }
 
-function colorTile(min, max) {
-    const scale = chroma.scale(["yellow", "008ae5"]).domain([min, max]);
-    return scale
-}
+
 
 function loadTiles() {
     return features
@@ -30,4 +40,4 @@ function getLALookupTable() {
 }
 
 
-export {colorTile, loadTiles, getColorScale, getLALookupTable}
+export { loadTiles, getColorScale, getLALookupTable}
