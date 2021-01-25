@@ -1,10 +1,13 @@
-import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BGC.json" // Can change to BUC to reduce bundle size
+import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json" // Can change to BUC to reduce bundle size
 let colormap = require('colormap')
 
 function getColorScale(dmin,dmax) {
+    dmin=.1
+    dmax = 200
+
     console.log("GCS")
 
-    let nshades = 400;
+    let nshades = 4000 ;
 
     let colors = colormap({
     colormap: 'magma',
@@ -15,8 +18,19 @@ function getColorScale(dmin,dmax) {
 
     let scale = function(number){
 
+        if(number>dmax){ number=dmax-1}
+
+        const max_log = Math.sqrt(dmax)
+        const min_log = Math.sqrt(dmin)
+        const num_log = Math.sqrt(number)
+
+
+
+        
+
         console.log("scale",)
-        return(colors[Math.round(nshades*(number-dmin)/(dmax-dmin))])
+        let portion_of_scale_to_use = 0.9; // don't go to deep black
+        return(colors[Math.round(portion_of_scale_to_use*nshades*(num_log-min_log)/(max_log-min_log))])
         
     }
     return scale
