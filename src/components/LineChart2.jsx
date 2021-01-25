@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 
 
 import { Line } from "react-chartjs-2";
 
-import Chart from 'chart.js';
 import * as ChartAnnotation from 'chartjs-plugin-annotation';
-
-import moment from "moment";
 
 
 

@@ -13,8 +13,8 @@ function loadData(){
     const dmax = Math.max(...meanArray);
 
 
-    filtered_data.map((item) => {
-      if (item.parameter == "lambda"){
+    filtered_data.forEach((item) => {
+      if (item.parameter === "lambda"){
       if(indexed_by_date[item.date]){
         indexed_by_date[item.date][item.location] = item
       }

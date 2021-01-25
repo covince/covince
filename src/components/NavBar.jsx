@@ -12,9 +12,7 @@ class NavBar extends Component {
   };
   render() {
     const collapsed = this.state.collapsed;
-    const classOne = collapsed
-      ? "collapse navbar-collapse"
-      : "collapse navbar-collapse show";
+
     const classTwo = collapsed
       ? "navbar-toggler navbar-toggler-right collapsed"
       : "navbar-toggler navbar-toggler-right";

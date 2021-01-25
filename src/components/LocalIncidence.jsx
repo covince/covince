@@ -5,7 +5,7 @@ import LineChart2 from "./LineChart2";
 import moment from "moment";
 function LocalIncidence({ data, lad, date, name }) {
 
-  const lad_data = data.filter((item) => item.location == lad)
+  const lad_data = data.filter((item) => item.location === lad)
   return (<div>
     <h2>Local incidences</h2>
     <p className="lead">Local Authority: {name}</p>

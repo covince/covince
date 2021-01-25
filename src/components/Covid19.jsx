@@ -5,10 +5,9 @@ import LocalIncidence from "./LocalIncidence";
 
 import Slider from "rc-slider";
 
-import moment from "moment";
+
 import "rc-slider/assets/index.css";
 
-import legendItems from "../entities/LegendItems";
 import { loadTiles, getLALookupTable } from "../utils/loadTiles";
 import { loadData } from "../utils/loadData";
 
@@ -38,22 +37,12 @@ const Covid19 = () => {
 
   };
 
-  const requestLad = async (lad) => {
-    //console.log(lad);
-
-    // setLad({ ...lad, data });
-    // const range = data.map((item) => item.date);
-    // setDate({ ...date, range });
-  };
-
 
 
   useEffect(() => {
     if (tiles.length === 0) setTiles(loadTiles());
-    if (lad.data === null) requestLad(lad);
-    // if (date.range === null) setDate({ ...date, range: getDates() });vo
-    // if ()
-  }, [lad, date]);
+
+  }, [lad, date,tiles]);
 
   return (
     <React.Fragment>

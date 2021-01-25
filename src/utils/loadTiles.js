@@ -46,7 +46,7 @@ function loadTiles() {
 function getLALookupTable() {
     let lookup_table = {};
     
-    features.map((item)=>{
+    features.forEach((item)=>{
    
         lookup_table[item.properties.lad19cd] = item.properties.lad19nm
     })

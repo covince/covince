@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MapContainer, GeoJSON, useMap } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 import "./Chloropleth.css";
-import { loadTiles, colorTile, getColorScale } from "../utils/loadTiles";
-import { kMaxLength } from "buffer";
+import {  getColorScale } from "../utils/loadTiles";
+
 
 
 
