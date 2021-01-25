@@ -19,7 +19,7 @@ const MapUpdater = ({ date, indexed_by_date, data, scale, map_loaded }) => {
     const layer = map._layers[i]
     if (layer.setStyle && layer.feature) {
 
-      const item = indexed_by_date[date][layer.feature.properties.lad18cd];
+      const item = indexed_by_date[date][layer.feature.properties.lad19cd];
 
       const fillColor =
         typeof item !== "undefined" ? scale(item.mean) : "#ffffff";

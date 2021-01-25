@@ -1,4 +1,4 @@
-import { features } from "../assets/unitedKingdom.json"
+import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json"
 import chroma from "chroma-js"
 
 
@@ -24,7 +24,7 @@ function getLALookupTable() {
     
     features.map((item)=>{
    
-        lookup_table[item.properties.lad18cd] = item.properties.lad18nm
+        lookup_table[item.properties.lad19cd] = item.properties.lad19nm
     })
     return(lookup_table)
 }
