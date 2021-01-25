@@ -3,7 +3,7 @@ import { MapContainer, GeoJSON, useMap } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 import "./Chloropleth.css";
-import {  getColorScale } from "../utils/loadTiles";
+import { getColorScale } from "../utils/loadTiles";
 
 
 
@@ -17,13 +17,19 @@ const MapUpdater = ({ date, indexed_by_date, data, scale, map_loaded }) => {
 
     const layer = map._layers[i]
     if (layer.setStyle && layer.feature) {
+      let fillColor = null
+      if (indexed_by_date[date]) {
+        const item = indexed_by_date[date][layer.feature.properties.lad19cd];
 
-      const item = indexed_by_date[date][layer.feature.properties.lad19cd];
-
-      const fillColor =
-        typeof item !== "undefined" ? scale(item.mean) : "#ffffff";
+        fillColor = typeof item !== "undefined" ? scale(item.mean) : "#ffffff";
+      }
+      else {
+        fillColor = "gray"
+      }
       layer.setStyle({ 'fillColor': fillColor })
     }
+
+
   }
   return (
     <div >{date}</div>

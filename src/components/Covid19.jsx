@@ -69,7 +69,7 @@ const Covid19 = () => {
               <p className="lead">Current date: {date.date}</p>
               <Slider
                 min={0}
-                max={unique_dates && unique_dates.length}
+                max={unique_dates && unique_dates.length-1}
                 onChange={handleDateSlider}
               />
               <hr />
