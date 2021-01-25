@@ -114,7 +114,7 @@ class Chloropleth extends React.Component {
 
     return (
       <div>
-        <MapContainer style={{ height: "60vh" }} zoom={6} center={[55.5, -3]}>
+        <MapContainer style={{ height: "60vh" }} zoom={5.5} center={[53.5, -3]}>
 
           <GeoJSON style={mapStyle} data={tiles} onEachFeature={onEachLad} eventHandlers={{
             add: this.whenReady
