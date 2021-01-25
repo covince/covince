@@ -107,8 +107,8 @@ class Chloropleth extends React.Component {
     };
 
     const onEachLad = async (lad, layer) => {
-      const name = lad.properties.lad18nm;
-      const code = lad.properties.lad18cd;
+      const name = lad.properties.lad19nm;
+      const code = lad.properties.lad19cd;
 
       // layer.options.fillColor =
       //   typeof item !== "undefined" ? await colorScale(data, item) : "#ffffff";
