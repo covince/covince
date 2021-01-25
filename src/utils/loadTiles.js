@@ -1,4 +1,4 @@
-import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json"
+import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BGC.json" // Can change to BUC to reduce bundle size
 import chroma from "chroma-js"
 
 
