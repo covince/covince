@@ -14,7 +14,11 @@ def make_json():
         for i, row in enumerate(reader):
             j, lad, date, mean, upper, lower, param, lineage = row
 
-            
+            if mean !="":
+                mean = round(float(mean),3)
+                upper = round(float(upper),3)
+                lower = round(float(lower),3)
+
             item = {
                 'date':date,
                 'parameter': param,
