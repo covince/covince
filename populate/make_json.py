@@ -7,12 +7,12 @@ import json
 
 
 def make_json():
-    with open("data.csv", "r") as csvfile:
+    with open("full_data_table.csv", "r") as csvfile:
         dataset = []
         reader = csv.reader(csvfile, delimiter=",")
         next(reader)
         for i, row in enumerate(reader):
-            j, lad, date, mean, upper, lower, param = row
+            j, lad, date, mean, upper, lower, param, lineage = row
 
             
             item = {
@@ -21,7 +21,8 @@ def make_json():
                 'location': lad,
                 'mean': mean,
                 'upper': upper,
-                'lower': lower
+                'lower': lower,
+                'lineage' : lineage
             }
             dataset.append(item)
         with open('../src/assets/data_full.json', 'w') as outfile:

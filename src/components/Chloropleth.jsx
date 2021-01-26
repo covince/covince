@@ -8,32 +8,15 @@ import { getColorScale } from "../utils/loadTiles";
 
 
 
-const MapUpdater = ({ date, indexed_by_date, data, scale, map_loaded }) => {
-  console.log("updating")
+const MapUpdater = ({ date, indexed_by_date, dataframe, scale, map_loaded }) => {
+
+
   const map = useMap()
 
   window.map = map
-  for (var i in map._layers) {
+  window.scale = scale
 
-    const layer = map._layers[i]
-    if (layer.setStyle && layer.feature) {
-      let fillColor = null
-      if (indexed_by_date[date]) {
-        const item = indexed_by_date[date][layer.feature.properties.lad19cd];
-
-        fillColor = typeof item !== "undefined" ? scale(item.mean) : "#ffffff";
-      }
-      else {
-        fillColor = "gray"
-      }
-      layer.setStyle({ 'fillColor': fillColor })
-    }
-
-
-  }
-  return (
-    <div >{date}</div>
-  )
+  return (false)
 }
 
 
@@ -46,9 +29,31 @@ class Chloropleth extends React.Component {
 
 
   shouldComponentUpdate(nextProps, nextState) {
+  const {dataframe,date} =nextProps
+  const by_loc = dataframe[date].getSeries('mean')
+  window.by_loc = by_loc
+  console.log("updating")
+  const map = window.map
+  const scale = window.scale
+  for (var i in map._layers) {
+
+    const layer = map._layers[i]
+    if (layer.setStyle && layer.feature) {
+      let fillColor = null
+      
+        const item = by_loc.getRowByIndex(layer.feature.properties.lad19cd);
+        //console.log(layer.feature.properties.lad19cd,item)
+
+        fillColor = typeof item !== "undefined" ? scale(item) : "#ffffff";
+      
+      layer.setStyle({ 'fillColor': fillColor })
+    }
+
+
+  }
 
     // TODO: return false and manually update map for updates
-    return true;
+    return false;
   }
 
   whenReady = () => {
@@ -58,10 +63,10 @@ class Chloropleth extends React.Component {
 
 
   render() {
-    const { tiles, data, indexed_by_date, date, handleOnClick, min_val, max_val } = this.props;
+    const { tiles, dataframe, indexed_by_date, date, handleOnClick, min_val, max_val, lineage } = this.props;
 
 
-
+    
 
     const scale = getColorScale(min_val, max_val)
 
@@ -106,6 +111,7 @@ class Chloropleth extends React.Component {
 
 
     const onEachLad = async (lad, layer) => {
+      console.log('each')
       const name = lad.properties.lad19nm;
       const code = lad.properties.lad19cd;
 
@@ -125,7 +131,7 @@ class Chloropleth extends React.Component {
           <GeoJSON style={mapStyle} data={tiles} onEachFeature={onEachLad} eventHandlers={{
             add: this.whenReady
           }} />
-          <MapUpdater date={date} indexed_by_date={indexed_by_date} data={data} scale={scale} map_loaded={this.state.map_loaded} />
+          <MapUpdater date={date} indexed_by_date={indexed_by_date} dataframe={dataframe} scale={scale} map_loaded={this.state.map_loaded} />
         </MapContainer>
         <div className="gradient">
           <center> {createColorBar(min_val, max_val, scale)}</center>

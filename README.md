@@ -3,6 +3,13 @@
 React app for exploring CovInce data.
 
 # Development
+## CSV to JSON
+
+`cd populate`
+
+`python make_json.py`
+
+
 ## Install dependencies
 
 ```npm install```
