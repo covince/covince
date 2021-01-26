@@ -29,28 +29,35 @@ class Chloropleth extends React.Component {
 
 
   shouldComponentUpdate(nextProps, nextState) {
-  const {dataframe,date} =nextProps
-  const by_loc = dataframe[date].getSeries('mean')
-  window.by_loc = by_loc
-  console.log("updating")
-  const map = window.map
-  const scale = window.scale
-  for (var i in map._layers) {
 
-    const layer = map._layers[i]
-    if (layer.setStyle && layer.feature) {
-      let fillColor = null
-      
+
+
+    const { dataframe, date } = nextProps
+    if (nextProps.dataframe!== this.props.dataframe){
+      return true;
+    }
+    
+    const by_loc = dataframe[date].getSeries('mean')
+    window.by_loc = by_loc
+    console.log("updating")
+    const map = window.map
+    const scale = window.scale
+    for (var i in map._layers) {
+
+      const layer = map._layers[i]
+      if (layer.setStyle && layer.feature) {
+        let fillColor = null
+
         const item = by_loc.getRowByIndex(layer.feature.properties.lad19cd);
         //console.log(layer.feature.properties.lad19cd,item)
 
         fillColor = typeof item !== "undefined" ? scale(item) : "#ffffff";
-      
-      layer.setStyle({ 'fillColor': fillColor })
+
+        layer.setStyle({ 'fillColor': fillColor })
+      }
+
+
     }
-
-
-  }
 
     // TODO: return false and manually update map for updates
     return false;
@@ -66,7 +73,7 @@ class Chloropleth extends React.Component {
     const { tiles, dataframe, indexed_by_date, date, handleOnClick, min_val, max_val, lineage } = this.props;
 
 
-    
+
 
     const scale = getColorScale(min_val, max_val)
 

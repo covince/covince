@@ -2,6 +2,7 @@ import React from 'react';
 import Covid19 from "./components/Covid19"
 import NavBar from "./components/NavBar"
 import './App.css';
+import ContainerWithTimer from './components/ContainerWithTimer';
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
       <NavBar />
     <div className="container">
       
-      <Covid19 />
+      <ContainerWithTimer />
     </div>
     </React.Fragment>
   );
