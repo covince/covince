@@ -52,7 +52,7 @@ const Covid19 = () => {
 
   ///  [data, indexed_by_date, unique_dates, min_val, max_val] 
   const [parameter, setParameter] = useState("lambda");
-  const unique_parameters = ['lambda','p','R']
+  let unique_parameters = ['lambda','p','R']
   const parameter_of_interest = parameter
   const value_of_interest = "mean"
 
@@ -115,10 +115,12 @@ const Covid19 = () => {
   }
 
   function PlayButton(props) {
+    return('')
 
     if(!props.is_playing){
     return (
-    <button onClick={props.onClick}><FaPlay /></button>);
+    <button onClick={props.onClick}><FaPlay /></button>
+    );
   }else{
     return (
     <button onClick={props.onClick}><FaPause /></button>);
@@ -136,6 +138,10 @@ const Covid19 = () => {
 
 
   const lineage_options = unique_lineages.map((x) =><option>{x}</option>)
+
+  if(lineage=="total"){
+    unique_parameters = ['lambda','R']
+  }
   const parameter_options = unique_parameters.map((x) =><option>{x}</option>)
 
   return (
