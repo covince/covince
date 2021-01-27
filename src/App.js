@@ -5,6 +5,8 @@ import './App.css';
 import ContainerWithTimer from './components/ContainerWithTimer';
 
 function App() {
+
+  document.getElementById('spinner').style.display = 'none'
   return (
     <React.Fragment>
       <NavBar />
