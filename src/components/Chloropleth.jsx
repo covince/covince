@@ -33,14 +33,16 @@ class Chloropleth extends React.Component {
 
 
     const { dataframe, date } = nextProps
-    if (nextProps.dataframe!== this.props.dataframe){
-      return true;
-    }
+
+   
     
     const by_loc = dataframe[date].getSeries('mean')
     window.by_loc = by_loc
     console.log("updating")
     const map = window.map
+    if (map == undefined){
+      return true
+    }
     const scale = window.scale
     for (var i in map._layers) {
 
@@ -58,7 +60,9 @@ class Chloropleth extends React.Component {
 
 
     }
-
+    if (nextProps.dataframe!== this.props.dataframe){
+      return true;
+    }
     // TODO: return false and manually update map for updates
     return false;
   }
@@ -72,7 +76,7 @@ class Chloropleth extends React.Component {
   render() {
     const { tiles, dataframe, indexed_by_date, date, handleOnClick, min_val, max_val, lineage } = this.props;
 
-
+    this.setState({'updateagain': new Date()})
 
 
     const scale = getColorScale(min_val, max_val)

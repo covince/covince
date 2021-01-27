@@ -1,4 +1,4 @@
-import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json" // Can change to BUC to reduce bundle size
+import { features } from "../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BGC.json" // Can change to BUC to reduce bundle size
 //import { features } from "../assets/hex.json" // Can change to BUC to reduce bundle size
 
 
