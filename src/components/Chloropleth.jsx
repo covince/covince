@@ -56,6 +56,16 @@ class Chloropleth extends React.Component {
         fillColor = typeof item !== "undefined" ? scale(item) : "#ffffff";
 
         layer.setStyle({ 'fillColor': fillColor })
+
+        if(layer.feature.properties.lad19cd == nextProps.lad){
+          //layer.setStyle({ 'stroke-width': "5" })
+          layer.setStyle({ weight:1})
+          layer.setStyle({ color:'black'})
+        }
+        else{
+          layer.setStyle({ weight:0.5})
+          layer.setStyle({ color:'#333333'})
+        }
       }
 
 
@@ -129,7 +139,7 @@ class Chloropleth extends React.Component {
       // layer.options.fillColor =
       //   typeof item !== "undefined" ? await colorScale(data, item) : "#ffffff";
 
-      layer.bindPopup(`${name} (${code})`);
+      layer.bindPopup(`${name}`);
       layer.on({
         click: (e) => handleOnClick(e, code),
       });

@@ -161,6 +161,7 @@ const Covid19 = () => {
                 {parameter_options}
               </select>
               <Chloropleth
+                lad ={lad.lad}
                 tiles={tiles}
                 max_val={max_val}
                 min_val={min_val}
