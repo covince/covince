@@ -153,6 +153,16 @@ const Covid19 = () => {
       ) : (
           <div className="row">
             <div className="col-md-6">
+            <h2>Select date</h2>
+              <p className="lead"><PlayButton is_playing={is_playing} onClick={togglePlay} />Current date: {date.date}</p>
+
+              <Slider
+                min={0}
+                max={unique_dates && unique_dates.length - 1}
+                onChange={handleDateSlider}
+                value={unique_dates.indexOf(date.date)}
+              />
+              <hr />
               <h2>Map</h2>
               <select value={lineage} name="lineages" onChange={e => setLineage(e.target.value)}>
                 {lineage_options}
@@ -172,16 +182,7 @@ const Covid19 = () => {
               />
             </div>
             <div className="col-md-6">
-              <h2>Select date</h2>
-              <p className="lead"><PlayButton is_playing={is_playing} onClick={togglePlay} />Current date: {date.date}</p>
-
-              <Slider
-                min={0}
-                max={unique_dates && unique_dates.length - 1}
-                onChange={handleDateSlider}
-                value={unique_dates.indexOf(date.date)}
-              />
-              <hr />
+              
 
               {<LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={dataframe} lineage={lineage} />}
 
