@@ -114,3 +114,12 @@ hr.graphdivider{
 .custom-tooltip{background: rgba(255,255,255,0.7);}
 
 .scale_control_holder{margin-top:5px; margin-bottom:15px}
+
+
+div.play_control {opacity:.7; margin-bottom:10px; line-height: 30px; text-align:center;
+
+position:absolute;top:100px; left:250px;width:50px; z-index:100}
+
+
+div.play_control button{background:transparent; border:0;}
+div.play_control button svg{height:25px; }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Spinner from "./Spinner";
 import Chloropleth from "./Chloropleth";
 import LocalIncidence from "./LocalIncidence";
-import { FaPlay, FaPause } from 'react-icons/fa';
+
 import Slider from "rc-slider";
 
 
@@ -46,14 +46,22 @@ function get_min_min_max(dataframe, parameter, value_of_interest, lineage) {
 
 var memoized_get_min_max = memoize(get_min_min_max)
 let dataframe = loadData();
-const Covid19 = () => {
+const Covid19 = ({playing}) => {
+  console.log('playing',playing)
+  if(playing){
+    clearTimeout(window.timeout)
+    window.timeout = setTimeout(x=>{
+      bump_date()
+      console.log('date bumped')
+    },100)
+  }
 
 
 
   window.df = dataframe
 
   ///  [data, indexed_by_date, unique_dates, min_val, max_val] 
-  const [parameter, setParameter] = useState("lambda");
+  const [parameter, setParameter] = useState("p");
   let unique_parameters = ['lambda', 'p', 'R']
   const parameter_of_interest = parameter
   const value_of_interest = "mean"
@@ -111,7 +119,10 @@ const Covid19 = () => {
 
 
   const bump_date = (e) => {
-    const cur_index = unique_dates.indexOf(date.date)
+    let cur_index = unique_dates.indexOf(date.date)
+    if (unique_dates[cur_index + 1] == undefined){
+      cur_index = -1
+    }
     const set_to = unique_dates[cur_index + 1]
     setDate({ date: set_to });
 
@@ -131,18 +142,7 @@ const Covid19 = () => {
 
   }
 
-  function PlayButton(props) {
-    return ('')
-
-    if (!props.is_playing) {
-      return (
-        <button onClick={props.onClick}><FaPlay /></button>
-      );
-    } else {
-      return (
-        <button onClick={props.onClick}><FaPause /></button>);
-    }
-  }
+  
 
 
 
@@ -174,7 +174,7 @@ const Covid19 = () => {
           <div className="row">
             <div className="col-md-6">
               <h2>Select date</h2>
-              <p className="lead"><PlayButton is_playing={is_playing} onClick={togglePlay} />Current date: {date.date}</p>
+              <p className="lead">Current date: {date.date}</p>
 
               <Slider
                 min={0}
