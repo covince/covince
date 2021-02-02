@@ -37,7 +37,7 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 
   return (<div>
     <h2>Local incidences</h2>
-    <p className="lead">Local Authority: {name}</p>
+    <p className="lead">Local Authority: {name} <small class="ltla_small_text">{lad}</small></p>
 
 
 
