@@ -1,10 +1,10 @@
-import React from "react";
-
+import React, { useState } from 'react';
 
 
 import moment from "moment";
 import memoize from 'memoize-one';
 import MultiLinePlot from "./MultiLinePlot";
+import { Form, Radio, Checkbox } from "semantic-ui-react";
 
 function get_lad_data(dataframe, lad, lineage) {
   console.log('calling get')
@@ -23,8 +23,17 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
   console.log(lad_data)
 
 
-  
+  const [proportion_display_type, setProportionDisplayType] = useState("line");
 
+ let handleChange = function(event) {
+    const target = event.target;
+    if(target.checked){
+    setProportionDisplayType("area")
+    }
+    else{
+      setProportionDisplayType("line")
+    }
+  }
 
   return (<div>
     <h2>Local incidences</h2>
@@ -35,9 +44,13 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 <center>Incidence</center>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="lambda" />
 <hr />
-<center>Proportion</center>
-<MultiLinePlot lad_data={lad_data} date={date} parameter="p" />
-<MultiLinePlot lad_data={lad_data} date={date} parameter="p" type="area" />
+<center>Proportion <Checkbox style={{"display":"inline-block"}} checked = {proportion_display_type=="area"}  onChange={ handleChange} toggle label="Area" />
+
+</center>
+{proportion_display_type=="line" && <MultiLinePlot lad_data={lad_data} date={date} parameter="p" />}
+{proportion_display_type=="area" && <MultiLinePlot lad_data={lad_data} date={date} parameter="p" type="area" />}
+
+
 <hr />
 <center>R</center>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="R" />

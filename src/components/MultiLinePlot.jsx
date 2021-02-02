@@ -54,7 +54,7 @@ return(<ComposedChart data={for_lambda} width={500} height={200}>
 
 
     <XAxis dataKey="date" />
-    <YAxis />
+    <YAxis tickFormatter= {value => parseFloat(value).toFixed(2)} domain={[0, 1]} />
     <ReferenceLine x={date} stroke="#aaa" label="" strokeWidth={1} strokeDasharray="3 3" />
 
     <Tooltip content={CustomTooltip} />
