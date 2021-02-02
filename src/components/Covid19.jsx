@@ -188,7 +188,7 @@ const Covid19 = ({playing}) => {
                 Lineage: <select value={lineage} name="lineages" onChange={e => carefulSetLineage(e.target.value)}>
                   {lineage_options}
                 </select>&nbsp;&nbsp;&nbsp;
-              Parameter: <select value={parameter} name="parameters" onChange={e => setParameterAndChangeScale(e.target.value)}>
+              Color by: <select value={parameter} name="parameters" onChange={e => setParameterAndChangeScale(e.target.value)}>
                   {parameter_options}&nbsp;
               </select>
               </div>
