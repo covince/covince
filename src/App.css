@@ -112,3 +112,5 @@ hr.graphdivider{
 .graph_header input{ font-weight:400; margin-left:20px;}
 
 .custom-tooltip{background: rgba(255,255,255,0.7);}
+
+.scale_control_holder{margin-top:5px; margin-bottom:15px}

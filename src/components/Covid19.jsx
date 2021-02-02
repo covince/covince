@@ -81,7 +81,14 @@ const Covid19 = () => {
 
   const [color_scale_type, setScale] = useState("quadratic");
 
+  const carefulSetLineage = (x) => {
+    
+    if (x === "total") { setParameterAndChangeScale("lambda");
+  console.log("Changing parameter as total only supports lambda") }
+   
 
+    setLineage(x);
+  }
 
   const setParameterAndChangeScale = (x) => {
     setParameter(x);
@@ -178,7 +185,7 @@ const Covid19 = () => {
               <hr />
               <h2>Map</h2>
               <div class='map_controls'>
-                Lineage: <select value={lineage} name="lineages" onChange={e => setLineage(e.target.value)}>
+                Lineage: <select value={lineage} name="lineages" onChange={e => carefulSetLineage(e.target.value)}>
                   {lineage_options}
                 </select>&nbsp;&nbsp;&nbsp;
               Parameter: <select value={parameter} name="parameters" onChange={e => setParameterAndChangeScale(e.target.value)}>
@@ -196,10 +203,11 @@ const Covid19 = () => {
                 scale={date.scale}
                 handleOnClick={handleOnClick}
               />
+              <div class='scale_control_holder'>
               Scale:&nbsp;<select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
                 {scale_options}
               </select>
-            </div>
+            </div></div>
 
             <div className="col-md-6">
 
