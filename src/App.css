@@ -111,7 +111,7 @@ hr.graphdivider{
 .graph_header label{ font-weight:400; margin-left:10px;}
 .graph_header input{ font-weight:400; margin-left:20px;}
 
-.custom-tooltip{background: rgba(255,255,255,0.7);}
+.custom-tooltip{background: rgba(255,255,255,0.7); padding:4px;}
 
 .scale_control_holder{margin-top:5px; margin-bottom:15px}
 
@@ -123,3 +123,5 @@ position:absolute;top:100px; left:250px;width:50px; z-index:100}
 
 div.play_control button{background:transparent; border:0;}
 div.play_control button svg{height:25px; }
+div.tooltip_header{font-weight:500}
+div.tooltip_entry{padding:0;margin:0; line-height: 18px;}
