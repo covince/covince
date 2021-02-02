@@ -32,7 +32,7 @@ function get_min_min_max(dataframe, parameter, value_of_interest, lineage) {
     lookup[dater] = group.setIndex('location')
 
   }
-  console.log("returning")
+
   const unique_dates = dataframe.getSeries('date').distinct().toArray()
   const unique_lineages = dataframe.getSeries('lineage').distinct().toArray()
 
@@ -60,7 +60,7 @@ const Covid19 = () => {
 
   const { min_val, max_val, series, dataframe_selected_parameter, unique_dates, unique_lineages } = memoized_get_min_max(dataframe, parameter_of_interest, value_of_interest, lineage)
   window.df2 = dataframe_selected_parameter
-  console.log(min_val, max_val)
+
 
 
   const[is_playing,setIsPlaying] = useState(false);
@@ -94,7 +94,7 @@ const Covid19 = () => {
 
   const handleDateSlider = (e) => {
     const set_to = unique_dates[e];
-    //console.log("date set to ", set_to)
+   
     setDate({ date: set_to });
 
 
@@ -110,7 +110,7 @@ const Covid19 = () => {
   };
 
   function togglePlay(){
-    console.log("toggle")
+ 
     if(is_playing){
     setIsPlaying(false)
     clearInterval(window.bumpTimeout)
@@ -154,7 +154,7 @@ const Covid19 = () => {
     unique_parameters = unique_parameters.filter(x => x[0] !=="p" && x[0] !=="R" )
   }
   const parameter_options = unique_parameters.map((x) =><option value={x[0]}>{x[1]}</option>)
-  console.log(color_scale_type)
+
   return (
     <React.Fragment>
       {tiles && tiles.length === 0 ? (

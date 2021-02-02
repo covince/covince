@@ -16,14 +16,14 @@ const MultiLinePlot = ({date,lad_data,parameter,type}) => {
       }
       for_lambda.push(row);
     }
-    console.log(lineages)
+  
     lineages = Array.from(lineages);
     window.lineages = lineages
     const colors = ['red', 'green', 'blue', 'orange', 'pink']
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload) {
-      console.log(label)
+    
       return (
         <div className="custom-tooltip">
           {label}
@@ -48,7 +48,7 @@ return(<ComposedChart data={for_lambda} width={500} height={200}>
     <CartesianGrid stroke="#ccc" />
 
     {lineages.map((value, index) => {
-      console.log(value)
+     
       return <Area stackId="1" dot={false} name={value} type="monotone" dataKey={value} fill={colors[index]} stroke={colors[index]} />
     })}
 
@@ -66,11 +66,11 @@ else{
     
     
         {lineages.map((value, index) => {
-          console.log(value)
+          
           return <Area type="monotone" name="_range" dataKey={value + "_range"} fill={colors[index]} strokeWidth={0} />
         })}
         {lineages.map((value, index) => {
-          console.log(value)
+         
           return <Line dot={false} name={value} type="monotone" dataKey={value} stroke={colors[index]} />
         })}
     
