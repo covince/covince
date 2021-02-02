@@ -4,7 +4,7 @@ import { features } from "../assets/Local_Authority_Districts__December_2019__Bo
 
 let colormap = require('colormap')
 
-function getColorScale(dmin, dmax) {
+function getColorScale(dmin, dmax, color_scale_type) {
     //dmin=0
     // dmax = 200
 
@@ -22,10 +22,20 @@ function getColorScale(dmin, dmax) {
     let scale = function (number) {
 
         if (number > dmax) { number = dmax - 1 }
+        let dmax_val,dmin_val, number_val
 
-        const max_log = Math.sqrt(dmax)
-        const min_log = Math.sqrt(dmin)
-        const num_log = Math.sqrt(number)
+        if(color_scale_type=="quadratic"){
+
+          dmax_val = Math.sqrt(dmax)
+          dmin_val = Math.sqrt(dmin)
+          number_val = Math.sqrt(number)
+
+        }
+        else{
+            dmax_val = dmax
+            dmin_val = dmin
+            number_val = number
+        }
 
 
 
@@ -33,7 +43,7 @@ function getColorScale(dmin, dmax) {
 
         //console.log("scale",)
         let portion_of_scale_to_use = 0.9; // don't go to deep black
-        return (colors[Math.round(portion_of_scale_to_use * nshades * (num_log - min_log) / (max_log - min_log))])
+        return (colors[Math.round(portion_of_scale_to_use * nshades * (number_val - dmin_val) / (dmax_val - dmin_val))])
 
     }
     return scale

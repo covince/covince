@@ -70,7 +70,7 @@ class Chloropleth extends React.Component {
 
 
     }
-    if (nextProps.dataframe!== this.props.dataframe){
+    if (nextProps.dataframe!== this.props.dataframe || nextProps.color_scale_type!== this.props.color_scale_type){
       return true;
     }
     // TODO: return false and manually update map for updates
@@ -84,12 +84,12 @@ class Chloropleth extends React.Component {
 
 
   render() {
-    const { tiles, dataframe, indexed_by_date, date, handleOnClick, min_val, max_val, lineage } = this.props;
+    const {color_scale_type, tiles, dataframe, indexed_by_date, date, handleOnClick, min_val, max_val, lineage } = this.props;
 
     this.setState({'updateagain': new Date()})
 
 
-    const scale = getColorScale(min_val, max_val)
+    const scale = getColorScale(min_val, max_val,color_scale_type)
 
     const mapStyle = {
       fillColor: "white",

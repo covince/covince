@@ -77,6 +77,9 @@ const Covid19 = () => {
 
   });
 
+  const [color_scale_type, setScale] = useState("quadratic");
+
+ 
  
 
 
@@ -139,11 +142,13 @@ const Covid19 = () => {
 
   const lineage_options = unique_lineages.map((x) =><option>{x}</option>)
 
+  const scale_options = ['quadratic','linear'].map((x) =><option value={x}>{x}</option>)
+
   if(lineage=="total"){
     unique_parameters = ['lambda','R']
   }
   const parameter_options = unique_parameters.map((x) =><option>{x}</option>)
-
+  console.log(color_scale_type)
   return (
     <React.Fragment>
       {tiles && tiles.length === 0 ? (
@@ -170,9 +175,13 @@ const Covid19 = () => {
               <select value={parameter} name="parameters" onChange={e => setParameter(e.target.value)}>
                 {parameter_options}
               </select>
+              <select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
+                {scale_options}
+              </select>
               <Chloropleth
                 lad ={lad.lad}
                 tiles={tiles}
+                color_scale_type={color_scale_type}
                 max_val={max_val}
                 min_val={min_val}
                 dataframe={dataframe_selected_parameter}
