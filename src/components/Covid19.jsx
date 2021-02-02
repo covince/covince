@@ -81,7 +81,12 @@ const Covid19 = () => {
 
  
  
-
+  const setParameterAndChangeScale = (x) => {
+    setParameter(x);
+    if(x==="p"){setScale("linear")}
+    if(x==="lambda"){setScale("quadratic")}
+    if(x==="R"){setScale("linear")}
+  }
 
   const handleOnClick = (e, lad) => {
     setLad({ ...lad, lad, data: null });
@@ -139,15 +144,16 @@ const Covid19 = () => {
 
   }, [tiles]);
 
+ 
 
   const lineage_options = unique_lineages.map((x) =><option>{x}</option>)
 
-  const scale_options = ['quadratic','linear'].map((x) =><option value={x}>{x}</option>)
-
-  if(lineage=="total"){
-    unique_parameters = ['lambda','R']
+  const scale_options = [['quadratic','Quadratic'],['linear','Linear']].map((x) =><option value={x[0]}>{x[1]}</option>)
+  unique_parameters = [['lambda','Incidence'],['p','Proportion'],['R','R']]
+  if(lineage==="total"){
+    unique_parameters = unique_parameters.filter(x => x[0] !=="p" && x[0] !=="R" )
   }
-  const parameter_options = unique_parameters.map((x) =><option>{x}</option>)
+  const parameter_options = unique_parameters.map((x) =><option value={x[0]}>{x[1]}</option>)
   console.log(color_scale_type)
   return (
     <React.Fragment>
@@ -169,15 +175,14 @@ const Covid19 = () => {
               />
               <hr />
               <h2>Map</h2>
-              <select value={lineage} name="lineages" onChange={e => setLineage(e.target.value)}>
+              <div class='map_controls'>
+              Lineage: <select value={lineage} name="lineages" onChange={e => setLineage(e.target.value)}>
                 {lineage_options}
+              </select>&nbsp;&nbsp;&nbsp;
+              Parameter: <select value={parameter} name="parameters" onChange={e => setParameterAndChangeScale(e.target.value)}>
+                {parameter_options}&nbsp;
               </select>
-              <select value={parameter} name="parameters" onChange={e => setParameter(e.target.value)}>
-                {parameter_options}
-              </select>
-              <select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
-                {scale_options}
-              </select>
+              </div>
               <Chloropleth
                 lad ={lad.lad}
                 tiles={tiles}
@@ -189,7 +194,11 @@ const Covid19 = () => {
                 scale={date.scale}
                 handleOnClick={handleOnClick}
               />
+              Scale:&nbsp;<select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
+                {scale_options}
+              </select>
             </div>
+
             <div className="col-md-6">
               
 

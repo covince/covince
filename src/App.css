@@ -95,5 +95,12 @@
   width: 1%;
 }
 
+.map_controls{
+  margin-bottom:10px;
+}
+
+hr.graphdivider{
+  margin-top:3px;margin-bottom:3px;
+}
 
 .ltla_small_text{font-size:12px;color:#BBB}

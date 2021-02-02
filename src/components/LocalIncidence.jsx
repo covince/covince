@@ -43,7 +43,7 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 
 <center>Incidence</center>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="lambda" />
-<hr />
+<hr class="graphdivider" />
 <center>Proportion <Checkbox style={{"display":"inline-block"}} checked = {proportion_display_type=="area"}  onChange={ handleChange} toggle label="Area" />
 
 </center>
@@ -51,7 +51,7 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 {proportion_display_type=="area" && <MultiLinePlot lad_data={lad_data} date={date} parameter="p" type="area" />}
 
 
-<hr />
+<hr class="graphdivider" />
 <center>R</center>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="R" />
 
