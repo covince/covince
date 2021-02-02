@@ -41,18 +41,18 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 
 
 
-<center>Incidence</center>
+<div class="graph_header">Incidence</div>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="lambda" />
 <hr class="graphdivider" />
-<center>Proportion <Checkbox style={{"display":"inline-block"}} checked = {proportion_display_type=="area"}  onChange={ handleChange} toggle label="Area" />
+<div class="graph_header">Proportion <div class="right_align"><Checkbox style={{"display":"inline-block"}} checked = {proportion_display_type=="area"}  onChange={ handleChange} toggle label="Area" /></div>
 
-</center>
+</div>
 {proportion_display_type=="line" && <MultiLinePlot lad_data={lad_data} date={date} parameter="p" />}
 {proportion_display_type=="area" && <MultiLinePlot lad_data={lad_data} date={date} parameter="p" type="area" />}
 
 
 <hr class="graphdivider" />
-<center>R</center>
+<div class="graph_header">R</div>
 <MultiLinePlot lad_data={lad_data} date={date} parameter="R" />
 
     {/*lad={lad}
