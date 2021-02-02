@@ -110,3 +110,5 @@ hr.graphdivider{
 .graph_header{text-align:center; font-weight:500; position:relative}
 .graph_header label{ font-weight:400; margin-left:10px;}
 .graph_header input{ font-weight:400; margin-left:20px;}
+
+.custom-tooltip{background: rgba(255,255,255,0.7);}

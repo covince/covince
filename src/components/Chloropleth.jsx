@@ -99,6 +99,15 @@ class Chloropleth extends React.Component {
     };
 
     const createColorBar = (dmin, dmax, scale) => {
+      let midpoint
+      if (dmax>2){
+
+      midpoint = Math.ceil((dmin + dmax) * 0.5)
+      }
+      else{
+        midpoint = Math.round(10*(dmin + dmax) * 0.5)/10
+
+      }
 
       const items = [];
       for (let i = 0; i <= 100; i++) {
@@ -117,7 +126,7 @@ class Chloropleth extends React.Component {
       );
       items.push(
         <span key="domain-med" className="domain-med">
-          {Math.ceil((dmin + dmax) * 0.5)}
+          {midpoint}
         </span>
       );
       items.push(

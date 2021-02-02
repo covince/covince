@@ -49,7 +49,7 @@ return(<ComposedChart data={for_lambda} width={500} height={200}>
 
     {lineages.map((value, index) => {
       console.log(value)
-      return <Area stackId="1" dot={false} name={value} type="monotone" dataKey={value} fill={colors[index]} />
+      return <Area stackId="1" dot={false} name={value} type="monotone" dataKey={value} fill={colors[index]} stroke={colors[index]} />
     })}
 
 
