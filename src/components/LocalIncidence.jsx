@@ -23,7 +23,7 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
   console.log(lad_data)
 
 
-  const [proportion_display_type, setProportionDisplayType] = useState("line");
+  const [proportion_display_type, setProportionDisplayType] = useState("area");
 
  let handleChange = function(event) {
     const target = event.target;
