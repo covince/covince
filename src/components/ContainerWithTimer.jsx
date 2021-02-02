@@ -26,7 +26,11 @@ function ContainerWithTimer() {
   
     return (
       <React.Fragment>
+        <div className="row">
+            <div className="col-md-6" style={{position:'relative'}}>
         <div className="play_control">&nbsp;&nbsp;<PlayButton playing={playing} onPlay={x=>setPlaying(true)} onPause={x=>setPlaying(false)} /></div>
+        </div>
+        </div>
         <Covid19  playing={playing}/>
       </React.Fragment>
     );

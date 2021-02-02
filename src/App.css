@@ -118,7 +118,7 @@ hr.graphdivider{
 
 div.play_control {opacity:.7; margin-bottom:10px; line-height: 30px; text-align:center;
 
-position:absolute;top:100px; left:250px;width:50px; z-index:100}
+position:absolute;top:44px; left:230px;width:50px; z-index:100}
 
 
 div.play_control button{background:transparent; border:0;}
