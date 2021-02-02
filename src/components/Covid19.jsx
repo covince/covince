@@ -87,7 +87,7 @@ const Covid19 = ({playing}) => {
 
   });
 
-  const [color_scale_type, setScale] = useState("quadratic");
+  const [color_scale_type, setScale] = useState("linear");
 
   const carefulSetLineage = (x) => {
     
