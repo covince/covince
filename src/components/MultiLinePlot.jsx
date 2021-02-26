@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, C
 import _ from 'lodash';
 
 const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
+
   const data = lad_data.filter(x => x.parameter == parameter).filter(x => x.lineage != "total")
   const grouped = _.groupBy(data, "date"); // creates an object where the key is the Time and the values are arrays of rows with that Time
   const for_lambda = []; // array to store the resulting data
@@ -19,7 +20,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
 
   lineages = Array.from(lineages);
   window.lineages = lineages
-  const colors = ['red', 'green', 'blue', 'orange', 'pink']
+  const colors = ['red', 'green', 'blue', 'orange', 'pink','#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload) {
@@ -49,7 +50,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
 
       {lineages.map((value, index) => {
 
-        return <Area stackId="1" dot={false} name={value} type="monotone" dataKey={value} fill={colors[index]} stroke={colors[index]} />
+        return <Area  isAnimationActive={false} stackId="1" dot={false} name={value} type="monotone" dataKey={value} fill={colors[index]} stroke={colors[index]} />
       })}
 
 
@@ -67,11 +68,11 @@ const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
 
       {lineages.map((value, index) => {
 
-        return <Area type="monotone" name="_range" dataKey={value + "_range"} fill={colors[index]} strokeWidth={0} />
+        return <Area  isAnimationActive={false}  type="monotone" name="_range" dataKey={value + "_range"} fill={colors[index]} strokeWidth={0} />
       })}
       {lineages.map((value, index) => {
 
-        return <Line dot={false} name={value} type="monotone" dataKey={value} stroke={colors[index]} />
+        return <Line isAnimationActive={false} dot={false} name={value} type="monotone" dataKey={value} stroke={colors[index]} />
       })}
 
 

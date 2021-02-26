@@ -2,16 +2,21 @@ import requests
 import csv
 import os
 from datetime import datetime
+from collections import defaultdict
 import json
+import tqdm
+
 
 
 
 def make_json():
-    with open("full_data_table.csv", "r") as csvfile:
+    by_ltla = defaultdict(list)
+    by_lineage = defaultdict(list)
+    with open("10_lineage.csv", "r") as csvfile:
         dataset = []
         reader = csv.reader(csvfile, delimiter=",")
         next(reader)
-        for i, row in enumerate(reader):
+        for i, row in tqdm.tqdm(enumerate(reader)):
             j, lad, date, mean, upper, lower, param, lineage = row
 
             if mean !="":
@@ -28,9 +33,16 @@ def make_json():
                 'lower': lower,
                 'lineage' : lineage
             }
-            dataset.append(item)
-        with open('../src/assets/data_full.json', 'w') as outfile:
-            json.dump({'data':dataset}, outfile)
+            by_ltla[lad].append(item)
+            by_lineage[lineage].append(item)
+        for k,v in tqdm.tqdm(by_ltla.items()):
+            with open(f'../public/data/ltla/{k}.json', 'w') as outfile:
+                json.dump({'data':v}, outfile)
+        for k,v in tqdm.tqdm(by_lineage.items()):
+            with open(f'../public/data/lineage/{k}.json', 'w') as outfile:
+                json.dump({'data':v}, outfile)
+        with open(f'../src/assets/lists.json', 'w') as outfile:
+                json.dump({'ltlas':list(by_ltla.keys()),'lineages':list(by_lineage.keys() )}, outfile)
         
 
 

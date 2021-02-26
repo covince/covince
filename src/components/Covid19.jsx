@@ -12,12 +12,17 @@ import { loadTiles, getLALookupTable } from "../utils/loadTiles";
 import { loadData } from "../utils/loadData";
 import { min } from "moment";
 import memoize from 'memoize-one';
+import axios from 'axios';
+
+const dataForge = require('data-forge');
+
+let default_lineage = "B.1.1.7"
+
 let LALookupTable = getLALookupTable()
 
 function get_min_min_max(dataframe, parameter, value_of_interest, lineage) {
 
   let dataframe_selected_parameter = dataframe.where(x => x.parameter == parameter)
-  dataframe_selected_parameter = dataframe_selected_parameter.where(x => x.lineage === lineage)
   const series = dataframe_selected_parameter.where(x => x['mean'] != undefined).getSeries(value_of_interest)
 
   const min_val = 0 // series.min()
@@ -34,31 +39,31 @@ function get_min_min_max(dataframe, parameter, value_of_interest, lineage) {
   }
 
   const unique_dates = dataframe.getSeries('date').distinct().toArray()
-  const unique_lineages = dataframe.getSeries('lineage').distinct().toArray()
 
   return {
-    'min_val': min_val, 'max_val': max_val, 'dataframe_selected_parameter': lookup, 'series': series, 'unique_dates': unique_dates,
-    'unique_lineages': unique_lineages
+    'min_val': min_val, 'max_val': max_val, 'dataframe_selected_parameter': lookup, 'series': series, 'unique_dates': unique_dates
   }
 
 
 }
 
+
 var memoized_get_min_max = memoize(get_min_min_max)
-let dataframe = loadData();
-const Covid19 = ({playing}) => {
-  console.log('playing',playing)
-  if(playing){
+let lists = loadData();
+const Covid19 = ({ playing }) => {
+  let unique_lineages = loadData()['lineages']
+  let results
+  console.log('playing', playing)
+  if (playing) {
     clearTimeout(window.timeout)
-    window.timeout = setTimeout(x=>{
+    window.timeout = setTimeout(x => {
       bump_date()
       console.log('date bumped')
-    },100)
+    }, 100)
   }
 
 
 
-  window.df = dataframe
 
   ///  [data, indexed_by_date, unique_dates, min_val, max_val] 
   const [parameter, setParameter] = useState("p");
@@ -66,11 +71,16 @@ const Covid19 = ({playing}) => {
   const parameter_of_interest = parameter
   const value_of_interest = "mean"
 
-  const [lineage, setLineage] = useState("B.1.1.7");
+  const [lineage, setLineage] = useState(default_lineage);
+  const [lineageData, setLineageData] = useState(null);
 
-  const { min_val, max_val, series, dataframe_selected_parameter, unique_dates, unique_lineages } = memoized_get_min_max(dataframe, parameter_of_interest, value_of_interest, lineage)
-  window.df2 = dataframe_selected_parameter
+  const [areaData, setAreaData] = useState(null);
 
+  if (lineageData !== null) {
+    console.log('hi')
+    results = memoized_get_min_max(lineageData, parameter_of_interest, value_of_interest, lineage)
+    
+  }
 
 
   const [is_playing, setIsPlaying] = useState(false);
@@ -90,10 +100,21 @@ const Covid19 = ({playing}) => {
   const [color_scale_type, setScale] = useState("linear");
 
   const carefulSetLineage = (x) => {
-    
-    if (x === "total") { setParameterAndChangeScale("lambda");
-  console.log("Changing parameter as total only supports lambda") }
-   
+
+    if (x === "total") {
+      setParameterAndChangeScale("lambda");
+      console.log("Changing parameter as total only supports lambda")
+    }
+
+    axios.get(`/data/lineage/${x}.json`)
+      .then(res => {
+       
+        const df = new dataForge.DataFrame(res.data.data)
+        window.df = df
+        setLineageData(df)
+        console.log("got res")
+      });
+
 
     setLineage(x);
   }
@@ -107,10 +128,22 @@ const Covid19 = ({playing}) => {
 
   const handleOnClick = (e, lad) => {
     setLad({ ...lad, lad, data: null });
+    axios.get(`/data/ltla/${lad}.json`)
+      .then(res => {
+       
+        const new_data = res.data.data.map(x => {
+          x.range = [x.lower,x.upper];
+          return(x)
+        } )
+        const df = new dataForge.DataFrame(new_data)
+      
+        setAreaData(df)
+        console.log("got area res")
+      });
   };
 
   const handleDateSlider = (e) => {
-    const set_to = unique_dates[e];
+    const set_to = results['unique_dates'][e];
 
     setDate({ date: set_to });
 
@@ -119,11 +152,11 @@ const Covid19 = ({playing}) => {
 
 
   const bump_date = (e) => {
-    let cur_index = unique_dates.indexOf(date.date)
-    if (unique_dates[cur_index + 1] == undefined){
+    let cur_index = results['unique_dates'].indexOf(date.date)
+    if (results['unique_dates'][cur_index + 1] == undefined) {
       cur_index = -1
     }
-    const set_to = unique_dates[cur_index + 1]
+    const set_to = results['unique_dates'][cur_index + 1]
     setDate({ date: set_to });
 
 
@@ -142,7 +175,7 @@ const Covid19 = ({playing}) => {
 
   }
 
-  
+
 
 
 
@@ -150,13 +183,19 @@ const Covid19 = ({playing}) => {
 
   useEffect(() => {
     if (tiles.length === 0) setTiles(loadTiles());
+    if (lineageData == null) {
+      carefulSetLineage(default_lineage)
+    }
+    if (lineageData == null) {
+      handleOnClick(null,"E08000006")
+    }
 
-  }, [tiles]);
+  }, [tiles, lineageData]);
 
-
-
-  const lineage_options = unique_lineages.map((x) => <option>{x}</option>)
-
+  let lineage_options
+  if (lineageData) {
+    lineage_options = unique_lineages.map((x) => <option>{x}</option>)
+  }
   const scale_options = [['quadratic', 'Quadratic'], ['linear', 'Linear']].map((x) => <option value={x[0]}>{x[1]}</option>)
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
   if (lineage === "total") {
@@ -164,9 +203,11 @@ const Covid19 = ({playing}) => {
   }
   const parameter_options = unique_parameters.map((x) => <option value={x[0]}>{x[1]}</option>)
 
+
   return (
+
     <React.Fragment>
-      {tiles && tiles.length === 0 ? (
+      {( lineageData==null| areaData==null )  ? (
         <div className="row">
           <Spinner />
         </div>
@@ -178,9 +219,9 @@ const Covid19 = ({playing}) => {
 
               <Slider
                 min={0}
-                max={unique_dates && unique_dates.length - 1}
+                max={results['unique_dates'] && results['unique_dates'].length - 1}
                 onChange={handleDateSlider}
-                value={unique_dates.indexOf(date.date)}
+                value={results['unique_dates'].indexOf(date.date)}
               />
               <hr />
               <h2>Map</h2>
@@ -196,23 +237,23 @@ const Covid19 = ({playing}) => {
                 lad={lad.lad}
                 tiles={tiles}
                 color_scale_type={color_scale_type}
-                max_val={max_val}
-                min_val={min_val}
-                dataframe={dataframe_selected_parameter}
+                max_val={results['max_val']}
+                min_val={results['min_val']}
+                dataframe={results['dataframe_selected_parameter']}
                 date={date.date}
                 scale={date.scale}
                 handleOnClick={handleOnClick}
               />
               <div class='scale_control_holder'>
-              Scale:&nbsp;<select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
-                {scale_options}
-              </select>
-            </div></div>
+                Scale:&nbsp;<select value={color_scale_type} name="color_scale_type" onChange={e => setScale(e.target.value)}>
+                  {scale_options}
+                </select>
+              </div></div>
 
             <div className="col-md-6">
 
 
-              {<LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={dataframe} lineage={lineage} />}
+              {<LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />}
 
             </div>
           </div>

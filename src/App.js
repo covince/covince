@@ -4,6 +4,7 @@ import NavBar from "./components/NavBar"
 import './App.css';
 import ContainerWithTimer from './components/ContainerWithTimer';
 
+
 function App() {
 
   document.getElementById('spinner').style.display = 'none'
