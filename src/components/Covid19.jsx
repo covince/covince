@@ -106,7 +106,7 @@ const Covid19 = ({ playing }) => {
       console.log("Changing parameter as total only supports lambda")
     }
 
-    axios.get(`/data/lineage/${x}.json`)
+    axios.get(`./data/lineage/${x}.json`)
       .then(res => {
        
         const df = new dataForge.DataFrame(res.data.data)
@@ -128,7 +128,7 @@ const Covid19 = ({ playing }) => {
 
   const handleOnClick = (e, lad) => {
     setLad({ ...lad, lad, data: null });
-    axios.get(`/data/ltla/${lad}.json`)
+    axios.get(`./data/ltla/${lad}.json`)
       .then(res => {
        
         const new_data = res.data.data.map(x => {
