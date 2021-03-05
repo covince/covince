@@ -1,6 +1,8 @@
 {
-  "name": "covince-vite",
-  "version": "0.0.0",
+  "name": "covince",
+  "version": "0.1.0",
+  "homepage": "http://theosanderson.github.io/covince",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,8 +12,6 @@
     "autoprefixer": "^10.2.4",
     "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
-    "chart.js": "^2.9.4",
-    "chartjs-plugin-annotation": "^0.5.7",
     "colormap": "^2.3.1",
     "data-forge": "^1.8.15",
     "leaflet": "^1.7.1",
