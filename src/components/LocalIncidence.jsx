@@ -1,41 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 
-import moment from "moment";
-import memoize from 'memoize-one';
-import MultiLinePlot from "./MultiLinePlot";
-import { Form, Radio, Checkbox } from "semantic-ui-react";
+import moment from 'moment';
+import memoize from 'memoize-one'
+import MultiLinePlot from './MultiLinePlot';
+import { Form, Radio, Checkbox } from 'semantic-ui-react';
 
-function get_lad_data(dataframe, lad, lineage) {
-
-  //const lad_data = dataframe.where((item) => item.location === lad ).where((item) => item.parameter === "lambda" ).where((item) => item.lineage === lineage ).toArray()
+function get_lad_data (dataframe, lad, lineage) {
+  // const lad_data = dataframe.where((item) => item.location === lad ).where((item) => item.parameter === "lambda" ).where((item) => item.lineage === lineage ).toArray()
   const lad_data = dataframe.where((item) => item.location === lad).toArray()
   return (lad_data)
 }
 
-var memoized_get_lad_data = memoize(get_lad_data)
+let memoized_get_lad_data = memoize(get_lad_data)
 
-function LocalIncidence({ dataframe, lad, date, name, lineage }) {
-
-  let lad_data = memoized_get_lad_data(dataframe, lad, lineage)
- 
+function LocalIncidence ({ dataframe, lad, date, name, lineage }) {
+  const lad_data = memoized_get_lad_data(dataframe, lad, lineage)
 
 
 
-  const [proportion_display_type, setProportionDisplayType] = useState("area");
+
+  const [proportion_display_type, setProportionDisplayType] = useState('area')
 
   let handleChange = function (event) {
-    const target = event.target;
+    const target = event.target
     if (target.checked) {
-      setProportionDisplayType("area")
-    }
-    else {
-      setProportionDisplayType("line")
+      setProportionDisplayType('area')
+    } else {
+      setProportionDisplayType('line')
     }
   }
 
-  return (<div>
-    <h2>Local incidences</h2>
+  return (
+<div>
+    <h2>Local incidences!</h2>
     <p className="lead">Local Authority: {name} <small class="ltla_small_text">{lad}</small></p>
 
 
@@ -67,8 +65,7 @@ function LocalIncidence({ dataframe, lad, date, name, lineage }) {
 
 
   </div>
-  );
+  )
 }
 
-
-export default LocalIncidence;
+export default LocalIncidence
