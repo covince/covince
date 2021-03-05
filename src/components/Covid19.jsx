@@ -5,8 +5,6 @@ import LocalIncidence from './LocalIncidence'
 
 import Slider from 'rc-slider'
 
-import 'rc-slider/assets/index.css'
-
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
 // import { min } from 'moment';
@@ -20,8 +18,8 @@ const default_lineage = 'B.1.1.7'
 const LALookupTable = getLALookupTable()
 
 function get_min_min_max (dataframe, parameter, value_of_interest, lineage) {
-  const dataframe_selected_parameter = dataframe.where(x => x.parameter == parameter)
-  const series = dataframe_selected_parameter.where(x => x.mean != undefined).getSeries(value_of_interest)
+  const dataframe_selected_parameter = dataframe.where(x => x.parameter === parameter)
+  const series = dataframe_selected_parameter.where(x => x.mean !== undefined).getSeries(value_of_interest)
 
   const min_val = 0 // series.min()
   const max_val = series.max()
@@ -41,7 +39,6 @@ function get_min_min_max (dataframe, parameter, value_of_interest, lineage) {
 }
 
 const memoized_get_min_max = memoize(get_min_min_max)
-const lists = loadData()
 const Covid19 = ({ playing }) => {
   const unique_lineages = loadData().lineages
   let results
@@ -69,8 +66,6 @@ const Covid19 = ({ playing }) => {
     console.log('hi')
     results = memoized_get_min_max(lineageData, parameter_of_interest, value_of_interest, lineage)
   }
-
-  const [is_playing, setIsPlaying] = useState(false)
 
   const [tiles, setTiles] = useState([])
   const [lad, setLad] = useState({
@@ -132,21 +127,11 @@ const Covid19 = ({ playing }) => {
 
   const bump_date = (e) => {
     let cur_index = results.unique_dates.indexOf(date.date)
-    if (results.unique_dates[cur_index + 1] == undefined) {
+    if (results.unique_dates[cur_index + 1] === undefined) {
       cur_index = -1
     }
     const set_to = results.unique_dates[cur_index + 1]
     setDate({ date: set_to })
-  }
-
-  function togglePlay () {
-    if (is_playing) {
-      setIsPlaying(false)
-      clearInterval(window.bumpTimeout)
-    } else {
-      setIsPlaying(true)
-      window.bumpTimeout = setInterval(() => this.bump_date(), 100)
-    }
   }
 
   useEffect(() => {
@@ -161,69 +146,71 @@ const Covid19 = ({ playing }) => {
 
   let lineage_options
   if (lineageData) {
-    lineage_options = unique_lineages.map((x) => <option>{x}</option>)
+    lineage_options = unique_lineages.map((x) => <option key={x}>{x}</option>)
   }
-  const scale_options = [['quadratic', 'Quadratic'], ['linear', 'Linear']].map((x) => <option value={x[0]}>{x[1]}</option>)
+  const scale_options = [['quadratic', 'Quadratic'], ['linear', 'Linear']].map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
   if (lineage === 'total') {
     unique_parameters = unique_parameters.filter(x => x[0] !== 'p' && x[0] !== 'R')
   }
-  const parameter_options = unique_parameters.map((x) => <option value={x[0]}>{x[1]}</option>)
+  const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
   return (
 
     <>
-      {(lineageData == null | areaData == null) ? (
+      {(lineageData == null | areaData == null)
+        ? (
         <div className='row'>
           <Spinner />
         </div>
-      ) : (
+          )
+        : (
         <div className='row'>
           <div className='col-md-6'>
-              <h2>Select date</h2>
-              <p className='lead'>Current date: {date.date}</p>
+            <h2>Select date</h2>
+            <p className='lead'>Current date: {date.date}</p>
 
-              <Slider
-                min={0}
-                max={results.unique_dates && results.unique_dates.length - 1}
-                onChange={handleDateSlider}
-                value={results.unique_dates.indexOf(date.date)}
-              />
-              <hr />
-              <h2>Map</h2>
-              <div class='map_controls'>
-                Lineage: <select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
-                  {lineage_options}
-                </select>&nbsp;&nbsp;&nbsp;
-                Color by: <select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
-                  {parameter_options}&nbsp;
-                          </select>
-              </div>
-              <Chloropleth
-                lad={lad.lad}
-                tiles={tiles}
-                color_scale_type={color_scale_type}
-                max_val={results.max_val}
-                min_val={results.min_val}
-                dataframe={results.dataframe_selected_parameter}
-                date={date.date}
-                scale={date.scale}
-                handleOnClick={handleOnClick}
-              />
-              <div class='scale_control_holder'>
-                Scale:&nbsp;<select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
-                  {scale_options}
-                </select>
-              </div>
+            <Slider
+              min={0}
+              max={results.unique_dates && results.unique_dates.length - 1}
+              onChange={handleDateSlider}
+              value={results.unique_dates.indexOf(date.date)}
+            />
+            <hr />
+            <h2>Map</h2>
+            <div className='map_controls'>
+              Lineage: <select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
+                {lineage_options}
+              </select>&nbsp;&nbsp;&nbsp;
+              Color by: <select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
+                {parameter_options}&nbsp;
+              </select>
             </div>
+            <Chloropleth
+              lad={lad.lad}
+              tiles={tiles}
+              color_scale_type={color_scale_type}
+              max_val={results.max_val}
+              min_val={results.min_val}
+              dataframe={results.dataframe_selected_parameter}
+              date={date.date}
+              scale={date.scale}
+              handleOnClick={handleOnClick}
+            />
+            <div className='scale_control_holder'>
+              Scale:&nbsp;<select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
+                {scale_options}
+              </select>
+            </div>
+          </div>
 
           <div className='col-md-6'>
 
-              <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
+            <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
 
-            </div>
+          </div>
         </div>
-      )}
+          )}
     </>
   )
 }

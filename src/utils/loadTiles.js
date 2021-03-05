@@ -4,7 +4,7 @@ import { features } from '../assets/Local_Authority_Districts__December_2019__Bo
 import colormap from 'colormap'
 // let colormap = require('colormap')
 
-function getColorScale (dmin, dmax, color_scale_type) {
+function getColorScale (dmin, dmax, colorScaleType) {
   // dmin=0
   // dmax = 200
 
@@ -21,21 +21,21 @@ function getColorScale (dmin, dmax, color_scale_type) {
 
   const scale = function (number) {
     if (number > dmax) { number = dmax - 1 }
-    let dmax_val, dmin_val, number_val
+    let dmaxVal, dminVal, numberVal
 
-    if (color_scale_type == 'quadratic') {
-      dmax_val = Math.sqrt(dmax)
-      dmin_val = Math.sqrt(dmin)
-      number_val = Math.sqrt(number)
+    if (colorScaleType === 'quadratic') {
+      dmaxVal = Math.sqrt(dmax)
+      dminVal = Math.sqrt(dmin)
+      numberVal = Math.sqrt(number)
     } else {
-      dmax_val = dmax
-      dmin_val = dmin
-      number_val = number
+      dmaxVal = dmax
+      dminVal = dmin
+      numberVal = number
     }
 
     // console.log("scale",)
-    const portion_of_scale_to_use = 0.9 // don't go to deep black
-    return (colors[Math.round(portion_of_scale_to_use * nshades * (number_val - dmin_val) / (dmax_val - dmin_val))])
+    const portionOfScaleToUse = 0.9 // don't go to deep black
+    return (colors[Math.round(portionOfScaleToUse * nshades * (numberVal - dminVal) / (dmaxVal - dminVal))])
   }
   return scale
 }
@@ -45,12 +45,12 @@ function loadTiles () {
 }
 
 function getLALookupTable () {
-  const lookup_table = {}
+  const lookupTable = {}
 
   features.forEach((item) => {
-    lookup_table[item.properties.lad19cd] = item.properties.lad19nm
+    lookupTable[item.properties.lad19cd] = item.properties.lad19nm
   })
-  return (lookup_table)
+  return (lookupTable)
 }
 
 export { loadTiles, getColorScale, getLALookupTable }

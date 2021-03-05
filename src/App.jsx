@@ -1,22 +1,20 @@
-import React from 'react';
-import Covid19 from "./components/Covid19"
-import NavBar from "./components/NavBar"
-import './App.css';
-import ContainerWithTimer from './components/ContainerWithTimer';
+import React from 'react'
+import NavBar from './components/NavBar'
+import 'rc-slider/assets/index.css'
+import './App.css'
+import ContainerWithTimer from './components/ContainerWithTimer'
 
-
-function App() {
-
+function App () {
   document.getElementById('spinner').style.display = 'none'
   return (
-    <React.Fragment>
+    <>
       <NavBar />
-    <div className="container">
-      
-      <ContainerWithTimer />
-    </div>
-    </React.Fragment>
-  );
+      <div className='container'>
+
+        <ContainerWithTimer />
+      </div>
+    </>
+  )
 }
 
-export default App;
+export default App
