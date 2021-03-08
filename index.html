@@ -1,30 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Incidence of Covid lineages in the UK"
-    />
-    <link rel="apple-touch-icon" href="/logo192.png" />
-    <!--
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Incidence of Covid lineages in the UK" />
+  <link rel="apple-touch-icon" href="/logo192.png" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CovInce</title>
-  </head>
-  <body>
-    <style>.lds-ring {
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CovInce</title>
+</head>
+
+<body>
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    #spinner {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      place-content: center;
+    }
+
+    .lds-ring {
       display: inline-block;
       position: relative;
       width: 80px;
       height: 80px;
     }
+
     .lds-ring div {
       box-sizing: border-box;
       display: block;
@@ -37,27 +53,41 @@
       animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
       border-color: #000 transparent transparent transparent;
     }
+
     .lds-ring div:nth-child(1) {
       animation-delay: -0.45s;
     }
+
     .lds-ring div:nth-child(2) {
       animation-delay: -0.3s;
     }
+
     .lds-ring div:nth-child(3) {
       animation-delay: -0.15s;
     }
+
     @keyframes lds-ring {
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }
-    }</style>
-    <div id="spinner" ><div  class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
+    }
+  </style>
 
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/index.jsx"></script>
-  </body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <div id="spinner">
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <script type="module" src="/src/index.jsx"></script>
+</body>
+
 </html>

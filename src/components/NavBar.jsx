@@ -17,7 +17,7 @@ class NavBar extends Component {
       ? "navbar-toggler navbar-toggler-right collapsed"
       : "navbar-toggler navbar-toggler-right";
     return (
-      <nav className="navbar navbar-expand-lg navbar bg-light transparent-nav bg-purple-500">
+      <nav className="navbar navbar-expand-lg navbar bg-light transparent-nav">
         <div className="container">
           <NavLink className="navbar-brand" to="/">
             CovInce
