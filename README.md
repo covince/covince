@@ -5,7 +5,7 @@ React app for exploring CovInce data.
 # Development
 ## CSV to JSON
 
-```cd populate````
+```cd populate```
 
 ```python make_json.py```
 
