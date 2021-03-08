@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react'
-import NavBar from './components/NavBar'
-import 'rc-slider/assets/index.css'
 import './App.css'
-import ContainerWithTimer from './components/ContainerWithTimer'
+
+import React, { lazy, Suspense } from 'react'
+import NavBar from './components/NavBar'
+import Spinner from './components/Spinner'
+
+const LazyContainer = lazy(() => import('./components/ContainerWithTimer'))
 
 function App () {
-  useEffect(() => {
-    document.getElementById('spinner').style.display = 'none'
-  }, [])
   return (
     <>
       <NavBar />
-      <div className='container'>
-        <ContainerWithTimer />
+      <div className='container mx-auto p-6'>
+        <Suspense fallback={<Spinner />}>
+          <LazyContainer />
+        </Suspense>
       </div>
     </>
   )

@@ -2,7 +2,7 @@ import React from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
 import _ from 'lodash'
 
-const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
+const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
   const data = lad_data
     .filter(x => x.parameter === parameter)
     .filter(x => x.lineage !== 'total')
@@ -49,7 +49,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
 
   if (type === 'area') {
     return (
-      <ComposedChart data={for_lambda} width={500} height={200}>
+      <ComposedChart data={for_lambda} width={width} height={200}>
         <CartesianGrid stroke='#ccc' />
 
         {lineages.map((value, index) => {
@@ -75,7 +75,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type }) => {
     )
   } else {
     return (
-      <ComposedChart data={for_lambda} width={500} height={200}>
+      <ComposedChart data={for_lambda} width={width} height={200}>
         <CartesianGrid stroke='#ccc' />
 
         {lineages.map((value, index) =>

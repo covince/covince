@@ -15,78 +15,17 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CovInce</title>
-</head>
-
-<body>
   <style>
     html,
     body {
       height: 100%;
     }
-
-    #spinner {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: grid;
-      place-content: center;
-    }
-
-    .lds-ring {
-      display: inline-block;
-      position: relative;
-      width: 80px;
-      height: 80px;
-    }
-
-    .lds-ring div {
-      box-sizing: border-box;
-      display: block;
-      position: absolute;
-      width: 64px;
-      height: 64px;
-      margin: 8px;
-      border: 8px solid #000;
-      border-radius: 50%;
-      animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-      border-color: #000 transparent transparent transparent;
-    }
-
-    .lds-ring div:nth-child(1) {
-      animation-delay: -0.45s;
-    }
-
-    .lds-ring div:nth-child(2) {
-      animation-delay: -0.3s;
-    }
-
-    .lds-ring div:nth-child(3) {
-      animation-delay: -0.15s;
-    }
-
-    @keyframes lds-ring {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
-    }
   </style>
+</head>
 
+<body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
-  <div id="spinner">
-    <div class="lds-ring">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  </div>
   <script type="module" src="/src/index.jsx"></script>
 </body>
 

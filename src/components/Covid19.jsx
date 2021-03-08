@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import Spinner from './Spinner'
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 
-import Slider from 'rc-slider'
-
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
-// import { min } from 'moment';
 import memoize from 'memoize-one'
 import axios from 'axios'
 import * as dataForge from 'data-forge'
-// const dataForge = require('data-forge');
 
 const default_lineage = 'B.1.1.7'
 
@@ -42,12 +37,10 @@ const memoized_get_min_max = memoize(get_min_min_max)
 const Covid19 = ({ playing }) => {
   const unique_lineages = loadData().lineages
   let results
-  console.log('playing', playing)
   if (playing) {
     clearTimeout(window.timeout)
     window.timeout = setTimeout(x => {
       bump_date()
-      console.log('date bumped')
     }, 100)
   }
 
@@ -63,7 +56,6 @@ const Covid19 = ({ playing }) => {
   const [areaData, setAreaData] = useState(null)
 
   if (lineageData !== null) {
-    console.log('hi')
     results = memoized_get_min_max(lineageData, parameter_of_interest, value_of_interest, lineage)
   }
 
@@ -91,7 +83,6 @@ const Covid19 = ({ playing }) => {
         const df = new dataForge.DataFrame(res.data.data)
         window.df = df
         setLineageData(df)
-        console.log('got res')
       })
 
     setLineage(x)
@@ -115,13 +106,12 @@ const Covid19 = ({ playing }) => {
         const df = new dataForge.DataFrame(new_data)
 
         setAreaData(df)
-        console.log('got area res')
       })
   }
 
   const handleDateSlider = (e) => {
-    const set_to = results.unique_dates[e]
-
+    const { value } = e.target
+    const set_to = results.unique_dates[value]
     setDate({ date: set_to })
   }
 
@@ -156,25 +146,19 @@ const Covid19 = ({ playing }) => {
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
   return (
-
     <>
-      {(lineageData == null | areaData == null)
-        ? (
-        <div className='row'>
-          <Spinner />
-        </div>
-          )
-        : (
-        <div className='row'>
-          <div className='col-md-6'>
+      {(
+        <div className='md:grid grid-cols-2 gap-3'>
+          <div>
             <h2>Select date</h2>
             <p className='lead'>Current date: {date.date}</p>
-
-            <Slider
+            <input
+              type='range'
               min={0}
-              max={results.unique_dates && results.unique_dates.length - 1}
+              max={results ? results.unique_dates.length - 1 : 1}
               onChange={handleDateSlider}
-              value={results.unique_dates.indexOf(date.date)}
+              value={results ? results.unique_dates.indexOf(date.date) : 0}
+              disabled={!results}
             />
             <hr />
             <h2>Map</h2>
@@ -190,9 +174,9 @@ const Covid19 = ({ playing }) => {
               lad={lad.lad}
               tiles={tiles}
               color_scale_type={color_scale_type}
-              max_val={results.max_val}
-              min_val={results.min_val}
-              dataframe={results.dataframe_selected_parameter}
+              max_val={results ? results.max_val : 0}
+              min_val={results ? results.min_val : 0}
+              dataframe={results ? results.dataframe_selected_parameter : null}
               date={date.date}
               scale={date.scale}
               handleOnClick={handleOnClick}
@@ -203,11 +187,8 @@ const Covid19 = ({ playing }) => {
               </select>
             </div>
           </div>
-
-          <div className='col-md-6'>
-
+          <div>
             <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
-
           </div>
         </div>
           )}
