@@ -52,8 +52,9 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
       <ComposedChart data={for_lambda} width={width} height={200}>
         <CartesianGrid stroke='#ccc' />
 
-        {lineages.map((value, index) => {
-          return <Area
+        {lineages.map((value, index) =>
+          // eslint-disable-next-line react/jsx-key
+          <Area
             // key={value}
             dataKey={value}
             fill={colors[index]}
@@ -64,7 +65,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
             name={value}
             type='monotone'
           />
-        })}
+        )}
 
         <XAxis dataKey='date' />
         <YAxis tickFormatter={value => parseFloat(value).toFixed(2)} domain={[0, 1]} />
@@ -79,6 +80,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
         <CartesianGrid stroke='#ccc' />
 
         {lineages.map((value, index) =>
+          // eslint-disable-next-line react/jsx-key
           <Area
             // key={value}
             isAnimationActive={false}
@@ -90,6 +92,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
           />
         )}
         {lineages.map((value, index) =>
+          // eslint-disable-next-line react/jsx-key
           <Line
             // key={value}
             isAnimationActive={false}

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
+
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
+import Slider from './Slider'
+import PlayButton from './PlayButton'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
@@ -34,9 +37,11 @@ function get_min_min_max (dataframe, parameter, value_of_interest, lineage) {
 }
 
 const memoized_get_min_max = memoize(get_min_min_max)
-const Covid19 = ({ playing }) => {
+const Covid19 = () => {
   const unique_lineages = loadData().lineages
   let results
+
+  const [playing, setPlaying] = useState(false)
   if (playing) {
     clearTimeout(window.timeout)
     window.timeout = setTimeout(x => {
@@ -151,9 +156,14 @@ const Covid19 = ({ playing }) => {
         <div className='md:grid grid-cols-2 gap-3'>
           <div>
             <h2>Select date</h2>
-            <p className='lead'>Current date: {date.date}</p>
-            <input
-              type='range'
+            <p className='flex items-center'>
+              <span className='mr-3'>Current date: {date.date}</span>
+              <PlayButton
+                playing={playing}
+                toggleState={setPlaying}
+              />
+            </p>
+            <Slider
               min={0}
               max={results ? results.unique_dates.length - 1 : 1}
               onChange={handleDateSlider}
@@ -187,9 +197,7 @@ const Covid19 = ({ playing }) => {
               </select>
             </div>
           </div>
-          <div>
-            <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
-          </div>
+          <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
         </div>
           )}
     </>

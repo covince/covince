@@ -4,7 +4,7 @@ import React, { lazy, Suspense } from 'react'
 import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 
-const LazyContainer = lazy(() => import('./components/ContainerWithTimer'))
+const LazyContainer = lazy(() => import('./components/Covid19'))
 
 function App () {
   return (
