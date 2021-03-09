@@ -1,3 +1,5 @@
+import './MultiLinePlot.css'
+
 import React from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
 import _ from 'lodash'
@@ -26,20 +28,33 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload) {
       return (
-        <div className='custom-tooltip'>
-          <div className='tooltip_header'>{label}</div>
-          {payload.map((value, index) => {
-            if (value.name === '_range') {
-              return null
-            }
-            return (
-              <div key={value.name} className='tooltip_entry' style={{ color: value.stroke }}>
-                {`${value.name} : ${value.value}`}
-              </div>
-            )
-          }
-          )}
+        <div className='p-3 bg-white shadow rounded-md text-sm leading-5 z-10'>
+          <h4 className='text-center text-gray-700 font-medium'>{label}</h4>
+          <table>
+            <thead className='sr-only'>
 
+            </thead>
+            <tbody>
+            {payload.map(item => {
+              if (item.name === '_range') {
+                return null
+              }
+              return (
+                <tr key={item.name} className='tooltip_entry'>
+                  <td>
+                    <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
+                  </td>
+                  <td className='px-3'>
+                    {item.name}
+                  </td>
+                  <td className='text-right'>
+                    {item.value}
+                  </td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
         </div>
       )
     }
@@ -67,8 +82,8 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
           />
         )}
 
-        <XAxis dataKey='date' />
-        <YAxis tickFormatter={value => parseFloat(value).toFixed(2)} domain={[0, 1]} />
+        <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
+        <YAxis tickFormatter={value => parseFloat(value).toFixed(2)} domain={[0, 1]} fontSize='14' />
         <ReferenceLine x={date} stroke='#aaa' label='' strokeWidth={1} strokeDasharray='3 3' />
 
         <Tooltip content={CustomTooltip} />
@@ -76,7 +91,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
     )
   } else {
     return (
-      <ComposedChart data={for_lambda} width={width} height={200}>
+      <ComposedChart data={for_lambda} width={width} height={240}>
         <CartesianGrid stroke='#ccc' />
 
         {lineages.map((value, index) =>
@@ -104,8 +119,8 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
           />
         )}
 
-        <XAxis dataKey='date' />
-        <YAxis />
+        <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
+        <YAxis fontSize='14' />
         <ReferenceLine x={date} stroke='#aaa' label='' strokeWidth={1} strokeDasharray='3 3' />
 
         <Tooltip content={CustomTooltip} />

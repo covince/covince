@@ -1,4 +1,3 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
@@ -13,10 +12,7 @@ module.exports = {
       sans: ['Helvetica Neue', 'arial', 'sans-serif'],
       display: ['Wellcome Bold', 'Helvetica Neue', 'arial', 'sans-serif']
     },
-    container: {
-      center: true,
-      padding: defaultTheme.spacing[6]
-    },
+    container: false,
     extend: {
       colors: {
         gray: colors.blueGray,

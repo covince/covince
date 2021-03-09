@@ -74,15 +74,15 @@ const ColourBar = ({ dmin, dmax, scale }) => {
   return (
     <div className='space-y-2'>
       <div className='h-4 rounded-sm' style={{ backgroundImage: gradient }} />
-      <div className='flex justify-between text-xs leading-none'>
+      <div className='grid grid-cols-3 text-xs leading-none'>
         <span>
-          {Math.ceil(dmin)}
+          {Math.ceil(dmin).toLocaleString()}
         </span>
-        <span>
-          {midpoint}
+        <span className='text-center'>
+          {midpoint.toLocaleString()}
         </span>
-        <span>
-          {Math.ceil(dmax)}
+        <span className='text-right'>
+          {Math.ceil(dmax).toLocaleString()}
         </span>
       </div>
     </div>

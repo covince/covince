@@ -8,7 +8,7 @@ function App () {
   return (
     <>
       <NavBar />
-      <div className='container py-6'>
+      <div className='container py-6 _baseline-grid-6'>
         <Suspense fallback={<Spinner />}>
           <LazyContainer />
         </Suspense>
