@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo } from 'react'
-import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
-
 import 'leaflet/dist/leaflet.css'
 import './Chloropleth.css'
+
+import React, { useEffect, useMemo } from 'react'
+import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
+import classnames from 'classnames'
+
 import { getColorScale } from '../utils/loadTiles'
 
 const Map = (props) => {
@@ -61,32 +63,28 @@ const ColourBar = ({ dmin, dmax, scale }) => {
     midpoint = Math.round(10 * (dmin + dmax) * 0.5) / 10
   }
 
-  const colours = useMemo(() => {
-    const memo = []
+  const gradient = useMemo(() => {
+    const stops = []
     for (let i = 0; i <= 100; i++) {
-      memo.push(scale(dmin + (i / 100) * (dmax - dmin)))
+      stops.push(`${scale(dmin + (i / 100) * (dmax - dmin))} ${i}%`)
     }
-    return memo
+    return `linear-gradient(to right, ${stops.join(',')})`
   }, [dmin, dmax, scale])
 
   return (
-    <div>
-      {colours.map((backgroundColor, i) =>
-        <span
-          key={`${i}`}
-          className="grad-step"
-          style={{ backgroundColor }}
-        ></span>
-      )}
-      <span key="domain-min" className="domain-min">
-        {Math.ceil(dmin)}
-      </span>
-      <span key="domain-med" className="domain-med">
-        {midpoint}
-      </span>
-      <span key="domain-max" className="domain-max">
-        {Math.ceil(dmax)}
-      </span>
+    <div className='space-y-2'>
+      <div className='h-4 rounded-sm' style={{ backgroundImage: gradient }} />
+      <div className='flex justify-between text-xs leading-none'>
+        <span>
+          {Math.ceil(dmin)}
+        </span>
+        <span>
+          {midpoint}
+        </span>
+        <span>
+          {Math.ceil(dmax)}
+        </span>
+      </div>
     </div>
   )
 }
@@ -121,8 +119,8 @@ const Chloropleth = (props) => {
   }
 
   return (
-    <div>
-      <MapContainer style={{ height: '60vh' }} zoom={5.5} center={[53.5, -3]}>
+    <div className={classnames(props.className, 'relative')}>
+      <MapContainer className='rounded-md' style={{ height: '60vh' }} zoom={5.5} center={[53.5, -3]}>
         <GeoJSON
           style={mapStyle}
           data={tiles}
@@ -133,7 +131,7 @@ const Chloropleth = (props) => {
         />
         <Map dataframe={props.dataframe} date={props.date} lad={props.lad} scale={scale} />
       </MapContainer>
-      <div className="gradient">
+      <div className="p-3 pb-2 bg-white shadow rounded absolute left-2 bottom-2 w-60 z-10">
         <ColourBar
           dmin={min_val}
           dmax={max_val}

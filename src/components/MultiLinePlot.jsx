@@ -49,7 +49,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
 
   if (type === 'area') {
     return (
-      <ComposedChart data={for_lambda} width={width} height={200}>
+      <ComposedChart data={for_lambda} width={width} height={240}>
         <CartesianGrid stroke='#ccc' />
 
         {lineages.map((value, index) =>

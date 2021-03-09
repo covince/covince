@@ -72,7 +72,6 @@ const Covid19 = () => {
   })
   const [date, setDate] = useState({
     date: '2020-09-01'
-
   })
 
   const [color_scale_type, setScale] = useState('linear')
@@ -153,9 +152,9 @@ const Covid19 = () => {
   return (
     <>
       {(
-        <div className='md:grid grid-cols-2 gap-3'>
+        <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
           <div>
-            <h2>Select date</h2>
+            <h2>Select Date</h2>
             <p className='flex items-center'>
               <span className='mr-3'>Current date: {date.date}</span>
               <PlayButton
@@ -163,21 +162,25 @@ const Covid19 = () => {
                 toggleState={setPlaying}
               />
             </p>
-            <Slider
-              min={0}
-              max={results ? results.unique_dates.length - 1 : 1}
-              onChange={handleDateSlider}
-              value={results ? results.unique_dates.indexOf(date.date) : 0}
-              disabled={!results}
-            />
-            <hr />
+            <form className='h-6'>
+              <Slider
+                min={0}
+                max={results ? results.unique_dates.length - 1 : 1}
+                onChange={handleDateSlider}
+                value={results ? results.unique_dates.indexOf(date.date) : 0}
+                disabled={!results}
+              />
+            </form>
             <h2>Map</h2>
             <div className='map_controls'>
               Lineage: <select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
                 {lineage_options}
-              </select>&nbsp;&nbsp;&nbsp;
+              </select>
               Color by: <select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
-                {parameter_options}&nbsp;
+                {parameter_options}
+              </select>
+              Scale: <select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
+                {scale_options}
               </select>
             </div>
             <Chloropleth
@@ -192,9 +195,7 @@ const Covid19 = () => {
               handleOnClick={handleOnClick}
             />
             <div className='scale_control_holder'>
-              Scale:&nbsp;<select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
-                {scale_options}
-              </select>
+
             </div>
           </div>
           <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />

@@ -1,4 +1,19 @@
 .leaflet-container {
-  /* background-color:  rgb(163, 206, 255); */
-  background-color: white;
+  background-color: theme('colors.gray.50');
+  z-index: 0;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  font-family: monospace;
+  font-size: 20px !important;
+  color: theme('colors.blue.700') !important;
+}
+
+.leaflet-control-zoom-in {
+  border-bottom-color: theme('colors.gray.200') !important;
+}
+
+.leaflet-control.leaflet-control-zoom {
+  @apply ml-2 mt-2 shadow border-white hover:bg-gray-200 hover:border-gray-200;
 }

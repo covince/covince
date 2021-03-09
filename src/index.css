@@ -10,11 +10,27 @@
 @tailwind utilities;
 
 html, body {
-	@apply leading-6 text-base font-normal p-0 m-0;	
+	@apply leading-6 text-base font-normal p-0 m-0 text-gray-800;	
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 h2 {
-  @apply font-display text-sanger-medium-blue text-xl font-medium leading-tight;
+  @apply font-display text-sanger-medium-blue text-xl font-medium leading-6 py-3;
+}
+
+* + h2 {
+ @apply mt-6;
+}
+
+/* Debug */
+.baseline-grid {
+  background-image: linear-gradient(180deg,red 1px,transparent 0);
+  background-position: 0 0;
+  background-repeat: repeat;
+}
+
+.baseline-grid-6 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.6');
 }

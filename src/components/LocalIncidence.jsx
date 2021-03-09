@@ -4,6 +4,7 @@ import memoize from 'memoize-one'
 import Measure from 'react-measure'
 
 import MultiLinePlot from './MultiLinePlot'
+import classnames from 'classnames'
 
 function get_lad_data (dataframe, lad, lineage) {
   // const lad_data = dataframe.where((item) => item.location === lad ).where((item) => item.parameter === "lambda" ).where((item) => item.lineage === lineage ).toArray()
@@ -12,6 +13,10 @@ function get_lad_data (dataframe, lad, lineage) {
 }
 
 const memoized_get_lad_data = memoize(get_lad_data)
+
+const GraphHeading =
+  ({ children, className }) =>
+    <h3 className={classnames(className, 'font-bold text-gray-600')}>{children}</h3>
 
 function LocalIncidence ({ dataframe, lad, date, name, lineage }) {
   const lad_data = memoized_get_lad_data(dataframe, lad, lineage)
@@ -40,25 +45,37 @@ function LocalIncidence ({ dataframe, lad, date, name, lineage }) {
         <div ref={measureRef}>
           <h2>Local incidences</h2>
           <p className='lead'>Local Authority: {name} <small className='ltla_small_text'>{lad}</small></p>
-          <div className='graph_header'>Incidence</div>
-          <MultiLinePlot width={width} lad_data={lad_data} date={date} parameter='lambda' />
-          <hr className='graphdivider' />
-          <div className='graph_header'>Proportion
-            <div className='right_align'>
-              <Checkbox
-                checked={proportion_display_type === 'area'}
-                label='Area'
-                onChange={handleChange}
-                style={{ display: 'inline-block' }}
-                toggle
-              />
-            </div>
-          </div>
-          {proportion_display_type === 'line' && <MultiLinePlot width={width} lad_data={lad_data} date={date} parameter='p' />}
-          {proportion_display_type === 'area' && <MultiLinePlot width={width} lad_data={lad_data} date={date} parameter='p' type='area' />}
-          <hr className='graphdivider' />
-          <div className='graph_header'>R</div>
-          <MultiLinePlot width={width} lad_data={lad_data} date={date} parameter='R' />
+          <GraphHeading>Incidence</GraphHeading>
+          <MultiLinePlot
+            width={width}
+            lad_data={lad_data}
+            date={date}
+            parameter='lambda'
+          />
+          <GraphHeading className='flex justify-between'>
+            Proportion
+            <Checkbox
+              checked={proportion_display_type === 'area'}
+              label='Area'
+              onChange={handleChange}
+              style={{ display: 'inline-block' }}
+              toggle
+            />
+          </GraphHeading>
+          <MultiLinePlot
+            width={width}
+            lad_data={lad_data}
+            date={date}
+            parameter='p'
+            type={proportion_display_type}
+          />
+          <GraphHeading>R</GraphHeading>
+          <MultiLinePlot
+            width={width}
+            lad_data={lad_data}
+            date={date}
+            parameter='R'
+          />
         </div>
       )}
     </Measure>
