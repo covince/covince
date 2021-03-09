@@ -84,7 +84,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
 
         <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
         <YAxis tickFormatter={value => parseFloat(value).toFixed(2)} domain={[0, 1]} fontSize='14' />
-        <ReferenceLine x={date} stroke='#aaa' label='' strokeWidth={1} strokeDasharray='3 3' />
+        <ReferenceLine x={date} stroke='#597fba' label='' strokeWidth={2} />
 
         <Tooltip content={CustomTooltip} />
       </ComposedChart>
@@ -121,7 +121,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
 
         <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
         <YAxis fontSize='14' />
-        <ReferenceLine x={date} stroke='#aaa' label='' strokeWidth={1} strokeDasharray='3 3' />
+        <ReferenceLine x={date} stroke='#597fba' label='' strokeWidth={2} />
 
         <Tooltip content={CustomTooltip} />
       </ComposedChart>
