@@ -2,15 +2,22 @@ import './MultiLinePlot.css'
 
 import React, { useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
+import format from 'date-fns/format'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload) {
     return (
-      <div className='p-3 bg-white shadow rounded-md text-sm leading-5 z-10'>
-        <h4 className='text-center text-gray-700 font-medium'>{label}</h4>
+      <div className='p-3 bg-white shadow rounded-md text-sm leading-5'>
+        <h4 className='text-center text-gray-700 font-medium mb-1'>
+          {format(new Date(label), 'do MMMM yyyy')}
+        </h4>
         <table>
           <thead className='sr-only'>
-
+            <tr>
+              <th>Color</th>
+              <th>Lineage</th>
+              <th>Value</th>
+            </tr>
           </thead>
           <tbody>
           {payload.map(item => {
@@ -70,7 +77,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
   if (type === 'area') {
     return (
       <ComposedChart data={data} width={width} height={240}>
-        <CartesianGrid stroke='#ccc' />
+        <CartesianGrid stroke='rgb(203, 213, 225)' />
         {lineages.map((lineage, index) =>
           // eslint-disable-next-line react/jsx-key
           <Area
@@ -92,14 +99,14 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
           fontSize='14'
           width={32}
         />
-        <ReferenceLine x={date} stroke='#597fba' label='' strokeWidth={2} />
+        <ReferenceLine x={date} stroke='#94a3b8' label='' strokeWidth={2} />
         <Tooltip content={CustomTooltip} />
       </ComposedChart>
     )
   } else {
     return (
       <ComposedChart data={data} width={width} height={240} margin={{ left: 0, right: 0 }}>
-        <CartesianGrid stroke='#ccc' />
+        <CartesianGrid stroke='rgb(203, 213, 225)' />
 
         {lineages.map((lineage, index) =>
           // eslint-disable-next-line react/jsx-key
@@ -128,7 +135,7 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
 
         <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
         <YAxis fontSize='14' width={32} />
-        <ReferenceLine x={date} stroke='#597fba' label='' strokeWidth={2} />
+        <ReferenceLine x={date} stroke='#94a3b8' label='' strokeWidth={2} />
         <Tooltip content={CustomTooltip} />
       </ComposedChart>
     )

@@ -1,5 +1,6 @@
 .leaflet-container {
-  background-color: theme('colors.gray.50');
+  @apply shadow-inner;
+  background-color: theme('colors.gray.200');
   z-index: 0;
 }
 
@@ -7,7 +8,7 @@
 .leaflet-control-zoom-out {
   font-family: monospace;
   font-size: 20px !important;
-  color: theme('colors.blue.700') !important;
+  color: theme('colors.gray.600') !important;
 }
 
 .leaflet-control-zoom-in {

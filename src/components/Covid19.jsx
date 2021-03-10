@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
+import memoize from 'memoize-one'
+import axios from 'axios'
+import * as dataForge from 'data-forge'
+import format from 'date-fns/format'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 import Slider from './Slider'
 import PlayButton from './PlayButton'
+import Card from './Card'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
-import memoize from 'memoize-one'
-import axios from 'axios'
-import * as dataForge from 'data-forge'
 
 const default_lineage = 'B.1.1.7'
 
@@ -151,26 +153,27 @@ const Covid19 = () => {
 
   return (
     <>
-      {(
-        <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
+      <Card className='-mt-16 w-80 mb-6'>
+        <p className='flex items-center justify-between'>
+          <span className='h2'>{format(new Date(date.date), 'do MMMM y')}</span>
+          <PlayButton
+            playing={playing}
+            toggleState={setPlaying}
+          />
+        </p>
+        <form className='h-6 mt-2'>
+          <Slider
+            min={0}
+            max={results ? results.unique_dates.length - 1 : 1}
+            onChange={handleDateSlider}
+            value={results ? results.unique_dates.indexOf(date.date) : 0}
+            disabled={!results}
+          />
+        </form>
+      </Card>
+      <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
+        <div className='space-y-6'>
           <div>
-            <h2>Select Date</h2>
-            <p className='flex items-center'>
-              <span className='mr-3'>Current date: {date.date}</span>
-              <PlayButton
-                playing={playing}
-                toggleState={setPlaying}
-              />
-            </p>
-            <form className='h-6'>
-              <Slider
-                min={0}
-                max={results ? results.unique_dates.length - 1 : 1}
-                onChange={handleDateSlider}
-                value={results ? results.unique_dates.indexOf(date.date) : 0}
-                disabled={!results}
-              />
-            </form>
             <h2>Map</h2>
             <div className='map_controls'>
               Lineage: <select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
@@ -194,18 +197,15 @@ const Covid19 = () => {
               scale={date.scale}
               handleOnClick={handleOnClick}
             />
-            <div className='scale_control_holder'>
-
-            </div>
           </div>
-          <LocalIncidence
-            name={LALookupTable[lad.lad]}
-            date={date.date}
-            lad={lad.lad}
-            dataframe={areaData}
-          />
         </div>
-      )}
+        <LocalIncidence
+          name={LALookupTable[lad.lad]}
+          date={date.date}
+          lad={lad.lad}
+          dataframe={areaData}
+        />
+      </div>
     </>
   )
 }

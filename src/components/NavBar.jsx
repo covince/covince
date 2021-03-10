@@ -2,9 +2,9 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 const NavBar = () => (
-  <header className="bg-gray-100 shadow-md h-16 flex items-center">
-    <div className="container text-sanger-medium-blue">
-      <NavLink className="font-display font-medium text-xl" to="/">
+  <header className="h-32 bg-gradient-to-r from-gray-700 to-gray-400">
+    <div className="h-16 flex items-center container text-white">
+      <NavLink className="font-bold text-xl" to="/">
         CovInce
       </NavLink>
     </div>

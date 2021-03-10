@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import { Checkbox } from 'semantic-ui-react'
 import Measure from 'react-measure'
+import classnames from 'classnames'
 
 import MultiLinePlot from './MultiLinePlot'
-import classnames from 'classnames'
+import Checkbox from './Checkbox'
 
 const GraphHeading =
   ({ children, className }) =>
@@ -48,10 +48,10 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
           <GraphHeading className='flex justify-between'>
             Proportion
             <Checkbox
+              id='proportion_display_type'
               checked={proportion_display_type === 'area'}
               label='Area'
               onChange={handleChange}
-              style={{ display: 'inline-block' }}
               toggle
             />
           </GraphHeading>

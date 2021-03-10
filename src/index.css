@@ -10,13 +10,13 @@
 @tailwind utilities;
 
 html, body {
-	@apply leading-6 text-base font-normal p-0 m-0 text-gray-800;	
+	@apply leading-6 text-base font-normal p-0 m-0 text-gray-800 bg-gray-100;	
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
-h2 {
-  @apply font-display text-sanger-medium-blue text-xl font-medium leading-6 py-3;
+h2, .h2 {
+  @apply text-gray-600 text-xl font-bold leading-6;
 }
 
 * + h2 {

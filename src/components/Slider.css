@@ -15,49 +15,46 @@ input[type=range]:focus {
   outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
 }
 
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
+.ci-slider-thumb {
   @apply
-    bg-gradient-to-b
-    from-sanger-light-blue
-    to-sanger-medium-blue
-    h-6 w-6
-    border-0
+    /* bg-gradient-to-b
+    from-gray-200
+    to-gray-500 */
+    bg-gray-400
+    h-4 w-4
+    border-2
+    border-solid
+    border-gray-400
     rounded-full
     shadow
     cursor-pointer;
-  
-  margin-top: -8px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  @apply ci-slider-thumb;
+  -webkit-appearance: none;
+  margin-top: -4px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 }
 
 /* All the same stuff for Firefox */
 input[type=range]::-moz-range-thumb {
+  @apply ci-slider-thumb;
+}
+
+.ci-border-track {
   @apply
-    bg-gradient-to-b
-    from-sanger-light-blue
-    to-sanger-medium-blue
-    h-6 w-6
-    border-0
-    rounded-full
-    shadow
-    cursor-pointer;
+    h-2 w-full
+    cursor-pointer
+    shadow-inner
+    bg-gray-200
+    rounded-full;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
-  @apply
-    h-2 w-full
-    cursor-pointer
-    shadow-inner
-    bg-gray-200
-    rounded-full;
+  @apply ci-border-track;
 }
 
 input[type=range]::-moz-range-track {
-  @apply
-    h-2 w-full
-    cursor-pointer
-    shadow-inner
-    bg-gray-200
-    rounded-full;
+  @apply ci-border-track;
 }
