@@ -1,25 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Checkbox } from 'semantic-ui-react'
-import memoize from 'memoize-one'
 import Measure from 'react-measure'
 
 import MultiLinePlot from './MultiLinePlot'
 import classnames from 'classnames'
 
-function get_lad_data (dataframe, lad, lineage) {
-  // const lad_data = dataframe.where((item) => item.location === lad ).where((item) => item.parameter === "lambda" ).where((item) => item.lineage === lineage ).toArray()
-  const lad_data = dataframe ? dataframe.where((item) => item.location === lad).toArray() : []
-  return (lad_data)
-}
-
-const memoized_get_lad_data = memoize(get_lad_data)
-
 const GraphHeading =
   ({ children, className }) =>
     <h3 className={classnames(className, 'font-bold text-gray-600')}>{children}</h3>
 
-function LocalIncidence ({ dataframe, lad, date, name, lineage }) {
-  const lad_data = memoized_get_lad_data(dataframe, lad, lineage)
+function LocalIncidence ({ dataframe, lad, date, name }) {
+  const lad_data = useMemo(() => {
+    return dataframe ? dataframe.where((item) => item.location === lad).toArray() : []
+  }, [dataframe, lad])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
 

@@ -198,9 +198,14 @@ const Covid19 = () => {
 
             </div>
           </div>
-          <LocalIncidence name={LALookupTable[lad.lad]} date={date.date} lad={lad.lad} dataframe={areaData} lineage={lineage} />
+          <LocalIncidence
+            name={LALookupTable[lad.lad]}
+            date={date.date}
+            lad={lad.lad}
+            dataframe={areaData}
+          />
         </div>
-          )}
+      )}
     </>
   )
 }
