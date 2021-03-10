@@ -1,9 +1,3 @@
-.recharts-wrapper,
-.recharts-wrapper svg {
-  z-index: 0;
-  /* font-size: 14px; */
-}
-
-.recharts-tooltip-wrapper {
+.recharts-wrapper:hover {
   z-index: 1;
 }

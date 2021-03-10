@@ -23,7 +23,7 @@ h2 {
  @apply mt-6;
 }
 
-/* tailwind default is disabled, we want more space at smaller sizes */
+/* Tailwind default is disabled, we want more space at smaller sizes */
 .container {
   @apply max-w-5xl mx-auto px-6;
 }
