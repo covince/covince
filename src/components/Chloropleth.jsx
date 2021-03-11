@@ -119,17 +119,15 @@ const Chloropleth = (props) => {
   }
 
   return (
-    <div className={classnames(props.className, 'relative')}>
-      <MapContainer className='rounded-md' style={{ height: '60vh' }} zoom={5.5} center={[53.5, -3]}>
+    <div className={classnames(props.className, 'relative shadow-inner rounded-md')}>
+      <MapContainer style={{ height: '60vh' }} zoom={5.5} center={[53.5, -3]}>
         <GeoJSON
           style={mapStyle}
           data={tiles}
           onEachFeature={onEachLad}
-          // eventHandlers={{
-          //   add: () => console.log('stuff')
-          // }}
         />
         <Map dataframe={props.dataframe} date={props.date} lad={props.lad} scale={scale} />
+        <div className='absolute left-0 right-0 top-0 bottom-0 shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
       </MapContainer>
       <div className="p-3 pb-2 bg-white shadow rounded absolute left-2 bottom-2 w-60 z-10">
         <ColourBar

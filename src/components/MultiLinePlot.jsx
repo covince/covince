@@ -6,12 +6,17 @@ import format from 'date-fns/format'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload) {
+    payload.sort((a, b) => {
+      if (a.value < b.value) return 1
+      if (a.value > b.value) return -1
+      return 0
+    })
     return (
       <div className='p-3 bg-white shadow rounded-md text-sm leading-5'>
-        <h4 className='text-center text-gray-700 font-medium mb-1'>
-          {format(new Date(label), 'do MMMM yyyy')}
+        <h4 className='text-center text-gray-700 font-bold mb-1'>
+          {format(new Date(label), 'd MMMM yyyy')}
         </h4>
-        <table>
+        <table className='tabular-nums'>
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
@@ -33,7 +38,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                   {item.name}
                 </td>
                 <td className='text-right'>
-                  {item.value}
+                  {item.value.toFixed(3)}
                 </td>
               </tr>
             )
@@ -49,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const colors = ['red', 'green', 'blue', 'orange', 'pink', 'aqua', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
-const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
+const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
     const lineages = new Set()
@@ -73,70 +78,114 @@ const MultiLinePlot = ({ date, lad_data, parameter, type, width }) => {
   }, [lad_data])
 
   const { lineages, data } = chart
+  const chartProps = {
+    data,
+    width,
+    height: 240,
+    margin: { top: 16, left: 0, right: 24 },
+    onClick: ({ activeLabel }) => setDate(activeLabel),
+    cursor: 'pointer'
+  }
+  const grid =
+    <CartesianGrid stroke='rgb(203, 213, 225)' />
+  const dateLine =
+    <ReferenceLine
+      x={date}
+      stroke='#94a3b8'
+      label=''
+      strokeWidth={2}
+      style={{ mixBlendMode: 'multiply' }}
+    />
+  const tooltip =
+    <Tooltip
+      content={CustomTooltip}
+      cursor={{ stroke: 'rgb(203, 213, 225)' }}
+    />
+  const xAxis =
+    <XAxis
+      dataKey='date'
+      fontSize='12'
+      tick={data.length}
+      tickFormatter={d => format(new Date(d), 'd MMM')}
+      tickMargin='4'
+      stroke='currentcolor'
+    />
 
   if (type === 'area') {
     return (
-      <ComposedChart data={data} width={width} height={240}>
-        <CartesianGrid stroke='rgb(203, 213, 225)' />
+      <ComposedChart {...chartProps}>
+        {grid}
         {lineages.map((lineage, index) =>
           // eslint-disable-next-line react/jsx-key
           <Area
             // key={value}
+            activeDot={{ stroke: '#94a3b8' }}
             dataKey={lineage}
-            fill={colors[index]}
-            stroke={colors[index]}
             dot={false}
+            fill={colors[index]}
             isAnimationActive={false}
-            stackId='1'
             name={lineage}
+            stackId='1'
+            stroke={colors[index]}
             type='monotone'
           />
         )}
-        <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
+        {xAxis}
         <YAxis
-          tickFormatter={value => parseFloat(value).toFixed(2)}
           domain={[0, 1]}
-          fontSize='14'
-          width={32}
+          fontSize='12'
+          tick={data.length}
+          tickFormatter={value => parseFloat(value).toFixed(2)}
+          tickMargin='4'
+          width={48}
+          stroke='currentcolor'
         />
-        <ReferenceLine x={date} stroke='#94a3b8' label='' strokeWidth={2} />
-        <Tooltip content={CustomTooltip} />
+        {dateLine}
+        {tooltip}
       </ComposedChart>
     )
   } else {
     return (
-      <ComposedChart data={data} width={width} height={240} margin={{ left: 0, right: 0 }}>
-        <CartesianGrid stroke='rgb(203, 213, 225)' />
-
+      <ComposedChart {...chartProps}>
+        {grid}
         {lineages.map((lineage, index) =>
           // eslint-disable-next-line react/jsx-key
           <Area
             // key={value}
-            isAnimationActive={false}
-            type='monotone'
-            name='_range'
+            activeDot={false}
             dataKey={`${lineage}_range`}
             fill={colors[index]}
+            isAnimationActive={false}
+            name='_range'
             strokeWidth={0}
+            type='monotone'
           />
         )}
         {lineages.map((lineage, index) =>
           // eslint-disable-next-line react/jsx-key
           <Line
             // key={value}
-            isAnimationActive={false}
-            dot={false}
-            name={lineage}
-            type='monotone'
+            activeDot={{ stroke: '#94a3b8' }}
             dataKey={lineage}
+            dot={false}
+            isAnimationActive={false}
+            name={lineage}
             stroke={colors[index]}
+            type='monotone'
           />
         )}
 
-        <XAxis dataKey='date' fontSize='14' tickFormatter={d => new Date(d).toLocaleDateString()} />
-        <YAxis fontSize='14' width={32} />
-        <ReferenceLine x={date} stroke='#94a3b8' label='' strokeWidth={2} />
-        <Tooltip content={CustomTooltip} />
+        {xAxis}
+        <YAxis
+          fontSize='12'
+          width={48}
+          tick={data.length}
+          stroke='currentcolor'
+          tickMargin='4'
+          tickFormatter={d => parseFloat(d).toLocaleString()}
+        />
+        {dateLine}
+        {tooltip}
       </ComposedChart>
     )
   }

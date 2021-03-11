@@ -1,5 +1,4 @@
 .leaflet-container {
-  @apply shadow-inner;
   background-color: theme('colors.gray.200');
   z-index: 0;
 }

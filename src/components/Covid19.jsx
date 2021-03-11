@@ -9,6 +9,8 @@ import LocalIncidence from './LocalIncidence'
 import Slider from './Slider'
 import PlayButton from './PlayButton'
 import Card from './Card'
+import Select from './Select'
+import { Heading, DescriptiveHeading } from './Typography'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
@@ -72,9 +74,7 @@ const Covid19 = () => {
     data: null,
     scale: null
   })
-  const [date, setDate] = useState({
-    date: '2020-09-01'
-  })
+  const [date, setDate] = useState('2020-09-01')
 
   const [color_scale_type, setScale] = useState('linear')
 
@@ -118,16 +118,16 @@ const Covid19 = () => {
   const handleDateSlider = (e) => {
     const { value } = e.target
     const set_to = results.unique_dates[value]
-    setDate({ date: set_to })
+    setDate(set_to)
   }
 
   const bump_date = (e) => {
-    let cur_index = results.unique_dates.indexOf(date.date)
+    let cur_index = results.unique_dates.indexOf(date)
     if (results.unique_dates[cur_index + 1] === undefined) {
       cur_index = -1
     }
     const set_to = results.unique_dates[cur_index + 1]
-    setDate({ date: set_to })
+    setDate(set_to)
   }
 
   useEffect(() => {
@@ -156,34 +156,34 @@ const Covid19 = () => {
       <div className='-mt-20 flex justify-between mb-6'>
         <Card className='flex px-4 mx-auto'>
           <div className='w-80'>
-            <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
+            <DescriptiveHeading>
               Select date
-            </p>
-            <p className='flex items-center justify-between'>
-              <span className='h2'>{format(new Date(date.date), 'd MMMM y')}</span>
+            </DescriptiveHeading>
+            <div className='flex items-center justify-between'>
+              <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
               <PlayButton
                 playing={playing}
                 toggleState={setPlaying}
               />
-            </p>
+            </div>
             <form className='h-6 mt-2'>
               <Slider
                 min={0}
                 max={results ? results.unique_dates.length - 1 : 1}
                 onChange={handleDateSlider}
-                value={results ? results.unique_dates.indexOf(date.date) : 0}
+                value={results ? results.unique_dates.indexOf(date) : 0}
                 disabled={!results}
               />
             </form>
           </div>
-          <vr className='border border-gray-200 mx-6' />
+          <div className='border border-gray-200 mx-6' />
           <div className='w-80'>
-            <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
+            <DescriptiveHeading>
               Local authority
-            </p>
-            <p className='h2'>
+            </DescriptiveHeading>
+            <Heading>
               {LALookupTable[lad.lad]}
-            </p>
+            </Heading>
             <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
               {lad.lad}
             </p>
@@ -203,19 +203,34 @@ const Covid19 = () => {
       </div>
       <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
         <div className='space-y-6'>
-          <div>
-            <h2>Map</h2>
-            <div className='map_controls'>
-              Lineage: <select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
-                {lineage_options}
-              </select>
-              Color by: <select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
-                {parameter_options}
-              </select>
-              Scale: <select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
-                {scale_options}
-              </select>
-            </div>
+          <div className='space-y-3'>
+            <Heading>Map</Heading>
+            <form className='flex space-x-3 text-sm'>
+              <div>
+                <label className='block font-medium mb-1'>
+                  Lineage
+                </label>
+                <Select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
+                  {lineage_options}
+                </Select>
+              </div>
+              <div>
+                <label className='block font-medium mb-1'>
+                  Color by
+                </label>
+                <Select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
+                  {parameter_options}
+                </Select>
+              </div>
+              <div>
+                <label className='block font-medium mb-1'>
+                  Scale
+                </label>
+                <Select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
+                  {scale_options}
+                </Select>
+              </div>
+            </form>
             <Chloropleth
               lad={lad.lad}
               tiles={tiles}
@@ -223,15 +238,15 @@ const Covid19 = () => {
               max_val={results ? results.max_val : 0}
               min_val={results ? results.min_val : 0}
               dataframe={results ? results.dataframe_selected_parameter : null}
-              date={date.date}
-              scale={date.scale}
+              date={date}
               handleOnClick={handleOnClick}
             />
           </div>
         </div>
         <LocalIncidence
           name={LALookupTable[lad.lad]}
-          date={date.date}
+          date={date}
+          setDate={setDate}
           lad={lad.lad}
           dataframe={areaData}
         />

@@ -3,8 +3,9 @@ import Measure from 'react-measure'
 
 import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
+import { Heading } from './Typography'
 
-function LocalIncidence ({ dataframe, lad, date, name }) {
+function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
   const lad_data = useMemo(() => {
     return dataframe ? dataframe.where((item) => item.location === lad).toArray() : []
   }, [dataframe, lad])
@@ -30,15 +31,16 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className='space-y-2'>
-          <h3 className='h2'>Incidence</h3>
+        <div ref={measureRef}>
+          <Heading className='pl-12'>Incidence</Heading>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
             date={date}
+            setDate={setDate}
             parameter='lambda'
           />
-          <h3 className='h2 flex justify-between'>
+          <Heading className='pl-12 pr-6 flex items-baseline justify-between'>
             Proportion
             <Checkbox
               id='proportion_display_type'
@@ -47,19 +49,21 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
               onChange={handleChange}
               toggle
             />
-          </h3>
+          </Heading>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
             date={date}
+            setDate={setDate}
             parameter='p'
             type={proportion_display_type}
           />
-          <h3 className='h2'>R</h3>
+          <Heading className='pl-12'>R</Heading>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
             date={date}
+            setDate={setDate}
             parameter='R'
           />
         </div>
