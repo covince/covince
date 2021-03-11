@@ -1,9 +1,9 @@
 /* https://github.com/wellcometrust/fonts */
-@font-face {
+/* @font-face {
   font-family: "Wellcome Bold";
   src: url("./assets/wellcome-bold-webfont.woff2") format("woff2"),
        url("./assets/wellcome-bold-webfont.woff") format("woff");
-}
+} */
 
 @tailwind base;
 @tailwind components;

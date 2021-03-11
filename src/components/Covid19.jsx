@@ -153,24 +153,54 @@ const Covid19 = () => {
 
   return (
     <>
-      <Card className='-mt-16 w-80 mb-6'>
-        <p className='flex items-center justify-between'>
-          <span className='h2'>{format(new Date(date.date), 'do MMMM y')}</span>
-          <PlayButton
-            playing={playing}
-            toggleState={setPlaying}
-          />
-        </p>
-        <form className='h-6 mt-2'>
-          <Slider
-            min={0}
-            max={results ? results.unique_dates.length - 1 : 1}
-            onChange={handleDateSlider}
-            value={results ? results.unique_dates.indexOf(date.date) : 0}
-            disabled={!results}
-          />
-        </form>
-      </Card>
+      <div className='-mt-20 flex justify-between mb-6'>
+        <Card className='flex px-4 mx-auto'>
+          <div className='w-80'>
+            <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
+              Select date
+            </p>
+            <p className='flex items-center justify-between'>
+              <span className='h2'>{format(new Date(date.date), 'd MMMM y')}</span>
+              <PlayButton
+                playing={playing}
+                toggleState={setPlaying}
+              />
+            </p>
+            <form className='h-6 mt-2'>
+              <Slider
+                min={0}
+                max={results ? results.unique_dates.length - 1 : 1}
+                onChange={handleDateSlider}
+                value={results ? results.unique_dates.indexOf(date.date) : 0}
+                disabled={!results}
+              />
+            </form>
+          </div>
+          <vr className='border border-gray-200 mx-6' />
+          <div className='w-80'>
+            <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
+              Local authority
+            </p>
+            <p className='h2'>
+              {LALookupTable[lad.lad]}
+            </p>
+            <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
+              {lad.lad}
+            </p>
+          </div>
+        </Card>
+        {/* <Card className='w-80'>
+          <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
+            Local authority
+          </p>
+          <p className='h2'>
+            {LALookupTable[lad.lad]}
+          </p>
+          <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
+            {lad.lad}
+          </p>
+        </Card> */}
+      </div>
       <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
         <div className='space-y-6'>
           <div>

@@ -1,13 +1,8 @@
 import React, { useState, useMemo } from 'react'
 import Measure from 'react-measure'
-import classnames from 'classnames'
 
 import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
-
-const GraphHeading =
-  ({ children, className }) =>
-    <h3 className={classnames(className, 'font-bold text-gray-600')}>{children}</h3>
 
 function LocalIncidence ({ dataframe, lad, date, name }) {
   const lad_data = useMemo(() => {
@@ -35,17 +30,15 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef}>
-          <h2>Local incidences</h2>
-          <p className='lead'>Local Authority: {name} <small className='ltla_small_text'>{lad}</small></p>
-          <GraphHeading>Incidence</GraphHeading>
+        <div ref={measureRef} className='space-y-2'>
+          <h3 className='h2'>Incidence</h3>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
             date={date}
             parameter='lambda'
           />
-          <GraphHeading className='flex justify-between'>
+          <h3 className='h2 flex justify-between'>
             Proportion
             <Checkbox
               id='proportion_display_type'
@@ -54,7 +47,7 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
               onChange={handleChange}
               toggle
             />
-          </GraphHeading>
+          </h3>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
@@ -62,7 +55,7 @@ function LocalIncidence ({ dataframe, lad, date, name }) {
             parameter='p'
             type={proportion_display_type}
           />
-          <GraphHeading>R</GraphHeading>
+          <h3 className='h2'>R</h3>
           <MultiLinePlot
             width={width}
             lad_data={lad_data}
