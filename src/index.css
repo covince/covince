@@ -15,10 +15,23 @@ html, body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  @apply flex-header-stretch;
+}
+
 /* Tailwind default is disabled, we want more space at smaller sizes */
 .container {
-  @apply max-w-5xl mx-auto px-6;
+  @apply max-w-7xl mx-auto px-6;
 }
+
+.flex-header-stretch  {
+  @apply flex flex-col h-full;
+}
+
+.flex-header-stretch > :first-child + * {
+  @apply flex-grow;
+}
+
 
 /* Debug */
 .baseline-grid {

@@ -54,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const colors = ['red', 'green', 'blue', 'orange', 'pink', 'aqua', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
-const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
+const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120 }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
     const lineages = new Set()
@@ -78,16 +78,19 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
   }, [lad_data])
 
   const { lineages, data } = chart
+
   const chartProps = {
     data,
     width,
-    height: 240,
+    height,
     margin: { top: 16, left: 0, right: 24 },
     onClick: ({ activeLabel }) => setDate(activeLabel),
     cursor: 'pointer'
   }
+
   const grid =
     <CartesianGrid stroke='rgb(203, 213, 225)' />
+
   const dateLine =
     <ReferenceLine
       x={date}
@@ -96,11 +99,13 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
       strokeWidth={2}
       style={{ mixBlendMode: 'multiply' }}
     />
+
   const tooltip =
     <Tooltip
       content={CustomTooltip}
       cursor={{ stroke: 'rgb(203, 213, 225)' }}
     />
+
   const xAxis =
     <XAxis
       dataKey='date'
@@ -116,9 +121,9 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
       <ComposedChart {...chartProps}>
         {grid}
         {lineages.map((lineage, index) =>
-          // eslint-disable-next-line react/jsx-key
+        // eslint-disable-next-line react/jsx-key
           <Area
-            // key={value}
+            key={lineage}
             activeDot={{ stroke: '#94a3b8' }}
             dataKey={lineage}
             dot={false}
@@ -148,23 +153,24 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
     return (
       <ComposedChart {...chartProps}>
         {grid}
+        {lineages.map((lineage, index) => {
+          const key = `${lineage}_range`
+          return (
+            <Area
+              key={key}
+              activeDot={false}
+              dataKey={key}
+              fill={colors[index]}
+              isAnimationActive={false}
+              name='_range'
+              strokeWidth={0}
+              type='monotone'
+            />
+          )
+        })}
         {lineages.map((lineage, index) =>
-          // eslint-disable-next-line react/jsx-key
-          <Area
-            // key={value}
-            activeDot={false}
-            dataKey={`${lineage}_range`}
-            fill={colors[index]}
-            isAnimationActive={false}
-            name='_range'
-            strokeWidth={0}
-            type='monotone'
-          />
-        )}
-        {lineages.map((lineage, index) =>
-          // eslint-disable-next-line react/jsx-key
           <Line
-            // key={value}
+            key={lineage}
             activeDot={{ stroke: '#94a3b8' }}
             dataKey={lineage}
             dot={false}
@@ -174,7 +180,6 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width }) => {
             type='monotone'
           />
         )}
-
         {xAxis}
         <YAxis
           fontSize='12'

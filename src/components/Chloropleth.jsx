@@ -119,8 +119,8 @@ const Chloropleth = (props) => {
   }
 
   return (
-    <div className={classnames(props.className, 'relative shadow-inner rounded-md')}>
-      <MapContainer style={{ height: '60vh' }} zoom={5.5} center={[53.5, -3]}>
+    <div className={classnames(props.className, 'relative flex flex-col')}>
+      <MapContainer className='rounded-md flex-grow' zoom={5.5} center={[53.5, -3]}>
         <GeoJSON
           style={mapStyle}
           data={tiles}

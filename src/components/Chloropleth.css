@@ -15,5 +15,10 @@
 }
 
 .leaflet-control.leaflet-control-zoom {
-  @apply ml-2 mt-2 shadow border-white hover:bg-gray-200 hover:border-gray-200;
+  @apply ml-2 mt-2 shadow border-white hover:bg-gray-100 hover:border-gray-100;
+  border: none;
+}
+
+.leaflet-control.leaflet-control-zoom a:hover {
+  @apply bg-gray-100;
 }

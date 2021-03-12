@@ -154,7 +154,7 @@ const Covid19 = () => {
   return (
     <>
       <div className='-mt-20 flex justify-between mb-6'>
-        <Card className='flex px-4 mx-auto'>
+        <Card className='flex mx-auto'>
           <div className='w-80'>
             <DescriptiveHeading>
               Select date
@@ -201,9 +201,9 @@ const Covid19 = () => {
           </p>
         </Card> */}
       </div>
-      <div className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0'>
-        <div className='space-y-6'>
-          <div className='space-y-3'>
+      <Card className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0 px-6 py-6'>
+        {/* <Card> */}
+          <div className='space-y-3 flex flex-col'>
             <Heading>Map</Heading>
             <form className='flex space-x-3 text-sm'>
               <div>
@@ -232,6 +232,7 @@ const Covid19 = () => {
               </div>
             </form>
             <Chloropleth
+              className='flex-grow'
               lad={lad.lad}
               tiles={tiles}
               color_scale_type={color_scale_type}
@@ -242,7 +243,7 @@ const Covid19 = () => {
               handleOnClick={handleOnClick}
             />
           </div>
-        </div>
+        {/* </Card> */}
         <LocalIncidence
           name={LALookupTable[lad.lad]}
           date={date}
@@ -250,7 +251,7 @@ const Covid19 = () => {
           lad={lad.lad}
           dataframe={areaData}
         />
-      </div>
+      </Card>
     </>
   )
 }
