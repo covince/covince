@@ -1,17 +1,19 @@
 import React, { useState, useMemo } from 'react'
 import Measure from 'react-measure'
+import classNames from 'classnames'
 
 import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
 import { Heading } from './Typography'
 
-const IncidenceChart = ({ heading, ...props }) => {
+const desktop = 768 // TODO: fix magic numver
+
+const IncidenceChart = ({ heading, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
   return (
     <Measure
       bounds
       onResize={rect => {
-        console.log(rect)
         // setting width here does not work when reducing screen size
         setHeight(rect.bounds.height)
       }}
@@ -20,8 +22,9 @@ const IncidenceChart = ({ heading, ...props }) => {
         <div ref={measureRef}>
           {heading}
           <MultiLinePlot
-            height={height - 24}
+            height={height - (isMobile ? 16 : 24)}
             {...props}
+            className='-mt-2 md:m-0'
           />
         </div>
       )}
@@ -29,7 +32,12 @@ const IncidenceChart = ({ heading, ...props }) => {
   )
 }
 
-function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
+const ChartHeading = ({ isMobile, ...props }) =>
+  isMobile
+    ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
+    : <Heading {...props} />
+
+function LocalIncidence ({ dataframe, lad, date, setDate, className, isMobile = false }) {
   const lad_data = useMemo(() => {
     return dataframe ? dataframe.where((item) => item.location === lad).toArray() : []
   }, [dataframe, lad])
@@ -55,10 +63,11 @@ function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className='grid grid-rows-3 gap-3'>
+        <div ref={measureRef} className={classNames('grid grid-rows-3 md:gap-3 h-full -ml-3 md:mx-0 md:grid', className)}>
           <IncidenceChart
             width={width}
-            heading={<Heading className='pl-12'>Incidence</Heading>}
+            isMobile={isMobile}
+            heading={<ChartHeading className='pl-12' isMobile={isMobile}>Incidence</ChartHeading>}
             lad_data={lad_data}
             date={date}
             setDate={setDate}
@@ -66,8 +75,9 @@ function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
           />
           <IncidenceChart
             width={width}
+            isMobile={isMobile}
             heading={
-              <Heading className='pl-12 pr-6 flex items-baseline justify-between'>
+              <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
                 Proportion
                 <Checkbox
                   id='proportion_display_type'
@@ -76,7 +86,7 @@ function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
                   onChange={handleChange}
                   toggle
                 />
-              </Heading>
+              </ChartHeading>
             }
             lad_data={lad_data}
             date={date}
@@ -86,7 +96,8 @@ function LocalIncidence ({ dataframe, lad, date, setDate, name }) {
           />
           <IncidenceChart
             width={width}
-            heading={<Heading className='pl-12'>R</Heading>}
+            isMobile={isMobile}
+            heading={<ChartHeading className='pl-12' isMobile={isMobile}>R</ChartHeading>}
             lad_data={lad_data}
             date={date}
             setDate={setDate}

@@ -16,12 +16,26 @@ html, body {
 }
 
 #root {
-  @apply flex-header-stretch;
+  height: 100%;
+}
+
+#root > header + * {
+  height: calc(100% - theme('spacing.header'))
 }
 
 /* Tailwind default is disabled, we want more space at smaller sizes */
 .container {
-  @apply max-w-7xl mx-auto px-6;
+  @apply max-w-7xl mx-auto;
+}
+
+@media (min-width: theme('screens.md')) {
+  #root > header + * {
+    height: calc(100% - theme('spacing.header-md'))
+  }
+  
+  .container {
+    @apply px-6;
+  }
 }
 
 .flex-header-stretch  {

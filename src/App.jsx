@@ -8,7 +8,7 @@ function App () {
   return (
     <>
       <NavBar />
-      <div className='container py-6 flex-header-stretch'>
+      <div className='container md:py-6 flex-header-stretch'>
         <Suspense fallback={<Spinner />}>
           <LazyContainer />
         </Suspense>

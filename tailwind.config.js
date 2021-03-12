@@ -1,3 +1,4 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
@@ -22,6 +23,10 @@ module.exports = {
           blue: '#2d3a87',
           'dark-blue': '#232642'
         }
+      },
+      spacing: {
+        header: defaultTheme.spacing[16],
+        'header-md': defaultTheme.spacing[32]
       }
     }
   },

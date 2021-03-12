@@ -3,6 +3,7 @@ import './MultiLinePlot.css'
 import React, { useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
 import format from 'date-fns/format'
+import * as tailwindColors from 'tailwindcss/colors'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload) {
@@ -54,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const colors = ['red', 'green', 'blue', 'orange', 'pink', 'aqua', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
-const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120 }) => {
+const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, color = 'blueGray', className }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
     const lineages = new Set()
@@ -85,16 +86,17 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     height,
     margin: { top: 16, left: 0, right: 24 },
     onClick: ({ activeLabel }) => setDate(activeLabel),
-    cursor: 'pointer'
+    cursor: 'pointer',
+    className
   }
 
   const grid =
-    <CartesianGrid stroke='rgb(203, 213, 225)' />
+    <CartesianGrid stroke={tailwindColors[color][300]} />
 
   const dateLine =
     <ReferenceLine
       x={date}
-      stroke='#94a3b8'
+      stroke={tailwindColors[color][400]}
       label=''
       strokeWidth={2}
       style={{ mixBlendMode: 'multiply' }}
@@ -103,7 +105,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   const tooltip =
     <Tooltip
       content={CustomTooltip}
-      cursor={{ stroke: 'rgb(203, 213, 225)' }}
+      cursor={{ stroke: tailwindColors[color][300] }}
     />
 
   const xAxis =
@@ -124,7 +126,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         // eslint-disable-next-line react/jsx-key
           <Area
             key={lineage}
-            activeDot={{ stroke: '#94a3b8' }}
+            activeDot={{ stroke: tailwindColors[color][400] }}
             dataKey={lineage}
             dot={false}
             fill={colors[index]}
@@ -171,7 +173,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {lineages.map((lineage, index) =>
           <Line
             key={lineage}
-            activeDot={{ stroke: '#94a3b8' }}
+            activeDot={{ stroke: tailwindColors[color][400] }}
             dataKey={lineage}
             dot={false}
             isAnimationActive={false}

@@ -14,6 +14,7 @@ import { Heading, DescriptiveHeading } from './Typography'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
+import classNames from 'classnames'
 
 const default_lineage = 'B.1.1.7'
 
@@ -151,22 +152,33 @@ const Covid19 = () => {
   }
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
+  const [view, setView] = useState('map')
+
   return (
     <>
-      <div className='-mt-20 flex justify-between mb-6'>
-        <Card className='flex mx-auto'>
-          <div className='w-80'>
-            <DescriptiveHeading>
-              Select date
-            </DescriptiveHeading>
-            <div className='flex items-center justify-between'>
+      <div className='flex justify-between md:mb-3 md:-mt-20'>
+        <Card className='w-full md:w-auto md:flex mx-auto'>
+          <div className={classNames('md:w-80 md:block', view === 'map' ? 'block' : 'hidden')}>
+            <div className='h-6 flex justify-between items-start'>
+              <DescriptiveHeading>
+                Select date
+              </DescriptiveHeading>
+              <button
+                className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
+                onClick={() => setView('chart')}
+              >
+                View charts
+              </button>
+            </div>
+            <div className='flex items-center justify-between h-6'>
               <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
               <PlayButton
+                className='hidden md:flex pl-2'
                 playing={playing}
                 toggleState={setPlaying}
               />
             </div>
-            <form className='h-6 mt-2'>
+            <div className='h-6 mt-2'>
               <Slider
                 min={0}
                 max={results ? results.unique_dates.length - 1 : 1}
@@ -174,13 +186,26 @@ const Covid19 = () => {
                 value={results ? results.unique_dates.indexOf(date) : 0}
                 disabled={!results}
               />
-            </form>
+              <PlayButton
+                className='md:hidden mx-auto relative z-10 pl-4 pr-2 -mt-1'
+                playing={playing}
+                toggleState={setPlaying}
+              />
+            </div>
           </div>
-          <div className='border border-gray-200 mx-6' />
-          <div className='w-80'>
-            <DescriptiveHeading>
-              Local authority
-            </DescriptiveHeading>
+          <div className='border border-gray-200 mx-6 hidden md:block' />
+          <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
+            <div className='h-6 flex justify-between items-start'>
+              <DescriptiveHeading>
+                Local authority
+              </DescriptiveHeading>
+              <button
+                className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
+                onClick={() => setView('map')}
+              >
+                View map
+              </button>
+            </div>
             <Heading>
               {LALookupTable[lad.lad]}
             </Heading>
@@ -189,67 +214,58 @@ const Covid19 = () => {
             </p>
           </div>
         </Card>
-        {/* <Card className='w-80'>
-          <p className='uppercase font-medium text-gray-500 text-xs leading-6'>
-            Local authority
-          </p>
-          <p className='h2'>
-            {LALookupTable[lad.lad]}
-          </p>
-          <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-            {lad.lad}
-          </p>
-        </Card> */}
       </div>
-      <Card className='md:grid grid-cols-2 gap-6 space-y-6 md:space-y-0 px-6 py-6'>
-        {/* <Card> */}
-          <div className='space-y-3 flex flex-col'>
-            <Heading>Map</Heading>
-            <form className='flex space-x-3 text-sm'>
-              <div>
-                <label className='block font-medium mb-1'>
-                  Lineage
-                </label>
-                <Select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
-                  {lineage_options}
-                </Select>
-              </div>
-              <div>
-                <label className='block font-medium mb-1'>
-                  Color by
-                </label>
-                <Select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
-                  {parameter_options}
-                </Select>
-              </div>
-              <div>
-                <label className='block font-medium mb-1'>
-                  Scale
-                </label>
-                <Select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
-                  {scale_options}
-                </Select>
-              </div>
-            </form>
-            <Chloropleth
-              className='flex-grow'
-              lad={lad.lad}
-              tiles={tiles}
-              color_scale_type={color_scale_type}
-              max_val={results ? results.max_val : 0}
-              min_val={results ? results.min_val : 0}
-              dataframe={results ? results.dataframe_selected_parameter : null}
-              date={date}
-              handleOnClick={handleOnClick}
-            />
-          </div>
-        {/* </Card> */}
+      <Card className='md:grid grid-cols-2 gap-6 pb-0 pt-0 md:px-6 md:py-6'>
+        <div className={classNames('flex flex-col h-full', { hidden: view === 'chart' })}>
+          <Heading>
+            Map
+          </Heading>
+          <form className='flex space-x-3 text-sm w-full overflow-x-auto pb-3 mt-2 md:mt-3'>
+            <div>
+              <label className='block font-medium mb-1'>
+                Lineage
+              </label>
+              <Select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
+                {lineage_options}
+              </Select>
+            </div>
+            <div>
+              <label className='block font-medium mb-1'>
+                Color by
+              </label>
+              <Select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
+                {parameter_options}
+              </Select>
+            </div>
+            <div>
+              <label className='block font-medium mb-1'>
+                Scale
+              </label>
+              <Select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
+                {scale_options}
+              </Select>
+            </div>
+          </form>
+          <Chloropleth
+            className='flex-grow -mx-3 md:m-0'
+            lad={lad.lad}
+            tiles={tiles}
+            color_scale_type={color_scale_type}
+            max_val={results ? results.max_val : 0}
+            min_val={results ? results.min_val : 0}
+            dataframe={results ? results.dataframe_selected_parameter : null}
+            date={date}
+            handleOnClick={handleOnClick}
+          />
+        </div>
         <LocalIncidence
+          className={classNames({ hidden: view === 'map' })}
           name={LALookupTable[lad.lad]}
           date={date}
           setDate={setDate}
           lad={lad.lad}
           dataframe={areaData}
+          isMobile={view === 'chart'}
         />
       </Card>
     </>
