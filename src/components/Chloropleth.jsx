@@ -118,9 +118,11 @@ const Chloropleth = (props) => {
     })
   }
 
+  const initialZoom = props.isMobile ? 4.5 : 5.5
+
   return (
     <div className={classnames(props.className, 'relative flex flex-col')}>
-      <MapContainer className='flex-grow md:rounded-md' zoom={5.5} center={[53.5, -3]}>
+      <MapContainer className='flex-grow md:rounded-md' zoom={initialZoom} center={[53.5, -3]}>
         <GeoJSON
           style={mapStyle}
           data={tiles}

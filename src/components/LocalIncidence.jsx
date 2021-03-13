@@ -6,8 +6,6 @@ import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
 import { Heading } from './Typography'
 
-const desktop = 768 // TODO: fix magic numver
-
 const IncidenceChart = ({ heading, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
   return (
@@ -22,7 +20,7 @@ const IncidenceChart = ({ heading, isMobile, ...props }) => {
         <div ref={measureRef}>
           {heading}
           <MultiLinePlot
-            height={height - (isMobile ? 16 : 24)}
+            height={isMobile ? props.width * (1 / 2) : height - 24}
             {...props}
             className='-mt-2 md:m-0'
           />

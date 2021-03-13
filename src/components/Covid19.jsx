@@ -3,6 +3,7 @@ import memoize from 'memoize-one'
 import axios from 'axios'
 import * as dataForge from 'data-forge'
 import format from 'date-fns/format'
+import classNames from 'classnames'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
@@ -14,7 +15,7 @@ import { Heading, DescriptiveHeading } from './Typography'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
-import classNames from 'classnames'
+import useMobile from '../hooks/useMobile'
 
 const default_lineage = 'B.1.1.7'
 
@@ -154,29 +155,25 @@ const Covid19 = () => {
 
   const [view, setView] = useState('map')
 
+  const isMobile = useMobile()
+
   return (
     <>
-      <div className='flex justify-between md:mb-3 md:-mt-20'>
+      <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none', { 'order-last': view === 'map' })}>
         <Card className='w-full md:w-auto md:flex mx-auto'>
           <div className={classNames('md:w-80 md:block', view === 'map' ? 'block' : 'hidden')}>
             <div className='h-6 flex justify-between items-start'>
               <DescriptiveHeading>
                 Select date
               </DescriptiveHeading>
-              <button
-                className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
-                onClick={() => setView('chart')}
-              >
-                View charts
-              </button>
-            </div>
-            <div className='flex items-center justify-between h-6'>
-              <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
               <PlayButton
-                className='hidden md:flex pl-2'
+                className='pl-2'
                 playing={playing}
                 toggleState={setPlaying}
               />
+            </div>
+            <div className='flex items-center justify-between h-6'>
+              <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
             </div>
             <div className='h-6 mt-2'>
               <Slider
@@ -185,11 +182,6 @@ const Covid19 = () => {
                 onChange={handleDateSlider}
                 value={results ? results.unique_dates.indexOf(date) : 0}
                 disabled={!results}
-              />
-              <PlayButton
-                className='md:hidden mx-auto relative z-10 pl-4 pr-2 -mt-1'
-                playing={playing}
-                toggleState={setPlaying}
               />
             </div>
           </div>
@@ -215,11 +207,19 @@ const Covid19 = () => {
           </div>
         </Card>
       </div>
-      <Card className='md:grid grid-cols-2 gap-6 pb-0 pt-0 md:px-6 md:py-6'>
-        <div className={classNames('flex flex-col h-full', { hidden: view === 'chart' })}>
-          <Heading>
-            Map
-          </Heading>
+      <Card className={classNames('flex flex-col md:grid md:grid-cols-2 gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': view === 'map' })}>
+        <div className={classNames('flex flex-col flex-grow', { hidden: view === 'chart' })}>
+          <div className='flex justify-between items-start'>
+            <Heading>
+              Map
+            </Heading>
+            <button
+              className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
+              onClick={() => setView('chart')}
+            >
+              View charts
+            </button>
+          </div>
           <form className='flex space-x-3 text-sm w-full overflow-x-auto pb-3 mt-2 md:mt-3'>
             <div>
               <label className='block font-medium mb-1'>
@@ -256,6 +256,7 @@ const Covid19 = () => {
             dataframe={results ? results.dataframe_selected_parameter : null}
             date={date}
             handleOnClick={handleOnClick}
+            isMobile={isMobile}
           />
         </div>
         <LocalIncidence
@@ -265,7 +266,7 @@ const Covid19 = () => {
           setDate={setDate}
           lad={lad.lad}
           dataframe={areaData}
-          isMobile={view === 'chart'}
+          isMobile={isMobile}
         />
       </Card>
     </>
