@@ -35,10 +35,8 @@ const ChartHeading = ({ isMobile, ...props }) =>
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
     : <Heading {...props} />
 
-function LocalIncidence ({ dataframe, lad, date, setDate, className, isMobile = false }) {
-  const lad_data = useMemo(() => {
-    return dataframe ? dataframe.where((item) => item.location === lad).toArray() : []
-  }, [dataframe, lad])
+function LocalIncidence ({ dataframe, date, setDate, className, isMobile = false }) {
+  const lad_data = useMemo(() => dataframe ? dataframe.toArray() : [], [dataframe])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
 
@@ -61,7 +59,7 @@ function LocalIncidence ({ dataframe, lad, date, setDate, className, isMobile = 
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classNames('grid grid-rows-3 md:gap-3 h-full -ml-3 md:mx-0 md:grid', className)}>
+        <div ref={measureRef} className={classNames('grid grid-rows-3 h-full -ml-3 md:mx-0 md:grid', className)}>
           <IncidenceChart
             width={width}
             isMobile={isMobile}

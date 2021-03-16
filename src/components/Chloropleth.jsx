@@ -5,6 +5,8 @@ import React, { useEffect, useMemo } from 'react'
 import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
 import classnames from 'classnames'
 
+import FadeTransition from './FadeTransition'
+
 import { getColorScale } from '../utils/loadTiles'
 
 const Map = (props) => {
@@ -131,13 +133,15 @@ const Chloropleth = (props) => {
         <Map dataframe={props.dataframe} date={props.date} lad={props.lad} scale={scale} />
         <div className='absolute left-0 right-0 top-0 bottom-0 shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
       </MapContainer>
-      <div className="p-3 pb-2 bg-white shadow rounded absolute left-2 bottom-2 w-60 z-10">
-        <ColourBar
-          dmin={min_val}
-          dmax={max_val}
-          scale={scale}
-        />
-      </div>
+      <FadeTransition in={max_val > 0} mountOnEnter>
+        <div className="p-3 pb-2 bg-white shadow rounded absolute left-2 bottom-2 w-60 z-10">
+          <ColourBar
+            dmin={min_val}
+            dmax={max_val}
+            scale={scale}
+          />
+        </div>
+      </FadeTransition>
     </div>
   )
 }

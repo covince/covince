@@ -1,17 +1,13 @@
 import React from 'react'
 import classnames from 'classnames'
-
 import { BsPlay, BsPause } from 'react-icons/bs'
+
+import Button from './Button'
 
 function PlayButton ({ playing, toggleState, className }) {
   return (
-    <button
-      className={classnames([
-        'fill-current text-gray-600 rounded flex items-center',
-        'text-xs font-medium tracking-wide uppercase',
-        'h-8 border border-solid border-gray-300',
-        className
-      ])}
+    <Button
+      className={classnames(className, 'fill-current flex items-center pl-3 pr-1 h-9')}
       onClick={() => toggleState(!playing)}
     >
       { playing
@@ -23,7 +19,7 @@ function PlayButton ({ playing, toggleState, className }) {
             <span>Play</span>
             <BsPlay className='w-6 h-6 text-gray-400' />
           </> }
-    </button>
+    </Button>
   )
 }
 

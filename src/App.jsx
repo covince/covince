@@ -4,15 +4,21 @@ import Spinner from './components/Spinner'
 
 const LazyContainer = lazy(() => import('./components/Covid19'))
 
+const Loading = () => (
+  <div className='fixed inset-0 grid place-content-center'>
+    <Spinner className='w-10 h-10' />
+  </div>
+)
+
 function App () {
   return (
     <>
-      <NavBar />
-      <div className='container md:py-6 flex-header-stretch'>
-        <Suspense fallback={<Spinner />}>
+      <Suspense fallback={<Loading />}>
+        <NavBar />
+        <div className='container md:py-6 flex-header-stretch'>
           <LazyContainer />
-        </Suspense>
-      </div>
+        </div>
+      </Suspense>
     </>
   )
 }

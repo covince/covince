@@ -106,6 +106,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     <Tooltip
       content={CustomTooltip}
       cursor={{ stroke: tailwindColors[color][300] }}
+      viewBox={{ x: 0, y: 0, width: 1, height: 1 }}
     />
 
   const xAxis =

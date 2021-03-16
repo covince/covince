@@ -10,8 +10,9 @@ const Select = (props) =>
     className={classnames(
       props.className, [
         'heron-styled-select',
-        'py-2 pl-2 md:pl-3 pr-6 md:pr-10 border border-gray-300 bg-white rounded-md shadow-sm',
-        'focus:outline-none focus:ring-gray-500 focus:border-gray-500'
+        'block w-full py-2 pl-2 lg:pl-3 pr-6 lg:pr-10',
+        'border border-gray-300 bg-white rounded-md shadow-sm',
+        'focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500'
       ]
     )}
   />

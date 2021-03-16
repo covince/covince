@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer, useCallback } from 'react'
 import memoize from 'memoize-one'
 import axios from 'axios'
 import * as dataForge from 'data-forge'
@@ -12,10 +12,13 @@ import PlayButton from './PlayButton'
 import Card from './Card'
 import Select from './Select'
 import { Heading, DescriptiveHeading } from './Typography'
+import Button from './Button'
+import Spinner from './Spinner'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
+import FadeTransition from './FadeTransition'
 
 const default_lineage = 'B.1.1.7'
 
@@ -64,20 +67,56 @@ const Covid19 = () => {
   const [lineage, setLineage] = useState(default_lineage)
   const [lineageData, setLineageData] = useState(null)
 
-  const [areaData, setAreaData] = useState(null)
-
   if (lineageData !== null) {
     results = memoized_get_min_max(lineageData, parameter_of_interest, value_of_interest, lineage)
   }
 
   const [tiles, setTiles] = useState([])
-  const [lad, setLad] = useState({
-    lad: 'E08000006',
-    data: null,
-    scale: null
-  })
-  const [date, setDate] = useState('2020-09-01')
 
+  const [ladState, dispatch] = useReducer((state, { type, payload }) => {
+    console.log({ type, payload })
+    switch (type) {
+      case 'LOAD':
+        return {
+          ...state,
+          status: 'LOADING',
+          loadingLad: payload
+        }
+      case 'DATA':
+        return {
+          ...state,
+          status: 'READY',
+          loadingLad: null,
+          currentLad: state.loadingLad,
+          data: payload
+        }
+      default:
+        return state
+    }
+  }, {
+    status: 'INIT',
+    loadingLad: null,
+    currentLad: null,
+    data: null
+  })
+
+  useEffect(() => {
+    console.log(ladState)
+    if (ladState.loadingLad === null) {
+      return
+    }
+    axios.get(`./data/ltla/${ladState.loadingLad}.json`)
+      .then(res => {
+        const new_data = res.data.data.map(x => {
+          x.range = [x.lower, x.upper]
+          return (x)
+        })
+        const df = new dataForge.DataFrame(new_data)
+        dispatch({ type: 'DATA', payload: df })
+      })
+  }, [ladState])
+
+  const [date, setDate] = useState('2020-09-01')
   const [color_scale_type, setScale] = useState('linear')
 
   const carefulSetLineage = (x) => {
@@ -89,7 +128,6 @@ const Covid19 = () => {
     axios.get(`./data/lineage/${x}.json`)
       .then(res => {
         const df = new dataForge.DataFrame(res.data.data)
-        window.df = df
         setLineageData(df)
       })
 
@@ -103,19 +141,11 @@ const Covid19 = () => {
     if (x === 'R') { setScale('linear') }
   }
 
-  const handleOnClick = (e, lad) => {
-    setLad({ ...lad, lad, data: null })
-    axios.get(`./data/ltla/${lad}.json`)
-      .then(res => {
-        const new_data = res.data.data.map(x => {
-          x.range = [x.lower, x.upper]
-          return (x)
-        })
-        const df = new dataForge.DataFrame(new_data)
-
-        setAreaData(df)
-      })
-  }
+  const handleOnClick = useCallback((e, lad) => {
+    console.log(ladState)
+    if (ladState.status === 'LOADING') return
+    dispatch({ type: 'LOAD', payload: lad })
+  }, [ladState])
 
   const handleDateSlider = (e) => {
     const { value } = e.target
@@ -133,19 +163,11 @@ const Covid19 = () => {
   }
 
   useEffect(() => {
-    if (tiles.length === 0) setTiles(loadTiles())
-    if (lineageData == null) {
-      carefulSetLineage(default_lineage)
-    }
-    if (lineageData == null) {
-      handleOnClick(null, 'E08000006')
-    }
-  }, [tiles, lineageData])
+    setTiles(loadTiles())
+    carefulSetLineage(default_lineage)
+    dispatch({ type: 'LOAD', payload: 'E08000006' })
+  }, [])
 
-  let lineage_options
-  if (lineageData) {
-    lineage_options = unique_lineages.map((x) => <option key={x}>{x}</option>)
-  }
   const scale_options = [['quadratic', 'Quadratic'], ['linear', 'Linear']].map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
   if (lineage === 'total') {
@@ -167,7 +189,6 @@ const Covid19 = () => {
                 Select date
               </DescriptiveHeading>
               <PlayButton
-                className='pl-2'
                 playing={playing}
                 toggleState={setPlaying}
               />
@@ -191,18 +212,19 @@ const Covid19 = () => {
               <DescriptiveHeading>
                 Local authority
               </DescriptiveHeading>
-              <button
-                className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
-                onClick={() => setView('map')}
-              >
-                View map
-              </button>
+              { isMobile
+                ? <Button onClick={() => setView('map')}>
+                  View map
+                </Button>
+                : <FadeTransition in={ladState.status === 'LOADING'}>
+                  <Spinner className='text-gray-700 w-8 h-8' />
+                </FadeTransition> }
             </div>
             <Heading>
-              {LALookupTable[lad.lad]}
+              {LALookupTable[ladState.currentLad]}
             </Heading>
             <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-              {lad.lad}
+              {ladState.currentLad}
             </p>
           </div>
         </Card>
@@ -213,20 +235,24 @@ const Covid19 = () => {
             <Heading>
               Map
             </Heading>
-            <button
-              className='py-2 px-3 text-sm font-medium border border-solid border-gray-300 rounded md:hidden'
-              onClick={() => setView('chart')}
-            >
-              View charts
-            </button>
+            { isMobile
+              ? <Button onClick={() => setView('chart')}>
+                View charts
+              </Button>
+              : <FadeTransition in={lineageData === null}>
+                <Spinner className='text-gray-700 w-8 h-8' />
+              </FadeTransition> }
           </div>
-          <form className='flex space-x-3 text-sm w-full overflow-x-auto pb-3 mt-2 md:mt-3'>
+          <form className={classNames(
+            'grid grid-cols-3 gap-3 max-w-md lg:flex lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
+            { 'opacity-50 pointer-events-none': lineageData === null }
+          )}>
             <div>
               <label className='block font-medium mb-1'>
                 Lineage
               </label>
               <Select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
-                {lineage_options}
+                {unique_lineages.map((x) => <option key={x}>{x}</option>)}
               </Select>
             </div>
             <div>
@@ -237,7 +263,7 @@ const Covid19 = () => {
                 {parameter_options}
               </Select>
             </div>
-            <div>
+            <div className='pr-px'>
               <label className='block font-medium mb-1'>
                 Scale
               </label>
@@ -248,7 +274,7 @@ const Covid19 = () => {
           </form>
           <Chloropleth
             className='flex-grow -mx-3 md:m-0'
-            lad={lad.lad}
+            lad={ladState.currentLad}
             tiles={tiles}
             color_scale_type={color_scale_type}
             max_val={results ? results.max_val : 0}
@@ -259,15 +285,22 @@ const Covid19 = () => {
             isMobile={isMobile}
           />
         </div>
-        <LocalIncidence
-          className={classNames({ hidden: view === 'map' })}
-          name={LALookupTable[lad.lad]}
-          date={date}
-          setDate={setDate}
-          lad={lad.lad}
-          dataframe={areaData}
-          isMobile={isMobile}
-        />
+        <div className='relative'>
+          <LocalIncidence
+            className={classNames(
+              'transition-opacity', {
+                hidden: view === 'map',
+                'opacity-50 pointer-events-none': ladState.status === 'LOADING'
+              }
+            )}
+            name={LALookupTable[ladState.currentLad]}
+            date={date}
+            setDate={setDate}
+            lad={ladState.currentLad}
+            dataframe={ladState.data}
+            isMobile={isMobile}
+          />
+        </div>
       </Card>
     </>
   )

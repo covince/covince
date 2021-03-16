@@ -8,7 +8,7 @@
   color-adjust: exact;
 }
 
-@media (min-width: theme('screens.md')) {
+@media (min-width: theme('screens.lg')) {
   .heron-styled-select {
     background-position: right theme('spacing.2') center;
   }
