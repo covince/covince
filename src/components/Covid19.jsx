@@ -74,21 +74,26 @@ const Covid19 = () => {
   const [tiles, setTiles] = useState([])
 
   const [ladState, dispatch] = useReducer((state, { type, payload }) => {
-    console.log({ type, payload })
+    if (state.status === 'LOADING') {
+      switch (type) {
+        case 'DATA':
+          return {
+            ...state,
+            status: 'READY',
+            loadingLad: null,
+            currentLad: state.loadingLad,
+            data: payload
+          }
+        default:
+          return state
+      }
+    }
     switch (type) {
       case 'LOAD':
         return {
           ...state,
           status: 'LOADING',
           loadingLad: payload
-        }
-      case 'DATA':
-        return {
-          ...state,
-          status: 'READY',
-          loadingLad: null,
-          currentLad: state.loadingLad,
-          data: payload
         }
       default:
         return state
@@ -242,7 +247,7 @@ const Covid19 = () => {
               </FadeTransition> }
           </div>
           <form className={classNames(
-            'grid grid-cols-3 gap-3 max-w-md lg:flex lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
+            'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
             { 'opacity-50 pointer-events-none': lineageData === null }
           )}>
             <div>
