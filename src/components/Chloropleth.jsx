@@ -15,14 +15,18 @@ const Map = (props) => {
   const { dataframe, date, lad, scale } = props
 
   useEffect(() => {
+    if (map === undefined) {
+      return
+    }
+
     const { dataframe, date, lad, scale } = props
 
-    if (dataframe === null) return
+    if (dataframe === null) {
+      return
+    }
 
     const by_loc = dataframe[date].getSeries('mean')
-    if (map === undefined) {
-      return true
-    }
+
     for (const i in map._layers) {
       const layer = map._layers[i]
       if (layer.setStyle && layer.feature) {

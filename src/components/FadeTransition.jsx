@@ -5,6 +5,8 @@ const FadeTransition = (props) =>
   <CSSTransition
     {...props}
     timeout={300}
+    mountOnEnter
+    unmountOnExit
     classNames={{
       appear: 'opacity-0',
       appearActive: 'transition-opacity duration-300 opacity-100',
