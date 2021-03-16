@@ -106,7 +106,6 @@ const Covid19 = () => {
   })
 
   useEffect(() => {
-    console.log(ladState)
     if (ladState.loadingLad === null) {
       return
     }
@@ -119,7 +118,7 @@ const Covid19 = () => {
         const df = new dataForge.DataFrame(new_data)
         dispatch({ type: 'DATA', payload: df })
       })
-  }, [ladState])
+  }, [ladState.loadingLad])
 
   const [date, setDate] = useState('2020-09-01')
   const [color_scale_type, setScale] = useState('linear')
@@ -234,7 +233,7 @@ const Covid19 = () => {
       </div>
       <Card className={classNames('flex flex-col md:grid md:grid-cols-2 gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: view === 'chart' })}>
-          <div className='flex justify-between items-start'>
+          <div className='flex justify-between items-start h-6'>
             <Heading>
               Map
             </Heading>
@@ -277,7 +276,7 @@ const Covid19 = () => {
           </form>
           <Chloropleth
             className='flex-grow -mx-3 md:m-0'
-            lad={ladState.currentLad}
+            lad={ladState.loadingLad || ladState.currentLad}
             tiles={tiles}
             color_scale_type={color_scale_type}
             max_val={results ? results.max_val : 0}
