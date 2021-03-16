@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useCallback } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import memoize from 'memoize-one'
 import axios from 'axios'
 import * as dataForge from 'data-forge'
@@ -141,11 +141,9 @@ const Covid19 = () => {
     if (x === 'R') { setScale('linear') }
   }
 
-  const handleOnClick = useCallback((e, lad) => {
-    console.log(ladState)
-    if (ladState.status === 'LOADING') return
+  const handleOnClick = (e, lad) => {
     dispatch({ type: 'LOAD', payload: lad })
-  }, [ladState])
+  }
 
   const handleDateSlider = (e) => {
     const { value } = e.target
@@ -217,7 +215,7 @@ const Covid19 = () => {
                   View map
                 </Button>
                 : <FadeTransition in={ladState.status === 'LOADING'}>
-                  <Spinner className='text-gray-700 w-8 h-8' />
+                  <Spinner className='text-gray-700 w-6 h-6' />
                 </FadeTransition> }
             </div>
             <Heading>
