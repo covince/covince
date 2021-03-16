@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react'
-import memoize from 'memoize-one'
-import axios from 'axios'
-import * as dataForge from 'data-forge'
+import React, { useState, useEffect } from 'react'
 import format from 'date-fns/format'
 import classNames from 'classnames'
 
@@ -19,161 +16,52 @@ import FadeTransition from './FadeTransition'
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
-
-const default_lineage = 'B.1.1.7'
+import useLADs from '../hooks/useLADs'
+import useLineages from '../hooks/useLineages'
 
 const LALookupTable = getLALookupTable()
+const tiles = loadTiles()
 
-function get_min_min_max (dataframe, parameter, value_of_interest) {
-  const dataframe_selected_parameter = dataframe.where(x => x.parameter === parameter)
-  const series = dataframe_selected_parameter.where(x => x.mean !== undefined).getSeries(value_of_interest)
-
-  const min_val = 0 // series.min()
-  const max_val = series.max()
-
-  const groups = dataframe_selected_parameter.groupBy(x => x.date)
-  const lookup = {}
-  for (const group of groups) {
-    const dater = group.first().date
-    lookup[dater] = group.setIndex('location')
-  }
-
-  const unique_dates = dataframe.getSeries('date').distinct().toArray()
-
-  return {
-    min_val: min_val, max_val: max_val, dataframe_selected_parameter: lookup, series: series, unique_dates: unique_dates
-  }
-}
-
-const memoized_get_min_max = memoize(get_min_min_max)
 const Covid19 = () => {
   const unique_lineages = loadData().lineages
-  let results
 
   const [playing, setPlaying] = useState(false)
-  if (playing) {
-    clearTimeout(window.timeout)
-    window.timeout = setTimeout(x => {
-      bump_date()
-    }, 100)
-  }
+  const [date, setDate] = useState('2020-09-07')
 
-  ///  [data, indexed_by_date, unique_dates, min_val, max_val]
-  const [parameter, setParameter] = useState('p')
-  let unique_parameters = ['lambda', 'p', 'R']
-  const parameter_of_interest = parameter
-  const value_of_interest = 'mean'
+  const [ladState, ladActions] = useLADs()
+  const [lineageState, lineageActions, results] = useLineages()
 
-  const [lineage, setLineage] = useState(default_lineage)
-  const [lineageData, setLineageData] = useState(null)
-
-  if (lineageData !== null) {
-    results = memoized_get_min_max(lineageData, parameter_of_interest, value_of_interest, lineage)
-  }
-
-  const [tiles, setTiles] = useState([])
-
-  const [ladState, dispatch] = useReducer((state, { type, payload }) => {
-    if (state.status === 'LOADING') {
-      switch (type) {
-        case 'DATA':
-          return {
-            ...state,
-            status: 'READY',
-            loadingLad: null,
-            currentLad: state.loadingLad,
-            data: payload
-          }
-        default:
-          return state
-      }
+  const bumpDate = () => {
+    let cur_index = results.dates.indexOf(date)
+    if (results.dates[cur_index + 1] === undefined) {
+      cur_index = -1
     }
-    switch (type) {
-      case 'LOAD':
-        return {
-          ...state,
-          status: 'LOADING',
-          loadingLad: payload
-        }
-      default:
-        return state
-    }
-  }, {
-    status: 'INIT',
-    loadingLad: null,
-    currentLad: null,
-    data: null
-  })
+    const set_to = results.dates[cur_index + 1]
+    setDate(set_to)
+  }
 
   useEffect(() => {
-    if (ladState.loadingLad === null) {
-      return
+    if (playing) {
+      const timeout = setTimeout(bumpDate, 100)
+      return () => clearTimeout(timeout)
     }
-    axios.get(`./data/ltla/${ladState.loadingLad}.json`)
-      .then(res => {
-        const new_data = res.data.data.map(x => {
-          x.range = [x.lower, x.upper]
-          return (x)
-        })
-        const df = new dataForge.DataFrame(new_data)
-        dispatch({ type: 'DATA', payload: df })
-      })
-  }, [ladState.loadingLad])
+  }, [playing, date])
 
-  const [date, setDate] = useState('2020-09-01')
-  const [color_scale_type, setScale] = useState('linear')
-
-  const carefulSetLineage = (x) => {
-    if (x === 'total') {
-      setParameterAndChangeScale('lambda')
-      console.log('Changing parameter as total only supports lambda')
-    }
-
-    axios.get(`./data/lineage/${x}.json`)
-      .then(res => {
-        const df = new dataForge.DataFrame(res.data.data)
-        setLineageData(df)
-      })
-
-    setLineage(x)
-  }
-
-  const setParameterAndChangeScale = (x) => {
-    setParameter(x)
-    if (x === 'p') { setScale('linear') }
-    if (x === 'lambda') { setScale('quadratic') }
-    if (x === 'R') { setScale('linear') }
-  }
+  let unique_parameters = ['lambda', 'p', 'R']
 
   const handleOnClick = (e, lad) => {
-    dispatch({ type: 'LOAD', payload: lad })
+    ladActions.load(lad)
   }
 
   const handleDateSlider = (e) => {
     const { value } = e.target
-    const set_to = results.unique_dates[value]
+    const set_to = results.dates[value]
     setDate(set_to)
   }
 
-  const bump_date = (e) => {
-    let cur_index = results.unique_dates.indexOf(date)
-    if (results.unique_dates[cur_index + 1] === undefined) {
-      cur_index = -1
-    }
-    const set_to = results.unique_dates[cur_index + 1]
-    setDate(set_to)
-  }
-
-  useEffect(() => {
-    setTiles(loadTiles())
-    carefulSetLineage(default_lineage)
-    dispatch({ type: 'LOAD', payload: 'E08000006' })
-  }, [])
-
-  const scale_options = [['quadratic', 'Quadratic'], ['linear', 'Linear']].map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
-  if (lineage === 'total') {
-    unique_parameters = unique_parameters.filter(x => x[0] !== 'p' && x[0] !== 'R')
+  if (lineageState.lineage === 'total') {
+    unique_parameters = unique_parameters[0]
   }
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
@@ -200,9 +88,9 @@ const Covid19 = () => {
             <div className='h-6 mt-2'>
               <Slider
                 min={0}
-                max={results ? results.unique_dates.length - 1 : 1}
+                max={results ? results.dates.length - 1 : 1}
                 onChange={handleDateSlider}
-                value={results ? results.unique_dates.indexOf(date) : 0}
+                value={results ? results.dates.indexOf(date) : 0}
                 disabled={!results}
               />
             </div>
@@ -241,13 +129,17 @@ const Covid19 = () => {
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
-            { 'opacity-50 pointer-events-none': lineageData === null }
+            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' }
           )}>
             <div>
               <label className='block font-medium mb-1'>
                 Lineage
               </label>
-              <Select value={lineage} name='lineages' onChange={e => carefulSetLineage(e.target.value)}>
+              <Select
+                value={lineageState.lineage}
+                name='lineages'
+                onChange={e => lineageActions.setLineage(e.target.value)}
+              >
                 {unique_lineages.map((x) => <option key={x}>{x}</option>)}
               </Select>
             </div>
@@ -255,7 +147,11 @@ const Covid19 = () => {
               <label className='block font-medium mb-1'>
                 Color by
               </label>
-              <Select value={parameter} name='parameters' onChange={e => setParameterAndChangeScale(e.target.value)}>
+              <Select
+                value={lineageState.parameter}
+                name='parameters'
+                onChange={e => lineageActions.colorBy(e.target.value)}
+              >
                 {parameter_options}
               </Select>
             </div>
@@ -263,8 +159,10 @@ const Covid19 = () => {
               <label className='block font-medium mb-1'>
                 Scale
               </label>
-              <Select value={color_scale_type} name='color_scale_type' onChange={e => setScale(e.target.value)}>
-                {scale_options}
+              <Select
+                value={lineageState.scale} name='color_scale_type' onChange={e => lineageActions.setScale(e.target.value)}>
+                <option value='quadratic'>Quadratic</option>
+                <option value='linear'>Linear</option>
               </Select>
             </div>
           </form>
@@ -273,15 +171,15 @@ const Covid19 = () => {
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={color_scale_type}
-              max_val={results ? results.max_val : 0}
-              min_val={results ? results.min_val : 0}
-              dataframe={results ? results.dataframe_selected_parameter : null}
+              color_scale_type={lineageState.scale}
+              max_val={results ? results.max : 0}
+              min_val={results ? results.min : 0}
+              index={results ? results.index : null}
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
             />
-            <FadeTransition in={!results}>
+            <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-700 w-8 h-8' />
               </div>

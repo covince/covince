@@ -13,29 +13,29 @@ import { getColorScale } from '../utils/loadTiles'
 const Map = (props) => {
   const map = useMap()
 
-  const { dataframe, date, lad, scale, color = 'blueGray' } = props
+  const { index, date, lad, scale, color = 'blueGray' } = props
 
   useEffect(() => {
     if (map === undefined) {
       return
     }
 
-    const { dataframe, date, lad, scale } = props
+    const { index, date, lad, scale } = props
 
-    if (dataframe === null) {
+    if (index === null) {
       return
     }
-
-    const by_loc = dataframe[date].getSeries('mean')
 
     for (const i in map._layers) {
       const layer = map._layers[i]
       if (layer.setStyle && layer.feature) {
         let fillColor = null
 
-        const item = by_loc.getRowByIndex(layer.feature.properties.lad19cd)
+        const { lad19cd } = layer.feature.properties
+        const values = index[lad19cd]
+        const value = values ? values[date] : undefined
 
-        fillColor = typeof item !== 'undefined' ? scale(item) : '#ffffff'
+        fillColor = typeof value !== 'undefined' ? scale(value) : '#ffffff'
 
         layer.setStyle({ fillColor })
 
@@ -56,7 +56,7 @@ const Map = (props) => {
     }
 
     return false
-  }, [dataframe, date, scale, lad])
+  }, [index, date, scale, lad])
 
   return null
 }
@@ -97,7 +97,6 @@ const ColourBar = ({ dmin, dmax, scale }) => {
 
 const Chloropleth = (props) => {
   const { color_scale_type, tiles, handleOnClick, min_val, max_val } = props
-
   const scale = useMemo(() => {
     return getColorScale(props.min_val, props.max_val, props.color_scale_type)
   }, [min_val, max_val, color_scale_type])
@@ -134,7 +133,7 @@ const Chloropleth = (props) => {
           data={tiles}
           onEachFeature={onEachLad}
         />
-        <Map dataframe={props.dataframe} date={props.date} lad={props.lad} scale={scale} />
+        <Map index={props.index} date={props.date} lad={props.lad} scale={scale} />
         <div className='absolute left-0 right-0 top-0 bottom-0 shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
       </MapContainer>
       <FadeTransition in={max_val > 0} mountOnEnter>

@@ -73,7 +73,7 @@ function LocalIncidence ({ dataframe, date, setDate, className, isMobile = false
             width={width}
             isMobile={isMobile}
             heading={
-              <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
+              <ChartHeading className='pl-12 pr-6 flex items-center justify-between' isMobile={isMobile}>
                 Proportion
                 <Checkbox
                   id='proportion_display_type'
