@@ -4,6 +4,7 @@ import './Chloropleth.css'
 import React, { useEffect, useMemo } from 'react'
 import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
 import classnames from 'classnames'
+import * as tailwindColors from 'tailwindcss/colors'
 
 import FadeTransition from './FadeTransition'
 
@@ -12,7 +13,7 @@ import { getColorScale } from '../utils/loadTiles'
 const Map = (props) => {
   const map = useMap()
 
-  const { dataframe, date, lad, scale } = props
+  const { dataframe, date, lad, scale, color = 'blueGray' } = props
 
   useEffect(() => {
     if (map === undefined) {
@@ -36,18 +37,17 @@ const Map = (props) => {
 
         fillColor = typeof item !== 'undefined' ? scale(item) : '#ffffff'
 
-        layer.setStyle({ fillColor: fillColor })
+        layer.setStyle({ fillColor })
 
         if (layer.feature.properties.lad19cd === lad) {
-          // layer.setStyle({ 'stroke-width': "5" })
           layer.setStyle({
-            color: 'black',
+            color: tailwindColors[color][900],
             weight: 2
           })
           layer.bringToFront()
         } else {
           layer.setStyle({
-            color: '#333333',
+            color: tailwindColors[color][600],
             weight: 0.5,
             zIndex: 0
           })
