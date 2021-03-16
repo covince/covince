@@ -15,9 +15,9 @@ const useLineages = () => {
           return {
             ...state,
             status: 'READY',
-            query: null,
             data: payload,
-            scale: setScale(state.parameter)
+            resetScale: false,
+            scale: state.resetScale ? setScale(state.parameter) : state.scale
           }
         }
         default:
@@ -36,7 +36,8 @@ const useLineages = () => {
         return {
           ...state,
           status: 'LOADING',
-          parameter: payload
+          parameter: payload,
+          resetScale: true
         }
       case 'SCALE':
         return {
@@ -51,6 +52,7 @@ const useLineages = () => {
     lineage: 'B.1.1.7',
     parameter: 'p',
     scale: 'linear',
+    resetScale: false,
     data: null
   })
 
