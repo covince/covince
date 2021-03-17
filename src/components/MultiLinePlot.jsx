@@ -90,15 +90,16 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     className
   }
 
-  let y_domain
-
-  if (type === 'area') {
-    y_domain = [0, 1]
-  } else if (parameter === 'R') {
-    y_domain = [0, 3]
-  } else {
-    y_domain = [0, 'auto']
-  }
+  const y_domain = useMemo(() => {
+    if (type === 'area') {
+      return [0, 1]
+    } else if (parameter === 'R') {
+      return [0, 3]
+    } else {
+      return [0, 'auto']
+    }
+  }, [type, parameter]
+  )
 
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
