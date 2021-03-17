@@ -97,7 +97,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   } else if (parameter === 'R') {
     y_domain = [0, 3]
   } else {
-    y_domain = [0,'auto']
+    y_domain = [0, 'auto']
   }
 
   const grid =
