@@ -1,0 +1,60 @@
+/* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
+
+input[type=range] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+  @apply h-6 rounded-md border-2 border-transparent focus:outline-none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type=range]:focus-visible {
+  @apply outline-none border-gray-500;
+}
+
+.heron-slider-thumb {
+  @apply
+    bg-white
+    h-5 w-5
+    box-border
+    border
+    border-solid
+    border-gray-400
+    rounded-full
+    shadow
+    cursor-pointer
+  ;
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  @apply heron-slider-thumb;
+  -webkit-appearance: none;
+  margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+}
+
+/* All the same stuff for Firefox */
+input[type=range]::-moz-range-thumb {
+  @apply heron-slider-thumb;
+}
+
+.heron-border-track {
+  @apply
+    h-2 w-full
+    cursor-pointer
+    shadow-inner
+    bg-gray-200
+    rounded-full
+  ;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  @apply heron-border-track;
+}
+
+input[type=range]::-moz-range-track {
+  @apply heron-border-track;
+}

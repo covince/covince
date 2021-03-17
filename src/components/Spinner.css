@@ -1,0 +1,28 @@
+/* https://projects.lukehaas.me/css-loaders/ */
+
+.heron-spinner,
+.heron-spinner::before {
+  @apply rounded-full box-content border-4;
+}
+.heron-spinner {
+  @apply relative border-solid border-transparent;
+  border-left-color: theme('colors.gray.500');
+  transform: translateZ(0);
+  animation: load8 1.1s infinite linear;
+}
+
+.heron-spinner::before {
+  @apply opacity-20 border-solid border-gray-500 w-full h-full absolute -top-1 -left-1;
+  content: '';
+}
+
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

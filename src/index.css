@@ -1,17 +1,60 @@
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
+/* https://github.com/wellcometrust/fonts */
+/* @font-face {
+  font-family: "Wellcome Bold";
+  src: url("./assets/wellcome-bold-webfont.woff2") format("woff2"),
+       url("./assets/wellcome-bold-webfont.woff") format("woff");
+} */
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+	@apply leading-6 text-base font-normal p-0 m-0 text-gray-800 bg-gray-100;	
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+#root {
+  height: 100%;
+}
+
+#root > header + * {
+  height: calc(100% - theme('spacing.header'))
+}
+
+/* Tailwind default is disabled, we want more space at smaller sizes */
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+@media (min-width: theme('screens.md')) {
+  #root > header + * {
+    height: calc(100% - theme('spacing.header-md'))
+  }
+  
+  .container {
+    @apply px-6;
+  }
+}
+
+.flex-header-stretch  {
+  @apply flex flex-col h-full;
+}
+
+.flex-header-stretch > :first-child + * {
+  @apply flex-grow;
+}
+
+
+/* Debug */
+.baseline-grid {
+  background-image: linear-gradient(180deg,red 1px,transparent 0);
+  background-position: 0 0;
+  background-repeat: repeat;
+}
+
+.baseline-grid-6 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.6');
 }
