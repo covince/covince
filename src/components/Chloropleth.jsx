@@ -1,65 +1,29 @@
 import 'leaflet/dist/leaflet.css'
 import './Chloropleth.css'
 
-import React, { useEffect, useMemo } from 'react'
-import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
+import React, { useState, useMemo } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
+import ReactMapGL, { NavigationControl } from 'react-map-gl'
+import Measure from 'react-measure'
 
 import FadeTransition from './FadeTransition'
 
-import { getColorScale } from '../utils/loadTiles'
+// magma
+const colorStops = [
+  { index: 0, rgb: 'rgb(0, 0, 4)' },
+  { index: 0.13, rgb: 'rgb(28, 16, 68)' },
+  { index: 0.25, rgb: 'rgb(79, 18, 123)' },
+  { index: 0.38, rgb: 'rgb(129, 37, 129)' },
+  { index: 0.5, rgb: 'rgb(181, 54, 122)' },
+  { index: 0.63, rgb: 'rgb(229, 80, 100)' },
+  { index: 0.75, rgb: 'rgb(251, 135, 97)' },
+  { index: 0.88, rgb: 'rgb(254, 194, 135)' },
+  { index: 1, rgb: 'rgb(252, 253, 191)' }
+]
 
-const Map = (props) => {
-  const map = useMap()
-
-  const { index, date, lad, scale, color = 'blueGray' } = props
-
-  useEffect(() => {
-    if (map === undefined) {
-      return
-    }
-
-    const { index, date, lad, scale } = props
-
-    if (index === null) {
-      return
-    }
-
-    for (const i in map._layers) {
-      const layer = map._layers[i]
-      if (layer.setStyle && layer.feature) {
-        let fillColor = null
-
-        const { lad19cd } = layer.feature.properties
-        const values = index[lad19cd]
-        const value = values ? values[date] : undefined
-
-        fillColor = typeof value !== 'undefined' ? scale(value) : '#ffffff'
-
-        layer.setStyle({ fillColor })
-
-        if (layer.feature.properties.lad19cd === lad) {
-          layer.setStyle({
-            color: tailwindColors[color][900],
-            weight: 2
-          })
-          layer.bringToFront()
-        } else {
-          layer.setStyle({
-            color: tailwindColors[color][600],
-            weight: 0.5,
-            zIndex: 0
-          })
-        }
-      }
-    }
-
-    return false
-  }, [index, date, scale, lad])
-
-  return null
-}
+const quadColorStops =
+  colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
 
 const ColourBar = ({ dmin, dmax, scale }) => {
   let midpoint
@@ -71,8 +35,10 @@ const ColourBar = ({ dmin, dmax, scale }) => {
 
   const gradient = useMemo(() => {
     const stops = []
-    for (let i = 0; i <= 100; i++) {
-      stops.push(`${scale(dmin + (i / 100) * (dmax - dmin))} ${i}%`)
+    for (let i = 0; i < scale.length; i += 2) {
+      const value = scale[i]
+      const color = scale[i + 1]
+      stops.push(`${color} ${value / (dmax - dmin) * 100}%`)
     }
     return `linear-gradient(to right, ${stops.join(',')})`
   }, [dmin, dmax, scale])
@@ -96,56 +62,163 @@ const ColourBar = ({ dmin, dmax, scale }) => {
 }
 
 const Chloropleth = (props) => {
-  const { color_scale_type, tiles, handleOnClick, min_val, max_val } = props
-  const scale = useMemo(() => {
-    return getColorScale(props.min_val, props.max_val, props.color_scale_type)
-  }, [min_val, max_val, color_scale_type])
+  const { color_scale_type, tiles, handleOnClick, min_val, max_val, lineColor = 'blueGray' } = props
 
-  const mapStyle = {
-    fillColor: 'white',
-    weight: 0.5,
-    color: '#333333',
-    fillOpacity: 1
-  }
+  const [viewport, setViewport] = useState({
+    width: 0,
+    height: 0,
+    // latitude: 53.5,
+    // longitude: -3,
+    latitude: 52.561928,
+    longitude: -1.464854,
+    zoom: props.isMobile ? 4.5 : 5
+  })
 
-  const onEachLad = async (lad, layer) => {
-    const name = lad.properties.lad19nm
-    const code = lad.properties.lad19cd
+  const { date, index, lad } = props
+  console.log(lad)
+  const data = useMemo(() => {
+    if (tiles === null || index === null) {
+      return null
+    }
 
-    // layer.options.fillColor =
-    //   typeof item !== "undefined" ? await colorScale(data, item) : "#ffffff";
-
-    layer.bindTooltip(`${name}`, {
-      direction: 'top'
+    const features = tiles.features.map(f => {
+      const { lad19cd } = f.properties
+      const values = index[lad19cd]
+      const value = values ? values[date] : undefined
+      return {
+        ...f,
+        properties: {
+          ...f.properties,
+          value,
+          selected: lad19cd === lad
+        }
+      }
     })
-    layer.on({
-      click: (e) => handleOnClick(e, code)
-    })
-  }
 
-  const initialZoom = props.isMobile ? 4.5 : 5.5
+    return {
+      ...tiles,
+      features
+    }
+  }, [tiles, date, index, lad])
+
+  const colorScale = useMemo(() => {
+    if (max_val === 0) {
+      return [0, '#fff']
+    }
+    const scale = []
+    const range = color_scale_type === 'quadratic'
+      ? Math.sqrt(max_val - min_val)
+      : max_val - min_val
+    const stops = color_scale_type === 'quadratic'
+      ? quadColorStops
+      : colorStops
+    for (const { index, rgb } of stops) {
+      scale.unshift(rgb)
+      scale.unshift(
+        range *
+        (1 - index) *
+        1.1 // don't go to deep black
+      )
+    }
+    return scale
+  }, [max_val, min_val, color_scale_type])
+
+  const mapStyle = useMemo(() => ({
+    version: 8,
+    sources: {
+      lads: {
+        type: 'geojson',
+        data
+      }
+    },
+    layers: [
+      {
+        id: 'lads-fill',
+        type: 'fill',
+        source: 'lads',
+        paint: {
+          'fill-color': [
+            'case',
+            ['==', ['get', 'value'], null],
+            '#fff',
+            [
+              'interpolate',
+              ['linear'],
+              ['get', 'value'],
+              ...colorScale
+            ]
+          ]
+          // 'fill-color-transition': { duration: 150 }
+        }
+      },
+      {
+        id: 'lads-line',
+        type: 'line',
+        source: 'lads',
+        paint: {
+          'line-color': [
+            'case',
+            ['get', 'selected'],
+            tailwindColors[lineColor][900],
+            tailwindColors[lineColor][600]
+          ],
+          // 'line-color-transition': { duration: 300 },
+          'line-width': [
+            'case',
+            ['get', 'selected'],
+            2,
+            0.5
+          ]
+        }
+      }
+    ]
+  }), [data])
 
   return (
-    <div className={classnames(props.className, 'relative flex flex-col')}>
-      <MapContainer className='flex-grow md:rounded-md' zoom={initialZoom} center={[53.5, -3]}>
-        <GeoJSON
-          style={mapStyle}
-          data={tiles}
-          onEachFeature={onEachLad}
-        />
-        <Map index={props.index} date={props.date} lad={props.lad} scale={scale} />
-        <div className='absolute left-0 right-0 top-0 bottom-0 shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
-      </MapContainer>
-      <FadeTransition in={max_val > 0} mountOnEnter>
-        <div className="p-3 pb-2 bg-white shadow rounded absolute left-2 bottom-2 w-60 z-10">
-          <ColourBar
-            dmin={min_val}
-            dmax={max_val}
-            scale={scale}
-          />
+    <Measure
+      bounds
+      onResize={rect => {
+        setViewport({
+          ...viewport,
+          width: rect.bounds.width,
+          height: rect.bounds.height
+        })
+      }}
+    >
+      {({ measureRef }) => (
+        <div ref={measureRef} className={classnames(props.className, 'relative')}>
+          <ReactMapGL
+            {...viewport}
+            disableTokenWarning
+            attributionControl={false}
+            onViewportChange={nextViewport => setViewport(nextViewport)}
+            mapStyle={mapStyle}
+            mapboxApiUrl={null}
+            className='bg-gray-200 md:rounded-md'
+            interactiveLayerIds={['lads-fill']}
+            onNativeClick={e => { // faster for some reason
+              const [feature] = e.features
+              if (feature) {
+                console.log('fire')
+                handleOnClick(feature.properties.lad19cd)
+              }
+            }}
+          >
+            <NavigationControl className='right-2 top-2' showCompass={false} />
+            <div className='absolute inset-0 md:rounded-md shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
+          </ReactMapGL>
+          <FadeTransition in={max_val > 0} mountOnEnter>
+            <div className="p-3 pb-2 bg-white shadow rounded absolute right-2 bottom-2 w-60 z-10">
+              <ColourBar
+                dmin={min_val}
+                dmax={max_val}
+                scale={colorScale}
+              />
+            </div>
+          </FadeTransition>
         </div>
-      </FadeTransition>
-    </div>
+      )}
+    </Measure>
   )
 }
 

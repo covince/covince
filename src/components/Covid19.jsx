@@ -49,7 +49,7 @@ const Covid19 = () => {
 
   let unique_parameters = ['lambda', 'p', 'R']
 
-  const handleOnClick = (e, lad) => {
+  const handleOnClick = (lad) => {
     ladActions.load(lad)
   }
 
