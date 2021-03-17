@@ -152,9 +152,10 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {xAxis}
         <YAxis
           domain={y_domain}
+          allowDataOverflow={true}
           fontSize='12'
           tick={data.length}
-          tickFormatter={value => parseFloat(value).toFixed(2)}
+          tickFormatter={value => `${(value * 100).toFixed(0)}%`}
           tickMargin='4'
           width={48}
           stroke='currentcolor'
