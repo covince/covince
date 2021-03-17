@@ -25,7 +25,7 @@ const colorStops = [
 const quadColorStops =
   colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
 
-const ColourBar = ({ dmin, dmax, scale }) => {
+const ColourBar = ({ dmin, dmax, scale, type }) => {
   let midpoint
   if (dmax > 2) {
     midpoint = Math.ceil((dmin + dmax) * 0.5)
@@ -38,7 +38,12 @@ const ColourBar = ({ dmin, dmax, scale }) => {
     for (let i = 0; i < scale.length; i += 2) {
       const value = scale[i]
       const color = scale[i + 1]
-      stops.push(`${color} ${value / (dmax - dmin) * 100}%`)
+      const range =
+        type === 'quadratic'
+          ? Math.sqrt(dmax) - Math.sqrt(dmin)
+          : dmax - dmin
+      const percent = value / range * 100
+      stops.push(`${color} ${percent}%`)
     }
     return `linear-gradient(to right, ${stops.join(',')})`
   }, [dmin, dmax, scale])
@@ -62,8 +67,6 @@ const ColourBar = ({ dmin, dmax, scale }) => {
 }
 
 const Chloropleth = (props) => {
-  const { color_scale_type, tiles, handleOnClick, min_val, max_val, lineColor = 'blueGray' } = props
-
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
@@ -74,8 +77,8 @@ const Chloropleth = (props) => {
     zoom: props.isMobile ? 4.5 : 5
   })
 
-  const { date, index, lad } = props
-  console.log(lad)
+  const { tiles, date, index, lad } = props
+
   const data = useMemo(() => {
     if (tiles === null || index === null) {
       return null
@@ -101,27 +104,31 @@ const Chloropleth = (props) => {
     }
   }, [tiles, date, index, lad])
 
+  const { color_scale_type, min_val, max_val } = props
+
   const colorScale = useMemo(() => {
     if (max_val === 0) {
       return [0, '#fff']
     }
     const scale = []
+
     const range = color_scale_type === 'quadratic'
-      ? Math.sqrt(max_val - min_val)
+      ? Math.sqrt(max_val) - Math.sqrt(min_val)
       : max_val - min_val
+
     const stops = color_scale_type === 'quadratic'
       ? quadColorStops
       : colorStops
+
     for (const { index, rgb } of stops) {
       scale.unshift(rgb)
-      scale.unshift(
-        range *
-        (1 - index) *
-        1.1 // don't go to deep black
-      )
+      scale.unshift(range * (1 - index))
     }
+
     return scale
   }, [max_val, min_val, color_scale_type])
+
+  const { lineColor = 'blueGray' } = props
 
   const mapStyle = useMemo(() => ({
     version: 8,
@@ -144,7 +151,9 @@ const Chloropleth = (props) => {
             [
               'interpolate',
               ['linear'],
-              ['get', 'value'],
+              color_scale_type === 'quadratic'
+                ? ['sqrt', ['get', 'value']]
+                : ['get', 'value'],
               ...colorScale
             ]
           ]
@@ -172,7 +181,7 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [data])
+  }), [data, colorScale, color_scale_type])
 
   return (
     <Measure
@@ -199,8 +208,7 @@ const Chloropleth = (props) => {
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (feature) {
-                console.log('fire')
-                handleOnClick(feature.properties.lad19cd)
+                props.handleOnClick(feature.properties.lad19cd)
               }
             }}
           >
@@ -213,6 +221,7 @@ const Chloropleth = (props) => {
                 dmin={min_val}
                 dmax={max_val}
                 scale={colorScale}
+                type={color_scale_type}
               />
             </div>
           </FadeTransition>
