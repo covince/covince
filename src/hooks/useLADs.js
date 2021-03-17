@@ -1,6 +1,5 @@
 import { useEffect, useReducer } from 'react'
 import axios from 'axios'
-import * as dataForge from 'data-forge'
 
 const useLAD = () => {
   const [state, dispatch] = useReducer((state, { type, payload }) => {
@@ -45,8 +44,7 @@ const useLAD = () => {
           x.range = [x.lower, x.upper]
           return (x)
         })
-        const df = new dataForge.DataFrame(new_data)
-        dispatch({ type: 'DATA', payload: df })
+        dispatch({ type: 'DATA', payload: new_data })
       })
   }, [state.loadingLad])
 

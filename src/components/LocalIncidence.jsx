@@ -35,8 +35,8 @@ const ChartHeading = ({ isMobile, ...props }) =>
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
     : <Heading {...props} />
 
-function LocalIncidence ({ dataframe, date, setDate, className, isMobile = false }) {
-  const lad_data = useMemo(() => dataframe ? dataframe.toArray() : [], [dataframe])
+function LocalIncidence ({ values, date, setDate, className, isMobile = false }) {
+  const lad_data = useMemo(() => values || [], [values])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
 

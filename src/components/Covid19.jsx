@@ -197,7 +197,7 @@ const Covid19 = () => {
           date={date}
           setDate={setDate}
           lad={ladState.currentLad}
-          dataframe={ladState.data}
+          values={ladState.data}
           isMobile={isMobile}
         />
       </Card>
