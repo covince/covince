@@ -27,6 +27,9 @@ module.exports = {
       spacing: {
         header: defaultTheme.spacing[16],
         'header-md': defaultTheme.spacing[32]
+      },
+      gridTemplateRows: {
+        '1-full': '100%'
       }
     }
   },

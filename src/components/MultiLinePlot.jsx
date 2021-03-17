@@ -13,7 +13,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       return 0
     })
     return (
-      <div className='p-3 bg-white shadow rounded-md text-sm leading-5'>
+      <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
           {format(new Date(label), 'd MMMM yyyy')}
         </h4>
@@ -106,7 +106,6 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     <Tooltip
       content={CustomTooltip}
       cursor={{ stroke: tailwindColors[color][300] }}
-      viewBox={{ x: 0, y: 0, width: 1, height: 1 }}
     />
 
   const xAxis =
@@ -124,7 +123,6 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
       <ComposedChart {...chartProps}>
         {grid}
         {lineages.map((lineage, index) =>
-        // eslint-disable-next-line react/jsx-key
           <Area
             key={lineage}
             activeDot={{ stroke: tailwindColors[color][400] }}
