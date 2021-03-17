@@ -90,6 +90,17 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     className
   }
 
+  const y_domain = useMemo(() => {
+    if (type === 'area') {
+      return [0, 1]
+    } else if (parameter === 'R') {
+      return [0, 3]
+    } else {
+      return [0, 'auto']
+    }
+  }, [type, parameter]
+  )
+
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
 
@@ -140,7 +151,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         )}
         {xAxis}
         <YAxis
-          domain={[0, 1]}
+          domain={y_domain}
           fontSize='12'
           tick={data.length}
           tickFormatter={value => parseFloat(value).toFixed(2)}
@@ -185,12 +196,16 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         )}
         {xAxis}
         <YAxis
+          type="number"
+          allowDataOverflow={true}
+          domain={y_domain}
           fontSize='12'
           width={48}
           tick={data.length}
           stroke='currentcolor'
           tickMargin='4'
           tickFormatter={d => parseFloat(d).toLocaleString()}
+          tickCount={4}
         />
         {dateLine}
         {tooltip}
