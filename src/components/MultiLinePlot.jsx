@@ -90,11 +90,14 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     className
   }
 
-  const yAxisFormatter = useMemo(() => (
-    parameter === 'p'
+  const percentage = parameter === 'p'
+  const yAxisProps = useMemo(() => ({
+    tickFormatter: percentage
       ? value => `${Math.min(parseFloat(value), 100)}%`
-      : value => parseFloat(value).toLocaleString()
-  ), [parameter])
+      : value => parseFloat(value).toLocaleString(),
+    ticks: percentage ? [0, 25, 50, 75, 100] : undefined,
+    domain: type === 'area' ? [0, 1] : undefined
+  }), [percentage, type])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
@@ -125,6 +128,16 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
       stroke='currentcolor'
     />
 
+  const yAxis =
+    <YAxis
+      fontSize='12'
+      width={48}
+      stroke='currentcolor'
+      tickMargin='4'
+      tick={data.length}
+      {...yAxisProps}
+    />
+
   if (type === 'area') {
     return (
       <ComposedChart {...chartProps}>
@@ -144,15 +157,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           />
         )}
         {xAxis}
-        <YAxis
-          domain={[0, 1]}
-          fontSize='12'
-          tick={data.length}
-          tickFormatter={yAxisFormatter}
-          tickMargin='4'
-          width={48}
-          stroke='currentcolor'
-        />
+        {yAxis}
         {dateLine}
         {tooltip}
       </ComposedChart>
@@ -189,14 +194,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           />
         )}
         {xAxis}
-        <YAxis
-          fontSize='12'
-          width={48}
-          tick={data.length}
-          stroke='currentcolor'
-          tickMargin='4'
-          tickFormatter={yAxisFormatter}
-        />
+        {yAxis}
         {dateLine}
         {tooltip}
       </ComposedChart>
