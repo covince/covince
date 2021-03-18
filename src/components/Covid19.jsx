@@ -136,7 +136,7 @@ const Covid19 = () => {
                 Lineage
               </label>
               <Select
-                value={lineageState.lineage}
+                value={lineageState.loading.lineage || lineageState.lineage}
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
@@ -148,7 +148,7 @@ const Covid19 = () => {
                 Color by
               </label>
               <Select
-                value={lineageState.parameter}
+                value={lineageState.loading.parameter || lineageState.parameter}
                 name='parameters'
                 onChange={e => lineageActions.colorBy(e.target.value)}
               >
@@ -178,6 +178,7 @@ const Covid19 = () => {
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
+              percentage={lineageState.parameter === 'p'}
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>

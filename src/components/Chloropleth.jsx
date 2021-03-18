@@ -8,7 +8,6 @@ import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
 
 import FadeTransition from './FadeTransition'
-import { Heading } from './Typography'
 
 // magma
 const colorStops = [
@@ -26,7 +25,7 @@ const colorStops = [
 const quadColorStops =
   colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
 
-const ColourBar = ({ dmin, dmax, scale, type, className }) => {
+const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   let midpoint
   if (dmax > 2) {
     midpoint = Math.ceil((dmin + dmax) * 0.5)
@@ -49,18 +48,24 @@ const ColourBar = ({ dmin, dmax, scale, type, className }) => {
     return `linear-gradient(to right, ${stops.join(',')})`
   }, [dmin, dmax, scale])
 
+  const formatValue = useMemo(() =>
+    percentage
+      ? v => `${v}%`
+      : v => Math.round(v).toLocaleString()
+  , [percentage])
+
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-70', className)}>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
       <div className='grid grid-cols-3 text-xs leading-6'>
         <span>
-          {Math.ceil(dmin).toLocaleString()}
+          {formatValue(dmin)}
         </span>
         <span className='text-center'>
-          {midpoint.toLocaleString()}
+          {formatValue(midpoint)}
         </span>
         <span className='text-right'>
-          {Math.ceil(dmax).toLocaleString()}
+          {formatValue(dmax)}
         </span>
       </div>
     </div>
@@ -186,6 +191,14 @@ const Chloropleth = (props) => {
 
   const [popupFeature, setPopupFeature] = useState(null)
 
+  const { percentage } = props
+
+  const formatValue = useMemo(() =>
+    percentage
+      ? v => `${v.toFixed(1)}%`
+      : v => v.toFixed(2)
+  , [percentage])
+
   return (
     <Measure
       bounds
@@ -227,12 +240,18 @@ const Chloropleth = (props) => {
             { popupFeature &&
               <Popup
                 closeButton={false}
+                captureDrag={false}
                 latitude={popupFeature.lat}
                 longitude={popupFeature.long}
-                className='text-center text-sm leading-5 font-sans px-1'
+                className='text-center text-current leading-none font-sans'
+                tipSize={8}
               >
-                <Heading tag='p'>{Math.round(popupFeature.value).toLocaleString()}</Heading>
-                <p className=''>{popupFeature.lad19nm}</p>
+                <p className='font-bold text-gray-700'>
+                  {formatValue(popupFeature.value)}
+                </p>
+                <p className='text-sm'>
+                  {popupFeature.lad19nm}
+                </p>
               </Popup> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
@@ -242,6 +261,7 @@ const Chloropleth = (props) => {
               dmax={max_val}
               scale={colorScale}
               type={color_scale_type}
+              percentage={percentage}
             />
           </FadeTransition>
         </div>

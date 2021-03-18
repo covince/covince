@@ -5,7 +5,7 @@ import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChar
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
     payload.sort((a, b) => {
       if (a.value < b.value) return 1
@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                   {item.name}
                 </td>
                 <td className='text-right'>
-                  {item.value.toFixed(3)}
+                  {percentage ? `${item.value.toFixed(1)}%` : item.value.toFixed(2)}
                 </td>
               </tr>
             )
@@ -90,6 +90,12 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     className
   }
 
+  const yAxisFormatter = useMemo(() => (
+    parameter === 'p'
+      ? value => `${Math.min(parseFloat(value), 100)}%`
+      : value => parseFloat(value).toLocaleString()
+  ), [parameter])
+
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
 
@@ -105,6 +111,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   const tooltip =
     <Tooltip
       content={CustomTooltip}
+      percentage={parameter === 'p'}
       cursor={{ stroke: tailwindColors[color][300] }}
     />
 
@@ -141,7 +148,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           domain={[0, 1]}
           fontSize='12'
           tick={data.length}
-          tickFormatter={value => parseFloat(value).toFixed(2)}
+          tickFormatter={yAxisFormatter}
           tickMargin='4'
           width={48}
           stroke='currentcolor'
@@ -188,7 +195,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           tick={data.length}
           stroke='currentcolor'
           tickMargin='4'
-          tickFormatter={d => parseFloat(d).toLocaleString()}
+          tickFormatter={yAxisFormatter}
         />
         {dateLine}
         {tooltip}

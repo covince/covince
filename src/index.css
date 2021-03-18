@@ -63,3 +63,13 @@ html, body {
   @apply baseline-grid;
   background-size: 100% theme('spacing.6');
 }
+
+.baseline-grid-5 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.5');
+}
+
+.baseline-grid-4 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.4');
+}

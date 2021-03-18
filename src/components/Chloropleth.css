@@ -1,24 +1,3 @@
-.leaflet-container {
-  background-color: theme('colors.gray.200');
-  z-index: 0;
-}
-
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  font-family: monospace;
-  font-size: 20px !important;
-  color: theme('colors.gray.600') !important;
-}
-
-.leaflet-control-zoom-in {
-  border-bottom-color: theme('colors.gray.200') !important;
-}
-
-.leaflet-control.leaflet-control-zoom {
-  @apply ml-2 mt-2 shadow border-white hover:bg-gray-100 hover:border-gray-100;
-  border: none;
-}
-
-.leaflet-control.leaflet-control-zoom a:hover {
-  @apply bg-gray-100;
+.mapboxgl-popup-content.mapboxgl-popup-content {
+  @apply shadow-lg p-2 rounded;
 }
