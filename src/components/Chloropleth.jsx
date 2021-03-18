@@ -1,13 +1,14 @@
-import 'leaflet/dist/leaflet.css'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
 import React, { useState, useMemo } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
-import ReactMapGL, { NavigationControl } from 'react-map-gl'
+import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
 
 import FadeTransition from './FadeTransition'
+import { Heading } from './Typography'
 
 // magma
 const colorStops = [
@@ -25,7 +26,7 @@ const colorStops = [
 const quadColorStops =
   colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
 
-const ColourBar = ({ dmin, dmax, scale, type }) => {
+const ColourBar = ({ dmin, dmax, scale, type, className }) => {
   let midpoint
   if (dmax > 2) {
     midpoint = Math.ceil((dmin + dmax) * 0.5)
@@ -49,9 +50,9 @@ const ColourBar = ({ dmin, dmax, scale, type }) => {
   }, [dmin, dmax, scale])
 
   return (
-    <div className='space-y-2'>
-      <div className='h-4 rounded-sm' style={{ backgroundImage: gradient }} />
-      <div className='grid grid-cols-3 text-xs leading-none'>
+    <div className={classnames('p-2 pb-0 bg-white bg-opacity-70', className)}>
+      <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
+      <div className='grid grid-cols-3 text-xs leading-6'>
         <span>
           {Math.ceil(dmin).toLocaleString()}
         </span>
@@ -183,6 +184,8 @@ const Chloropleth = (props) => {
     ]
   }), [data, colorScale, color_scale_type])
 
+  const [popupFeature, setPopupFeature] = useState(null)
+
   return (
     <Measure
       bounds
@@ -198,8 +201,8 @@ const Chloropleth = (props) => {
         <div ref={measureRef} className={classnames(props.className, 'relative z-0')}>
           <ReactMapGL
             {...viewport}
+            minZoom={4}
             disableTokenWarning
-            attributionControl={false}
             onViewportChange={nextViewport => setViewport(nextViewport)}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
@@ -207,22 +210,39 @@ const Chloropleth = (props) => {
             interactiveLayerIds={['lads-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
-              if (feature) {
+              if (feature && 'value' in feature.properties) {
                 props.handleOnClick(feature.properties.lad19cd)
               }
             }}
+            onHover={e => {
+              const [feature] = e.features
+              if (feature && 'value' in feature.properties) {
+                setPopupFeature(feature.properties)
+              } else {
+                setPopupFeature(null)
+              }
+            }}
           >
-            <NavigationControl className='right-2 top-2' showCompass={false} />
+            <NavigationControl className='right-2 top-2' />
+            { popupFeature &&
+              <Popup
+                closeButton={false}
+                latitude={popupFeature.lat}
+                longitude={popupFeature.long}
+                className='text-center text-sm leading-5 font-sans px-1'
+              >
+                <Heading tag='p'>{Math.round(popupFeature.value).toLocaleString()}</Heading>
+                <p className=''>{popupFeature.lad19nm}</p>
+              </Popup> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
-            <div className="p-3 pb-2 bg-white shadow rounded absolute right-2 bottom-2 w-60 z-10">
-              <ColourBar
-                dmin={min_val}
-                dmax={max_val}
-                scale={colorScale}
-                type={color_scale_type}
-              />
-            </div>
+            <ColourBar
+              className='absolute left-0 bottom-0 w-60 z-10'
+              dmin={min_val}
+              dmax={max_val}
+              scale={colorScale}
+              type={color_scale_type}
+            />
           </FadeTransition>
         </div>
       )}
