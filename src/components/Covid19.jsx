@@ -160,9 +160,12 @@ const Covid19 = () => {
                 Scale
               </label>
               <Select
-                value={lineageState.scale} name='color_scale_type' onChange={e => lineageActions.setScale(e.target.value)}>
-                <option value='quadratic'>Quadratic</option>
+                value={lineageState.scale}
+                name='color_scale_type'
+                onChange={e => lineageActions.setScale(e.target.value)}
+              >
                 <option value='linear'>Linear</option>
+                <option value='quadratic'>Quadratic</option>
               </Select>
             </div>
           </form>

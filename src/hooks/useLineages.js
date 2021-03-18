@@ -19,7 +19,7 @@ const useLineages = () => {
             loading: {},
             ...state.loading,
             scale: state.parameter !== state.loading.parameter
-              ? setScale(state.parameter)
+              ? setScale(state.loading.parameter)
               : state.scale
           }
         }
