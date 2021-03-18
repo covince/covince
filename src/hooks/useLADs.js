@@ -41,8 +41,17 @@ const useLAD = () => {
     axios.get(`./data/ltla/${state.loadingLad}.json`)
       .then(res => {
         const new_data = res.data.data.map(x => {
-          x.range = [x.lower, x.upper]
-          return (x)
+          if (x.parameter === 'p') {
+            return {
+              ...x,
+              mean: x.mean * 100,
+              range: [x.lower * 100, x.upper * 100]
+            }
+          }
+          return {
+            ...x,
+            range: [x.lower, x.upper]
+          }
         })
         dispatch({ type: 'DATA', payload: new_data })
       })

@@ -16,8 +16,11 @@ const useLineages = () => {
             ...state,
             status: 'READY',
             data: payload,
-            resetScale: false,
-            scale: state.resetScale ? setScale(state.parameter) : state.scale
+            loading: {},
+            ...state.loading,
+            scale: state.parameter !== state.loading.parameter
+              ? setScale(state.parameter)
+              : state.scale
           }
         }
         default:
@@ -29,15 +32,20 @@ const useLineages = () => {
         return {
           ...state,
           status: 'LOADING',
-          lineage: payload
+          loading: {
+            lineage: payload,
+            parameter: state.parameter
+          }
         }
       }
       case 'COLOR_BY':
         return {
           ...state,
           status: 'LOADING',
-          parameter: payload,
-          resetScale: true
+          loading: {
+            lineage: state.lineage,
+            parameter: payload
+          }
         }
       case 'SCALE':
         return {
@@ -49,16 +57,19 @@ const useLineages = () => {
     }
   }, {
     status: 'LOADING',
-    lineage: 'B.1.1.7',
-    parameter: 'p',
-    scale: 'linear',
-    resetScale: false,
+    loading: {
+      lineage: 'B.1.1.7',
+      parameter: 'p'
+    },
+    lineage: null,
+    parameter: null,
+    scale: null,
     data: null
   })
 
   useEffect(() => {
     if (state.status === 'LOADING') {
-      const { lineage, parameter } = state
+      const { lineage, parameter } = state.loading
       axios.get(`./data/lineage/${lineage}/${parameter}.json`)
         .then(res => {
           dispatch({ type: 'DATA', payload: res.data })
@@ -83,6 +94,7 @@ const useLineages = () => {
     for (const row of values) {
       max = Math.max(max, ...row)
     }
+    if (state.parameter === 'p') max *= 100
 
     const index = {}
 
@@ -90,7 +102,8 @@ const useLineages = () => {
       const ltla = ltlas[i]
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
-        lookup[dates[j]] = values[i][j]
+        const value = values[i][j]
+        lookup[dates[j]] = state.parameter === 'p' ? value * 100 : value
       }
       index[ltla] = lookup
     }

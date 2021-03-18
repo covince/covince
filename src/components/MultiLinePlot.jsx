@@ -5,7 +5,7 @@ import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChar
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
     payload.sort((a, b) => {
       if (a.value < b.value) return 1
@@ -13,7 +13,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       return 0
     })
     return (
-      <div className='p-3 bg-white shadow rounded-md text-sm leading-5'>
+      <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
           {format(new Date(label), 'd MMMM yyyy')}
         </h4>
@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                   {item.name}
                 </td>
                 <td className='text-right'>
-                  {item.value.toFixed(3)}
+                  {percentage ? `${item.value.toFixed(1)}%` : item.value.toFixed(2)}
                 </td>
               </tr>
             )
@@ -90,7 +90,15 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     className
   }
 
-  const y_domain = useMemo(() => {
+  const percentage = parameter === 'p'
+  const yAxisTicks = useMemo(() => ({
+    tickFormatter: percentage
+      ? value => `${Math.min(parseFloat(value), 100)}%`
+      : value => parseFloat(value).toLocaleString(),
+    ticks: percentage ? [0, 25, 50, 75, 100] : undefined
+  }), [percentage, type])
+
+  const yAxisDomain = useMemo(() => {
     if (type === 'area') {
       return [0, 1]
     } else if (parameter === 'R') {
@@ -98,8 +106,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     } else {
       return [0, 'auto']
     }
-  }, [type, parameter]
-  )
+  }, [type, parameter])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
@@ -116,8 +123,8 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   const tooltip =
     <Tooltip
       content={CustomTooltip}
+      percentage={parameter === 'p'}
       cursor={{ stroke: tailwindColors[color][300] }}
-      viewBox={{ x: 0, y: 0, width: 1, height: 1 }}
     />
 
   const xAxis =
@@ -130,12 +137,24 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
       stroke='currentcolor'
     />
 
+  const yAxis =
+    <YAxis
+      type='number'
+      allowDataOverflow={parameter === 'R'}
+      domain={yAxisDomain}
+      fontSize='12'
+      width={48}
+      stroke='currentcolor'
+      tickMargin='4'
+      tick={data.length}
+      {...yAxisTicks}
+    />
+
   if (type === 'area') {
     return (
       <ComposedChart {...chartProps}>
         {grid}
         {lineages.map((lineage, index) =>
-        // eslint-disable-next-line react/jsx-key
           <Area
             key={lineage}
             activeDot={{ stroke: tailwindColors[color][400] }}
@@ -150,15 +169,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           />
         )}
         {xAxis}
-        <YAxis
-          domain={y_domain}
-          fontSize='12'
-          tick={data.length}
-          tickFormatter={value => parseFloat(value).toFixed(2)}
-          tickMargin='4'
-          width={48}
-          stroke='currentcolor'
-        />
+        {yAxis}
         {dateLine}
         {tooltip}
       </ComposedChart>
@@ -195,18 +206,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           />
         )}
         {xAxis}
-        <YAxis
-          type="number"
-          allowDataOverflow={true}
-          domain={y_domain}
-          fontSize='12'
-          width={48}
-          tick={data.length}
-          stroke='currentcolor'
-          tickMargin='4'
-          tickFormatter={d => parseFloat(d).toLocaleString()}
-          tickCount={4}
-        />
+        {yAxis}
         {dateLine}
         {tooltip}
       </ComposedChart>

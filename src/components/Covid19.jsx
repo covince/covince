@@ -49,7 +49,7 @@ const Covid19 = () => {
 
   let unique_parameters = ['lambda', 'p', 'R']
 
-  const handleOnClick = (e, lad) => {
+  const handleOnClick = (lad) => {
     ladActions.load(lad)
   }
 
@@ -70,7 +70,7 @@ const Covid19 = () => {
 
   return (
     <>
-      <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none', { 'order-last': view === 'map' })}>
+      <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
         <Card className='w-full md:w-auto md:flex mx-auto'>
           <div className={classNames('md:w-80 md:block', { hidden: view !== 'map' })}>
             <div className='h-6 flex justify-between items-start'>
@@ -118,7 +118,7 @@ const Covid19 = () => {
           </div>
         </Card>
       </div>
-      <Card className={classNames('flex flex-col md:grid md:grid-cols-2 md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': view === 'map' })}>
+      <Card className={classNames('flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: view === 'chart' })}>
           <div className='flex justify-between items-start'>
             <Heading>Map</Heading>
@@ -136,7 +136,7 @@ const Covid19 = () => {
                 Lineage
               </label>
               <Select
-                value={lineageState.lineage}
+                value={lineageState.loading.lineage || lineageState.lineage}
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
@@ -148,7 +148,7 @@ const Covid19 = () => {
                 Color by
               </label>
               <Select
-                value={lineageState.parameter}
+                value={lineageState.loading.parameter || lineageState.parameter}
                 name='parameters'
                 onChange={e => lineageActions.colorBy(e.target.value)}
               >
@@ -166,7 +166,7 @@ const Covid19 = () => {
               </Select>
             </div>
           </form>
-          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col'>
+          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
@@ -178,12 +178,14 @@ const Covid19 = () => {
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
+              percentage={lineageState.parameter === 'p'}
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-700 w-8 h-8' />
               </div>
             </FadeTransition>
+            <div className='absolute inset-0 shadow-inner pointer-events-none' />
           </div>
         </div>
         <LocalIncidence

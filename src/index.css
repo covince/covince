@@ -19,6 +19,7 @@ html, body {
   height: 100%;
 }
 
+/* 100vh is incorrect on android, need to use % */
 #root > header + * {
   height: calc(100% - theme('spacing.header'))
 }
@@ -29,8 +30,12 @@ html, body {
 }
 
 @media (min-width: theme('screens.md')) {
+  #root {
+    height: auto;
+  }
+
   #root > header + * {
-    height: calc(100% - theme('spacing.header-md'))
+    min-height: calc(100vh - theme('spacing.header-md'))
   }
   
   .container {
@@ -57,4 +62,14 @@ html, body {
 .baseline-grid-6 {
   @apply baseline-grid;
   background-size: 100% theme('spacing.6');
+}
+
+.baseline-grid-5 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.5');
+}
+
+.baseline-grid-4 {
+  @apply baseline-grid;
+  background-size: 100% theme('spacing.4');
 }
