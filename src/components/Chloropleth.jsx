@@ -195,7 +195,7 @@ const Chloropleth = (props) => {
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classnames(props.className, 'relative')}>
+        <div ref={measureRef} className={classnames(props.className, 'relative z-0')}>
           <ReactMapGL
             {...viewport}
             disableTokenWarning
@@ -203,7 +203,7 @@ const Chloropleth = (props) => {
             onViewportChange={nextViewport => setViewport(nextViewport)}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
-            className='bg-gray-200 md:rounded-md'
+            className='bg-gray-200'
             interactiveLayerIds={['lads-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
@@ -213,7 +213,6 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2' showCompass={false} />
-            <div className='absolute inset-0 md:rounded-md shadow-inner pointer-events-none' style={{ zIndex: 999 }} />
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
             <div className="p-3 pb-2 bg-white shadow rounded absolute right-2 bottom-2 w-60 z-10">

@@ -166,7 +166,7 @@ const Covid19 = () => {
               </Select>
             </div>
           </form>
-          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col'>
+          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
@@ -180,10 +180,11 @@ const Covid19 = () => {
               isMobile={isMobile}
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
-              <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center z-10'>
+              <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-700 w-8 h-8' />
               </div>
             </FadeTransition>
+            <div className='absolute inset-0 shadow-inner pointer-events-none' />
           </div>
         </div>
         <LocalIncidence
