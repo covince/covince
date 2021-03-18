@@ -236,7 +236,7 @@ const Chloropleth = (props) => {
               }
             }}
           >
-            <NavigationControl className='right-2 top-2' />
+            <NavigationControl className='right-2 top-2 z-10' />
             { popupFeature &&
               <Popup
                 closeButton={false}
