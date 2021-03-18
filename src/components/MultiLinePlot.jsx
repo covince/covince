@@ -91,13 +91,22 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   }
 
   const percentage = parameter === 'p'
-  const yAxisProps = useMemo(() => ({
+  const yAxisTicks = useMemo(() => ({
     tickFormatter: percentage
       ? value => `${Math.min(parseFloat(value), 100)}%`
       : value => parseFloat(value).toLocaleString(),
-    ticks: percentage ? [0, 25, 50, 75, 100] : undefined,
-    domain: type === 'area' ? [0, 1] : undefined
+    ticks: percentage ? [0, 25, 50, 75, 100] : undefined
   }), [percentage, type])
+
+  const yAxisDomain = useMemo(() => {
+    if (type === 'area') {
+      return [0, 1]
+    } else if (parameter === 'R') {
+      return [0, 3]
+    } else {
+      return [0, 'auto']
+    }
+  }, [type, parameter])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[color][300]} />
@@ -130,12 +139,15 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
 
   const yAxis =
     <YAxis
+      type='number'
+      allowDataOverflow={parameter === 'R'}
+      domain={yAxisDomain}
       fontSize='12'
       width={48}
       stroke='currentcolor'
       tickMargin='4'
       tick={data.length}
-      {...yAxisProps}
+      {...yAxisTicks}
     />
 
   if (type === 'area') {
