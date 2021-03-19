@@ -12,7 +12,7 @@ const Select = (props) =>
         'heron-styled-select',
         'block w-full py-2 pl-2 lg:pl-3 pr-6 lg:pr-10',
         'border border-gray-300 bg-white rounded-md shadow-sm',
-        'focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500'
+        'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary'
       ]
     )}
   />

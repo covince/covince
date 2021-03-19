@@ -9,20 +9,15 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
-    // fontFamily: {
-    //   sans: ['Helvetica Neue', 'arial', 'sans-serif'],
-    //   display: ['Wellcome Bold', 'Helvetica Neue', 'arial', 'sans-serif']
-    // },
+    fontFamily: {
+      sans: defaultTheme.fontFamily.sans,
+      heading: defaultTheme.fontFamily.sans
+    },
     container: false,
     extend: {
       colors: {
         gray: colors.blueGray,
-        sanger: {
-          'light-blue': '#b2c9d3',
-          'medium-blue': '#597fba',
-          blue: '#2d3a87',
-          'dark-blue': '#232642'
-        }
+        primary: colors.blue[700]
       },
       spacing: {
         header: defaultTheme.spacing[16],
