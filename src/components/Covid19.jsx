@@ -155,7 +155,7 @@ const Covid19 = () => {
                 {parameter_options}
               </Select>
             </div>
-            <div className='pr-px'>
+            <div>
               <label className='block font-medium mb-1'>
                 Scale
               </label>
