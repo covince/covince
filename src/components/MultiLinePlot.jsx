@@ -55,7 +55,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
 
 const colors = ['red', 'green', 'blue', 'orange', 'pink', 'aqua', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
-const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, color = 'blueGray', className }) => {
+const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, stroke = 'blueGray', className }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
     const lineages = new Set()
@@ -109,12 +109,12 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   }, [type, parameter])
 
   const grid =
-    <CartesianGrid stroke={tailwindColors[color][300]} />
+    <CartesianGrid stroke={tailwindColors[stroke][300]} />
 
   const dateLine =
     <ReferenceLine
       x={date}
-      stroke={tailwindColors[color][400]}
+      stroke={tailwindColors[stroke][400]}
       label=''
       strokeWidth={2}
       style={{ mixBlendMode: 'multiply' }}
@@ -124,7 +124,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     <Tooltip
       content={CustomTooltip}
       percentage={parameter === 'p'}
-      cursor={{ stroke: tailwindColors[color][300] }}
+      cursor={{ stroke: tailwindColors[stroke][300] }}
     />
 
   const xAxis =
@@ -157,7 +157,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {lineages.map((lineage, index) =>
           <Area
             key={lineage}
-            activeDot={{ stroke: tailwindColors[color][400] }}
+            activeDot={{ stroke: tailwindColors[stroke][400] }}
             dataKey={lineage}
             dot={false}
             fill={colors[index]}
@@ -196,7 +196,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {lineages.map((lineage, index) =>
           <Line
             key={lineage}
-            activeDot={{ stroke: tailwindColors[color][400] }}
+            activeDot={{ stroke: tailwindColors[stroke][400] }}
             dataKey={lineage}
             dot={false}
             isAnimationActive={false}

@@ -22,7 +22,7 @@ import useLineages from '../hooks/useLineages'
 const LALookupTable = getLALookupTable()
 const tiles = loadTiles()
 
-const Covid19 = () => {
+const Covid19 = ({ lineColor = 'blueGray' }) => {
   const unique_lineages = loadData().lineages
 
   const [playing, setPlaying] = useState(false)
@@ -182,6 +182,7 @@ const Covid19 = () => {
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               percentage={lineageState.parameter === 'p'}
+              lineColor={lineColor}
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
@@ -204,6 +205,7 @@ const Covid19 = () => {
           lad={ladState.currentLad}
           values={ladState.data}
           isMobile={isMobile}
+          lineColor={lineColor}
         />
       </Card>
     </>
