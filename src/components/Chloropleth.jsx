@@ -225,6 +225,8 @@ const Chloropleth = (props) => {
               const [feature] = e.features
               if (feature && 'value' in feature.properties) {
                 props.handleOnClick(feature.properties.lad19cd)
+              } else {
+                props.handleOnClick('national')
               }
             }}
             onHover={e => {
@@ -234,6 +236,11 @@ const Chloropleth = (props) => {
               } else {
                 setPopupFeature(null)
               }
+            }}
+            getCursor={({ isHovering, isDragging }) => {
+              if (isDragging) return 'grabbing'
+              if (isHovering || lad !== 'national') return 'pointer'
+              return 'grab'
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />

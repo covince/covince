@@ -99,7 +99,7 @@ const Covid19 = () => {
           <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
             <div className='h-6 flex justify-between items-start relative'>
               <DescriptiveHeading>
-                Local authority
+                Region
               </DescriptiveHeading>
               { isMobile
                 ? <Button onClick={() => setView('map')}>
@@ -113,7 +113,10 @@ const Covid19 = () => {
               {LALookupTable[ladState.currentLad]}
             </Heading>
             <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-              {ladState.currentLad}
+              {ladState.currentLad === 'national'
+                ? null
+                : ladState.currentLad
+              }
             </p>
           </div>
         </Card>
