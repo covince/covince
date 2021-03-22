@@ -21,12 +21,13 @@ import useLineages from '../hooks/useLineages'
 
 const LALookupTable = getLALookupTable()
 const tiles = loadTiles()
+const data = loadData()
 
 const Covid19 = ({ lineColor = 'blueGray' }) => {
-  const unique_lineages = loadData().lineages
+  const unique_lineages = data.lineages
 
   const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState('2020-09-02')
+  const [date, setDate] = useState(data.initialDate)
 
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
