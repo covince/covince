@@ -12,7 +12,7 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 input[type=range]:focus-visible {
-  @apply outline-none border-gray-500;
+  @apply outline-none border-primary;
 }
 
 .heron-slider-thumb {
@@ -46,7 +46,7 @@ input[type=range]::-moz-range-thumb {
     h-2 w-full
     cursor-pointer
     shadow-inner
-    bg-gray-200
+    bg-gray-100
     rounded-full
   ;
 }
