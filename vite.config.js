@@ -6,7 +6,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 export default defineConfig({
   plugins: [reactRefresh()],
   publicDir: './public',
-  base: '/covince/',
+  base: '/',
   resolve: {
     alias: {
       'mapbox-gl': 'maplibre-gl'
