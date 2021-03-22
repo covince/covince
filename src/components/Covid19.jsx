@@ -26,7 +26,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   const unique_lineages = loadData().lineages
 
   const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState('2020-09-07')
+  const [date, setDate] = useState('2020-09-02')
 
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
