@@ -11,7 +11,7 @@ const Checkbox = ({ id, name, label, checked, onChange, children }) => (
         checked={checked}
         onChange={onChange}
         type="checkbox"
-        className="outline-none focus:ring-2 ring-gray-500 ring-offset-2 h-4 w-4 text-gray-500 border-gray-300 rounded"
+        className="outline-none focus:ring-2 ring-primary ring-offset-2 h-4 w-4 text-primary border-gray-300 rounded"
       />
     </div>
     <div className='ml-2 text-sm'>
