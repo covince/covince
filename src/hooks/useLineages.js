@@ -95,6 +95,8 @@ const useLineages = () => {
       max = Math.max(max, ...row)
     }
     if (state.parameter === 'p') max *= 100
+    if (state.parameter === 'R') max = 4
+    if (state.parameter === 'lambda') max = Math.min(max, 1000)
 
     const index = {}
 
