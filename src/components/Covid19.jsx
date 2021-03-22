@@ -74,7 +74,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         category: 'National overview',
         heading: 'England',
         subheading: (
-          <span className='flex items-center text-gray-500'>
+          <span className='flex items-center text-subheading'>
             Select a local authority to explore
           </span>
         )

@@ -5,6 +5,11 @@ import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChar
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 
+const formatLargeNumber = number => {
+  const fixed = number.toFixed(2)
+  return parseFloat(fixed).toLocaleString()
+}
+
 const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
     payload.sort((a, b) => {
@@ -39,7 +44,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
                   {item.name}
                 </td>
                 <td className='text-right'>
-                  {percentage ? `${item.value.toFixed(1)}%` : item.value.toFixed(2)}
+                  {percentage ? `${item.value.toFixed(1)}%` : formatLargeNumber(item.value)}
                 </td>
               </tr>
             )
@@ -98,7 +103,12 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   const yAxisTicks = useMemo(() => ({
     tickFormatter: percentage
       ? value => `${Math.min(parseFloat(value), 100)}%`
-      : value => parseFloat(value).toLocaleString(),
+      : value => {
+        if (value >= 10e3) {
+          return `${value.toString().slice(0, 2)}K`
+        }
+        return value.toLocaleString()
+      },
     ticks: percentage ? [0, 25, 50, 75, 100] : undefined
   }), [percentage, type])
 
