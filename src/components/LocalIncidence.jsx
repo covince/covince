@@ -35,7 +35,7 @@ const ChartHeading = ({ isMobile, ...props }) =>
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
     : <Heading {...props} />
 
-function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
+function LocalIncidence({ values, date, setDate, className, isMobile = false, lineColor }) {
   const lad_data = useMemo(() => values || [], [values])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
@@ -89,6 +89,28 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             date={date}
             setDate={setDate}
             parameter='p'
+            type={proportion_display_type}
+            stroke={lineColor}
+          />
+          <IncidenceChart
+            width={width}
+            isMobile={isMobile}
+            heading={
+              <ChartHeading className='pl-12 pr-6 flex items-center justify-between' isMobile={isMobile}>
+                Raw proportion
+                <Checkbox
+                  id='proportion_display_type'
+                  checked={proportion_display_type === 'area'}
+                  label='Area'
+                  onChange={handleChange}
+                  toggle
+                />
+              </ChartHeading>
+            }
+            lad_data={lad_data}
+            date={date}
+            setDate={setDate}
+            parameter='raw_p'
             type={proportion_display_type}
             stroke={lineColor}
           />
