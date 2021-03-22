@@ -55,7 +55,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   , [percentage])
 
   return (
-    <div className={classnames('p-2 pb-0 bg-white bg-opacity-70', className)}>
+    <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
       <div className='grid grid-cols-3 text-xs leading-6'>
         <span>
@@ -219,7 +219,7 @@ const Chloropleth = (props) => {
             onViewportChange={nextViewport => setViewport(nextViewport)}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
-            className='bg-gray-200'
+            className='bg-gray-50'
             interactiveLayerIds={['lads-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
