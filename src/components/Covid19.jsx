@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import format from 'date-fns/format'
 import classNames from 'classnames'
 
@@ -68,6 +68,25 @@ const Covid19 = () => {
   const [view, setView] = useState('map')
   const isMobile = useMobile()
 
+  const locationFilter = useMemo(() => {
+    if (ladState.currentLad === 'national') {
+      return {
+        category: 'National overview',
+        heading: 'England',
+        subheading: (
+          <span className='flex items-center text-gray-500'>
+            Select a local authority to explore
+          </span>
+        )
+      }
+    }
+    return {
+      category: 'Local authority',
+      heading: LALookupTable[ladState.currentLad],
+      subheading: ladState.currentLad
+    }
+  }, [ladState.currentLad])
+
   return (
     <>
       <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
@@ -99,7 +118,7 @@ const Covid19 = () => {
           <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
             <div className='h-6 flex justify-between items-start relative'>
               <DescriptiveHeading>
-                Region
+                {locationFilter.category}
               </DescriptiveHeading>
               { isMobile
                 ? <Button onClick={() => setView('map')}>
@@ -110,13 +129,10 @@ const Covid19 = () => {
                 </FadeTransition> }
             </div>
             <Heading>
-              {LALookupTable[ladState.currentLad]}
+              {locationFilter.heading}
             </Heading>
             <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-              {ladState.currentLad === 'national'
-                ? null
-                : ladState.currentLad
-              }
+              {locationFilter.subheading}
             </p>
           </div>
         </Card>
