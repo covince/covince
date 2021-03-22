@@ -85,7 +85,11 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     width,
     height,
     margin: { top: 16, left: 0, right: 24 },
-    onClick: ({ activeLabel }) => setDate(activeLabel),
+    onClick: item => {
+      if (item) {
+        setDate(item.activeLabel)
+      }
+    },
     cursor: 'pointer',
     className
   }

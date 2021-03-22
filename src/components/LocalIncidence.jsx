@@ -20,7 +20,7 @@ const IncidenceChart = ({ heading, isMobile, ...props }) => {
         <div ref={measureRef}>
           {heading}
           <MultiLinePlot
-            height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3))}
+            height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
             {...props}
             className='-mt-2 md:m-0'
           />
