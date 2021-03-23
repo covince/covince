@@ -45,7 +45,9 @@ function loadTiles () {
 }
 
 function getLALookupTable () {
-  const lookupTable = {}
+  const lookupTable = {
+    national: 'National'
+  }
 
   geojson.features.forEach((item) => {
     lookupTable[item.properties.lad19cd] = item.properties.lad19nm
