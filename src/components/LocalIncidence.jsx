@@ -35,17 +35,26 @@ const ChartHeading = ({ isMobile, ...props }) =>
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
     : <Heading {...props} />
 
-function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
+function LocalIncidence({ values, date, setDate, className, isMobile = false, lineColor }) {
   const lad_data = useMemo(() => values || [], [values])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
+  const [lambda_display_type, setLambdaDisplayType] = useState('line')
 
-  const handleChange = function (event) {
+  const handlePropChange = function (event) {
     const target = event.target
     if (target.checked) {
       setProportionDisplayType('area')
     } else {
       setProportionDisplayType('line')
+    }
+  }
+  const handleLambdaChange = function (event) {
+    const target = event.target
+    if (target.checked) {
+      setLambdaDisplayType('area')
+    } else {
+      setLambdaDisplayType('line')
     }
   }
 
@@ -63,11 +72,18 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading={<ChartHeading className='pl-12' isMobile={isMobile}>Incidence</ChartHeading>}
+            heading={<ChartHeading className='pl-12 pr-6 flex items-center justify-between' isMobile={isMobile}>Incidence  <Checkbox
+              id='lambda_display_type'
+              checked={lambda_display_type === 'area'}
+              label='Stack'
+              onChange={handleLambdaChange}
+              toggle
+            /></ChartHeading>}
             lad_data={lad_data}
             date={date}
             setDate={setDate}
             parameter='lambda'
+            type={lambda_display_type}
             stroke={lineColor}
           />
           <IncidenceChart
@@ -79,8 +95,8 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
                 <Checkbox
                   id='proportion_display_type'
                   checked={proportion_display_type === 'area'}
-                  label='Area'
-                  onChange={handleChange}
+                  label='Stack'
+                  onChange={handlePropChange}
                   toggle
                 />
               </ChartHeading>
