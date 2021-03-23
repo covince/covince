@@ -186,7 +186,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
                 Scale
               </label>
               <Select
-                value={lineageState.scale}
+                value={lineageState.scale || ''}
                 name='color_scale_type'
                 onChange={e => lineageActions.setScale(e.target.value)}
               >

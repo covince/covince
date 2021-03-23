@@ -7,7 +7,7 @@ import * as tailwindColors from 'tailwindcss/colors'
 
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
-  return parseFloat(fixed).toLocaleString()
+  return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
 const CustomTooltip = ({ active, payload, label, percentage }) => {
