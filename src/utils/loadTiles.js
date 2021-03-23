@@ -1,10 +1,10 @@
-import geojson from '../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json' // Can change to BUC to reduce bundle size
-// import { features } from '../assets/hex.json' // Can change to BUC to reduce bundle size
+//import geojson from '../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json' // Can change to BUC to reduce bundle size
+import geojson from '../assets/hex3.json'
 
 import colormap from 'colormap'
 // let colormap = require('colormap')
 
-function getColorScale (dmin, dmax, colorScaleType) {
+function getColorScale(dmin, dmax, colorScaleType) {
   // dmin=0
   // dmax = 200
 
@@ -40,11 +40,11 @@ function getColorScale (dmin, dmax, colorScaleType) {
   return scale
 }
 
-function loadTiles () {
+function loadTiles() {
   return geojson
 }
 
-function getLALookupTable () {
+function getLALookupTable() {
   const lookupTable = {
     national: 'National'
   }
