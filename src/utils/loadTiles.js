@@ -1,5 +1,5 @@
-//import geojson from '../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json' // Can change to BUC to reduce bundle size
-import geojson from '../assets/hex3.json'
+import geojson from '../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json' // Can change to BUC to reduce bundle size
+//import geojson from '../assets/hex3.json'
 
 import colormap from 'colormap'
 // let colormap = require('colormap')
