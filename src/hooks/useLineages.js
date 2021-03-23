@@ -59,7 +59,7 @@ const useLineages = () => {
     status: 'LOADING',
     loading: {
       lineage: 'B.1.1.7',
-      parameter: 'p'
+      parameter: 'lambda'
     },
     lineage: null,
     parameter: null,
