@@ -109,7 +109,11 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         }
         return value.toLocaleString()
       },
-    ticks: percentage ? [0, 25, 50, 75, 100] : undefined
+    ticks: percentage
+      ? [0, 25, 50, 75, 100]
+      : parameter === 'R'
+        ? [0, 1, 2, 3]
+        : undefined
   }), [percentage, type])
 
   const yAxisDomain = useMemo(() => {
@@ -223,6 +227,15 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {yAxis}
         {dateLine}
         {tooltip}
+        {parameter === 'R' &&
+          <ReferenceLine
+            y={1}
+            stroke={tailwindColors[stroke][600]}
+            strokeDasharray={[8, 8]}
+            label=''
+            strokeWidth={3}
+            style={{ mixBlendMode: 'multiply' }}
+          /> }
       </ComposedChart>
     )
   }
