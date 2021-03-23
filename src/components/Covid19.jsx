@@ -92,28 +92,34 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
     <>
       <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
         <Card className='w-full md:w-auto md:flex mx-auto'>
-          <div className={classNames('md:w-80 md:block', { hidden: view !== 'map' })}>
-            <div className='h-6 flex justify-between items-start'>
-              <DescriptiveHeading>
-                Select date
-              </DescriptiveHeading>
-              <PlayButton
-                playing={playing}
-                toggleState={setPlaying}
-              />
-            </div>
-            <div className='flex items-center justify-between h-6'>
-              <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
-            </div>
-            <div className='h-6 mt-2'>
-              <Slider
-                min={0}
-                max={results ? results.dates.length - 1 : 1}
-                onChange={handleDateSlider}
-                value={results ? results.dates.indexOf(date) : 0}
-                disabled={!results}
-              />
-            </div>
+          <div className={classNames('md:w-80', { hidden: view !== 'map' })}>
+            { results
+              ? <>
+                <div className='h-6 flex justify-between items-start'>
+                  <DescriptiveHeading>
+                    Select date
+                  </DescriptiveHeading>
+                  <PlayButton
+                    playing={playing}
+                    toggleState={setPlaying}
+                  />
+                </div>
+                <div className='flex items-center justify-between h-6'>
+                  <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
+                </div>
+                <div className='h-6 mt-2'>
+                  <Slider
+                    min={0}
+                    max={results.dates.length - 1}
+                    onChange={handleDateSlider}
+                    value={results.dates.indexOf(date)}
+                    disabled={!results}
+                  />
+                </div>
+              </>
+              : <div className='h-20 grid place-content-center'>
+                <Spinner className='text-gray-700 w-6 h-6' />
+              </div> }
           </div>
           <div className='border border-gray-200 mx-6 hidden md:block' />
           <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
@@ -206,7 +212,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-700 w-8 h-8' />
+                <Spinner className='text-gray-700 w-6 h-6' />
               </div>
             </FadeTransition>
             <div className='absolute inset-0 shadow-inner pointer-events-none' />
