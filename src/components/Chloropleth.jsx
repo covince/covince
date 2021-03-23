@@ -91,7 +91,7 @@ const Chloropleth = (props) => {
     else if (newViewport.longitude > bounds.maxLongitude) {
       newViewport.longitude = bounds.maxLongitude;
     }
-    else if (newViewport.latitude < bounds.minLatitude) {
+    if (newViewport.latitude < bounds.minLatitude) {
       newViewport.latitude = bounds.minLatitude;
     }
     else if (newViewport.latitude > bounds.maxLatitude) {
