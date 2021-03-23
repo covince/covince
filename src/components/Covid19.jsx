@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import format from 'date-fns/format'
 import classNames from 'classnames'
 
@@ -21,12 +21,13 @@ import useLineages from '../hooks/useLineages'
 
 const LALookupTable = getLALookupTable()
 const tiles = loadTiles()
+const data = loadData()
 
 const Covid19 = ({ lineColor = 'blueGray' }) => {
-  const unique_lineages = loadData().lineages
+  const unique_lineages = data.lineages
 
   const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState('2020-09-07')
+  const [date, setDate] = useState(data.initialDate)
 
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
@@ -68,38 +69,63 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   const [view, setView] = useState('map')
   const isMobile = useMobile()
 
+  const locationFilter = useMemo(() => {
+    if (ladState.currentLad === 'national') {
+      return {
+        category: 'National overview',
+        heading: 'England',
+        subheading: (
+          <span className='flex items-center text-subheading'>
+            Select a local authority to explore
+          </span>
+        )
+      }
+    }
+    return {
+      category: 'Local authority',
+      heading: LALookupTable[ladState.currentLad],
+      subheading: ladState.currentLad
+    }
+  }, [ladState.currentLad])
+
   return (
     <>
       <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
         <Card className='w-full md:w-auto md:flex mx-auto'>
-          <div className={classNames('md:w-80 md:block', { hidden: view !== 'map' })}>
-            <div className='h-6 flex justify-between items-start'>
-              <DescriptiveHeading>
-                Select date
-              </DescriptiveHeading>
-              <PlayButton
-                playing={playing}
-                toggleState={setPlaying}
-              />
-            </div>
-            <div className='flex items-center justify-between h-6'>
-              <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
-            </div>
-            <div className='h-6 mt-2'>
-              <Slider
-                min={0}
-                max={results ? results.dates.length - 1 : 1}
-                onChange={handleDateSlider}
-                value={results ? results.dates.indexOf(date) : 0}
-                disabled={!results}
-              />
-            </div>
+          <div className={classNames('md:w-80', { hidden: view !== 'map' })}>
+            { results
+              ? <>
+                <div className='h-6 flex justify-between items-start'>
+                  <DescriptiveHeading>
+                    Select date
+                  </DescriptiveHeading>
+                  <PlayButton
+                    playing={playing}
+                    toggleState={setPlaying}
+                  />
+                </div>
+                <div className='flex items-center justify-between h-6'>
+                  <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
+                </div>
+                <div className='h-6 mt-2'>
+                  <Slider
+                    min={0}
+                    max={results.dates.length - 1}
+                    onChange={handleDateSlider}
+                    value={results.dates.indexOf(date)}
+                    disabled={!results}
+                  />
+                </div>
+              </>
+              : <div className='h-20 grid place-content-center'>
+                <Spinner className='text-gray-700 w-6 h-6' />
+              </div> }
           </div>
           <div className='border border-gray-200 mx-6 hidden md:block' />
           <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
             <div className='h-6 flex justify-between items-start relative'>
               <DescriptiveHeading>
-                Local authority
+                {locationFilter.category}
               </DescriptiveHeading>
               { isMobile
                 ? <Button onClick={() => setView('map')}>
@@ -110,10 +136,10 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
                 </FadeTransition> }
             </div>
             <Heading>
-              {LALookupTable[ladState.currentLad]}
+              {locationFilter.heading}
             </Heading>
             <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-              {ladState.currentLad}
+              {locationFilter.subheading}
             </p>
           </div>
         </Card>
@@ -160,7 +186,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
                 Scale
               </label>
               <Select
-                value={lineageState.scale}
+                value={lineageState.scale || ''}
                 name='color_scale_type'
                 onChange={e => lineageActions.setScale(e.target.value)}
               >
@@ -186,7 +212,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-700 w-8 h-8' />
+                <Spinner className='text-gray-700 w-6 h-6' />
               </div>
             </FadeTransition>
             <div className='absolute inset-0 shadow-inner pointer-events-none' />
