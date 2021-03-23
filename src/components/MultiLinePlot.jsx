@@ -194,7 +194,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     )
   } else {
     return (
-      <ComposedChart {...chartProps}>
+      <ComposedChart {...chartProps} >
         {grid}
         {lineages.map((lineage, index) => {
           const key = `${lineage}_range`
@@ -233,7 +233,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
             stroke={tailwindColors[stroke][600]}
             strokeDasharray={[8, 8]}
             label=''
-            strokeWidth={3}
+            strokeWidth={2}
             style={{ mixBlendMode: 'multiply' }}
           /> }
       </ComposedChart>
