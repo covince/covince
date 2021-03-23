@@ -17,7 +17,9 @@ module.exports = {
     extend: {
       colors: {
         gray: colors.blueGray,
-        primary: colors.blue[700]
+        primary: colors.blue[700],
+        heading: 'theme("colors.gray.600")',
+        subheading: 'theme("colors.gray.500")'
       },
       spacing: {
         header: defaultTheme.spacing[16],

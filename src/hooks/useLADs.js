@@ -18,18 +18,20 @@ const useLAD = () => {
       }
     }
     switch (type) {
-      case 'LOAD':
+      case 'LOAD': {
+        if (payload === state.currentLad) return state
         return {
           ...state,
           status: 'LOADING',
           loadingLad: payload
         }
+      }
       default:
         return state
     }
   }, {
     status: 'LOADING',
-    loadingLad: 'E08000006',
+    loadingLad: 'national',
     currentLad: null,
     data: null
   })

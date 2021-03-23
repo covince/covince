@@ -5,6 +5,11 @@ import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChar
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 
+const formatLargeNumber = number => {
+  const fixed = number.toFixed(2)
+  return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
+}
+
 const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
     payload.sort((a, b) => {
@@ -39,7 +44,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
                   {item.name}
                 </td>
                 <td className='text-right'>
-                  {percentage ? `${item.value.toFixed(1)}%` : item.value.toFixed(2)}
+                  {percentage ? `${item.value.toFixed(1)}%` : formatLargeNumber(item.value)}
                 </td>
               </tr>
             )
@@ -85,7 +90,11 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     width,
     height,
     margin: { top: 16, left: 0, right: 24 },
-    onClick: ({ activeLabel }) => setDate(activeLabel),
+    onClick: item => {
+      if (item) {
+        setDate(item.activeLabel)
+      }
+    },
     cursor: 'pointer',
     className
   }
@@ -94,8 +103,17 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   const yAxisTicks = useMemo(() => ({
     tickFormatter: percentage
       ? value => `${Math.min(parseFloat(value), 100)}%`
-      : value => parseFloat(value).toLocaleString(),
-    ticks: percentage ? [0, 25, 50, 75, 100] : undefined
+      : value => {
+        if (value >= 10e3) {
+          return `${value.toString().slice(0, 2)}K`
+        }
+        return value.toLocaleString()
+      },
+    ticks: percentage
+      ? [0, 25, 50, 75, 100]
+      : parameter === 'R'
+        ? [0, 1, 2, 3]
+        : undefined
   }), [percentage, type])
 
   const yAxisDomain = useMemo(() => {
@@ -176,7 +194,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     )
   } else {
     return (
-      <ComposedChart {...chartProps}>
+      <ComposedChart {...chartProps} >
         {grid}
         {lineages.map((lineage, index) => {
           const key = `${lineage}_range`
@@ -209,6 +227,15 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {yAxis}
         {dateLine}
         {tooltip}
+        {parameter === 'R' &&
+          <ReferenceLine
+            y={1}
+            stroke={tailwindColors[stroke][600]}
+            strokeDasharray={[8, 8]}
+            label=''
+            strokeWidth={2}
+            style={{ mixBlendMode: 'multiply' }}
+          /> }
       </ComposedChart>
     )
   }
