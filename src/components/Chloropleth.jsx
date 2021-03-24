@@ -9,6 +9,7 @@ import Measure from 'react-measure'
 
 import FadeTransition from './FadeTransition'
 
+const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
 // magma
 const colorStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
@@ -87,6 +88,22 @@ const Chloropleth = (props) => {
     latitude: 52.561928,
     longitude: -1.464854,
     zoom: props.isMobile ? 4.5 : 5
+  })
+
+  const clampAndSetViewport = (newViewport => {
+    if (newViewport.longitude < bounds.minLongitude) {
+      newViewport.longitude = bounds.minLongitude;
+    }
+    else if (newViewport.longitude > bounds.maxLongitude) {
+      newViewport.longitude = bounds.maxLongitude;
+    }
+    if (newViewport.latitude < bounds.minLatitude) {
+      newViewport.latitude = bounds.minLatitude;
+    }
+    else if (newViewport.latitude > bounds.maxLatitude) {
+      newViewport.latitude = bounds.maxLatitude;
+    }
+    setViewport(newViewport)
   })
 
   const { tiles, date, index, lad } = props
@@ -222,7 +239,7 @@ const Chloropleth = (props) => {
             {...viewport}
             minZoom={4}
             disableTokenWarning
-            onViewportChange={nextViewport => setViewport(nextViewport)}
+            onViewportChange={nextViewport => clampAndSetViewport(nextViewport)}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'
