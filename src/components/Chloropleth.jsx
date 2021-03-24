@@ -174,7 +174,7 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'lads',
         paint: {
-          'line-color': ['case', ['==', ['get', 'value'], null], tailwindColors[lineColor][400], [
+          'line-color': ['case', ['==', ['get', 'value'], null], tailwindColors[lineColor][300], [
             'case',
             ['get', 'selected'],
             tailwindColors[lineColor][900],
