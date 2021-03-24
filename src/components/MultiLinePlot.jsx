@@ -89,7 +89,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     data,
     width,
     height,
-    margin: { top: 16, left: 0, right: 24 },
+    margin: { top: 12, left: 0, right: 24 },
     onClick: item => {
       if (item) {
         setDate(item.activeLabel)

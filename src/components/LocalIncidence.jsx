@@ -6,7 +6,12 @@ import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
 import { Heading } from './Typography'
 
-const IncidenceChart = ({ heading, isMobile, ...props }) => {
+const ChartHeading = ({ isMobile, ...props }) =>
+  isMobile
+    ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
+    : <Heading {...props} />
+
+const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
   return (
     <Measure
@@ -18,11 +23,14 @@ const IncidenceChart = ({ heading, isMobile, ...props }) => {
     >
       {({ measureRef }) => (
         <div ref={measureRef}>
-          {heading}
+          <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
+            {heading}
+            {controls}
+          </ChartHeading>
           <MultiLinePlot
             height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
             {...props}
-            className='-mt-2 md:m-0'
+            className='-mt-1 md:m-0'
           />
         </div>
       )}
@@ -30,12 +38,7 @@ const IncidenceChart = ({ heading, isMobile, ...props }) => {
   )
 }
 
-const ChartHeading = ({ isMobile, ...props }) =>
-  isMobile
-    ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
-    : <Heading {...props} />
-
-function LocalIncidence({ values, date, setDate, className, isMobile = false, lineColor }) {
+function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
   const lad_data = useMemo(() => values || [], [values])
 
   const [proportion_display_type, setProportionDisplayType] = useState('area')
@@ -68,17 +71,20 @@ function LocalIncidence({ values, date, setDate, className, isMobile = false, li
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classNames('grid grid-rows-3 h-full -ml-3 md:mx-0 md:grid', className)}>
+        <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2 h-full -ml-3 md:mx-0 md:grid', className)}>
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading={<ChartHeading className='pl-12 pr-6 flex items-center justify-between' isMobile={isMobile}>Incidence  <Checkbox
-              id='lambda_display_type'
-              checked={lambda_display_type === 'area'}
-              label='Stack'
-              onChange={handleLambdaChange}
-              toggle
-            /></ChartHeading>}
+            heading='Incidence'
+            controls={
+              <Checkbox
+                id='lambda_display_type'
+                checked={lambda_display_type === 'area'}
+                label='Stack'
+                onChange={handleLambdaChange}
+                toggle
+              />
+            }
             lad_data={lad_data}
             date={date}
             setDate={setDate}
@@ -89,17 +95,15 @@ function LocalIncidence({ values, date, setDate, className, isMobile = false, li
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading={
-              <ChartHeading className='pl-12 pr-6 flex items-center justify-between' isMobile={isMobile}>
-                Proportion
-                <Checkbox
-                  id='proportion_display_type'
-                  checked={proportion_display_type === 'area'}
-                  label='Stack'
-                  onChange={handlePropChange}
-                  toggle
-                />
-              </ChartHeading>
+            heading='Proportion'
+            controls={
+              <Checkbox
+                id='proportion_display_type'
+                checked={proportion_display_type === 'area'}
+                label='Stack'
+                onChange={handlePropChange}
+                toggle
+              />
             }
             lad_data={lad_data}
             date={date}
@@ -111,7 +115,7 @@ function LocalIncidence({ values, date, setDate, className, isMobile = false, li
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading={<ChartHeading className='pl-12' isMobile={isMobile}>R</ChartHeading>}
+            heading='R'
             lad_data={lad_data}
             date={date}
             setDate={setDate}

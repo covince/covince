@@ -3,7 +3,7 @@ import './Checkbox.css'
 import React from 'react'
 
 const Checkbox = ({ id, name, label, checked, onChange, children }) => (
-  <div className='flex items-start'>
+  <div className='flex items-center'>
     <div className="flex items-center h-5">
       <input
         id={id}
