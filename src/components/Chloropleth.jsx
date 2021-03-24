@@ -156,7 +156,7 @@ const Chloropleth = (props) => {
           'fill-color': [
             'case',
             ['==', ['get', 'value'], null],
-            '#eee',
+            '#fff',
             [
               'interpolate',
               ['linear'],
