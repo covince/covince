@@ -118,7 +118,7 @@ const Chloropleth = (props) => {
     }
 
     if (color_scale_type === 'R_scale') {
-      return [0, "#0000FF", 1, "#EEE", 3.5, "#FF0000"]
+      return [0, "#0000FF", 1, "#FFFFFF", 3.5, "#FF0000"]
     }
     const scale = []
 
