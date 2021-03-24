@@ -52,7 +52,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
     percentage
       ? v => `${v}%`
       : v => Math.round(v).toLocaleString()
-  , [percentage])
+    , [percentage])
 
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
@@ -116,6 +116,10 @@ const Chloropleth = (props) => {
     if (max_val === 0) {
       return [0, '#fff']
     }
+
+    if (color_scale_type === 'R_scale') {
+      return [0, "#0000FF", 1, "#FFFFFF", 3.5, "#FF0000"]
+    }
     const scale = []
 
     const range = color_scale_type === 'quadratic'
@@ -130,7 +134,6 @@ const Chloropleth = (props) => {
       scale.unshift(rgb)
       scale.unshift(range * (1 - index))
     }
-
     return scale
   }, [max_val, min_val, color_scale_type])
 
@@ -197,7 +200,7 @@ const Chloropleth = (props) => {
     percentage
       ? v => `${v.toFixed(1)}%`
       : v => v.toFixed(2)
-  , [percentage])
+    , [percentage])
 
   return (
     <Measure
@@ -244,7 +247,7 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />
-            { popupFeature &&
+            {popupFeature &&
               <Popup
                 closeButton={false}
                 captureDrag={false}
@@ -259,7 +262,7 @@ const Chloropleth = (props) => {
                 <p className='text-sm'>
                   {popupFeature.lad19nm}
                 </p>
-              </Popup> }
+              </Popup>}
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
             <ColourBar

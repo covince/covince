@@ -93,7 +93,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
       <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
         <Card className='w-full md:w-auto md:flex mx-auto'>
           <div className={classNames('md:w-80', { hidden: view !== 'map' })}>
-            { results
+            {results
               ? <>
                 <div className='h-6 flex justify-between items-start'>
                   <DescriptiveHeading>
@@ -119,7 +119,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               </>
               : <div className='h-20 grid place-content-center'>
                 <Spinner className='text-gray-700 w-6 h-6' />
-              </div> }
+              </div>}
           </div>
           <div className='border border-gray-200 mx-6 hidden md:block' />
           <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
@@ -127,13 +127,13 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               <DescriptiveHeading>
                 {locationFilter.category}
               </DescriptiveHeading>
-              { isMobile
+              {isMobile
                 ? <Button onClick={() => setView('map')}>
                   View map
                 </Button>
                 : <FadeTransition in={ladState.status === 'LOADING'}>
                   <Spinner className='text-gray-700 w-6 h-6 absolute top-0 right-0' />
-                </FadeTransition> }
+                </FadeTransition>}
             </div>
             <Heading>
               {locationFilter.heading}
@@ -148,10 +148,10 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         <div className={classNames('flex flex-col flex-grow', { hidden: view === 'chart' })}>
           <div className='flex justify-between items-start'>
             <Heading>Map</Heading>
-            { isMobile &&
+            {isMobile &&
               <Button onClick={() => setView('chart')}>
                 View charts
-              </Button> }
+              </Button>}
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
@@ -180,27 +180,28 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               >
                 {parameter_options}
               </Select>
-            </div>
-            <div>
-              <label className='block font-medium mb-1'>
-                Scale
+            </div> {lineageState.parameter != 'R' &&
+              <div>
+                <label className='block font-medium mb-1'>
+                  Scale
               </label>
-              <Select
-                value={lineageState.scale || ''}
-                name='color_scale_type'
-                onChange={e => lineageActions.setScale(e.target.value)}
-              >
-                <option value='linear'>Linear</option>
-                <option value='quadratic'>Quadratic</option>
-              </Select>
-            </div>
+
+                <Select
+                  value={lineageState.scale || ''}
+                  name='color_scale_type'
+                  onChange={e => lineageActions.setScale(e.target.value)}
+                >
+                  <option value='linear'>Linear</option>
+                  <option value='quadratic'>Quadratic</option>
+                </Select>
+              </div>}
           </form>
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={lineageState.scale}
+              color_scale_type={lineageState.parameter == "R" ? "R_scale" : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               index={results ? results.index : null}
@@ -221,9 +222,9 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         <LocalIncidence
           className={classNames(
             'transition-opacity', {
-              hidden: view === 'map',
-              'opacity-50 pointer-events-none': ladState.status === 'LOADING'
-            }
+            hidden: view === 'map',
+            'opacity-50 pointer-events-none': ladState.status === 'LOADING'
+          }
           )}
           name={LALookupTable[ladState.currentLad]}
           date={date}
