@@ -275,12 +275,14 @@ const Chloropleth = (props) => {
                 className='text-center text-current leading-none font-sans'
                 tipSize={8}
               >
-                <p className='font-bold text-gray-700'>
-                  {formatValue(popupFeature.value)}
-                </p>
-                <p className='text-sm'>
-                  {popupFeature.lad19nm}
-                </p>
+                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.lad19cd)}>
+                  <p className='font-bold text-gray-700'>
+                    {formatValue(popupFeature.value)}
+                  </p>
+                  <p className='text-sm'>
+                    {popupFeature.lad19nm}
+                  </p>
+                </div>
               </Popup>}
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
