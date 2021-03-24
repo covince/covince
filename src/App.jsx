@@ -15,7 +15,7 @@ function App () {
     <>
       <Suspense fallback={<Loading />}>
         <NavBar />
-        <div className='container md:py-6 flex-header-stretch'>
+        <div className='container md:py-4 flex-header-stretch'>
           <LazyContainer />
         </div>
       </Suspense>
