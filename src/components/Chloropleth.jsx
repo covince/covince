@@ -156,7 +156,7 @@ const Chloropleth = (props) => {
           'fill-color': [
             'case',
             ['==', ['get', 'value'], null],
-            '#fff',
+            '#eee',
             [
               'interpolate',
               ['linear'],
@@ -174,12 +174,12 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'lads',
         paint: {
-          'line-color': [
+          'line-color': ['case', ['==', ['get', 'value'], null], tailwindColors[lineColor][400], [
             'case',
             ['get', 'selected'],
             tailwindColors[lineColor][900],
             tailwindColors[lineColor][600]
-          ],
+          ]],
           // 'line-color-transition': { duration: 300 },
           'line-width': [
             'case',
