@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import format from 'date-fns/format'
 import classNames from 'classnames'
+import format from 'date-fns/format'
+import { BsArrowCounterclockwise, BsArrowRightShort } from 'react-icons/bs'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
-import Slider from './Slider'
-import PlayButton from './PlayButton'
 import Card from './Card'
 import Select from './Select'
-import { Heading, DescriptiveHeading } from './Typography'
-import Button from './Button'
+import { Heading } from './Typography'
+import { CircleButton, PillButton } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
+import DateFilter from './DateFilter'
+import LocationFilter from './LocationFilter'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
@@ -66,7 +67,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   }
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
-  const [view, setView] = useState('map')
+  const [view, setView] = useState('chart')
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
@@ -76,7 +77,11 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         heading: 'England',
         subheading: (
           <span className='flex items-center text-subheading'>
-            Select a local authority to explore
+            Explore local authorities {
+            isMobile
+              ? <button onClick={() => setView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
+              : 'on the map'
+            }
           </span>
         )
       }
@@ -86,72 +91,63 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
       heading: LALookupTable[ladState.currentLad],
       subheading: ladState.currentLad
     }
-  }, [ladState.currentLad])
+  }, [ladState.currentLad, isMobile])
+
+  const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
+
+  const NOButton = (
+    <div className='absolute top-2 right-3 md:top-0 md:right-0'>
+      { ladState.loadingLad !== 'national' && ladState.currentLad !== 'national' &&
+        <CircleButton
+          title='Return to national overview'
+          onClick={() => ladActions.load('national')}
+        >
+          <BsArrowCounterclockwise className='h-5 w-5 text-gray-500' />
+        </CircleButton> }
+    </div>
+  )
 
   return (
     <>
-      <div className={classNames('flex md:mb-3 md:-mt-20 md:order-none md:sticky md:top-1 md:z-10', { 'order-last': view === 'map' })}>
-        <Card className='w-full md:w-auto md:flex mx-auto'>
-          <div className={classNames('md:w-80', { hidden: view !== 'map' })}>
-            {results
-              ? <>
-                <div className='h-6 flex justify-between items-start'>
-                  <DescriptiveHeading>
-                    Select date
-                  </DescriptiveHeading>
-                  <PlayButton
-                    playing={playing}
-                    toggleState={setPlaying}
-                  />
-                </div>
-                <div className='flex items-center justify-between h-6'>
-                  <Heading>{format(new Date(date), 'd MMMM y')}</Heading>
-                </div>
-                <div className='h-6 mt-2'>
-                  <Slider
-                    min={0}
-                    max={results.dates.length - 1}
-                    onChange={handleDateSlider}
-                    value={results.dates.indexOf(date)}
-                    disabled={!results}
-                  />
-                </div>
-              </>
-              : <div className='h-20 grid place-content-center'>
-                <Spinner className='text-gray-700 w-6 h-6' />
-              </div>}
-          </div>
-          <div className='border border-gray-200 mx-6 hidden md:block' />
-          <div className={classNames('md:w-80 md:block', view === 'chart' ? 'block' : 'hidden')}>
-            <div className='h-6 flex justify-between items-start relative'>
-              <DescriptiveHeading>
-                {locationFilter.category}
-              </DescriptiveHeading>
-              {isMobile
-                ? <Button onClick={() => setView('map')}>
-                  View map
-                </Button>
-                : <FadeTransition in={ladState.status === 'LOADING'}>
-                  <Spinner className='text-gray-700 w-6 h-6 absolute top-0 right-0' />
-                </FadeTransition>}
-            </div>
-            <Heading>
-              {locationFilter.heading}
-            </Heading>
-            <p className='text-sm leading-6 mt-1 text-gray-600 font-medium'>
-              {locationFilter.subheading}
-            </p>
-          </div>
-        </Card>
-      </div>
-      <Card className={classNames('flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
-        <div className={classNames('flex flex-col flex-grow', { hidden: view === 'chart' })}>
-          <div className='flex justify-between items-start'>
+      { isMobile && view === 'chart' &&
+        <LocationFilter
+          className='px-4 pt-3 pb-0 bg-white relative'
+          {...locationFilter}
+        >
+          {NOButton}
+        </LocationFilter>}
+      { !isMobile && <div className='mb-3 -mt-20 sticky top-1 z-10 mx-auto'>
+          <Card className='w-full md:w-auto border-t border-gray-100 md:border-0 md:flex mx-auto'>
+            <DateFilter
+              className='w-80'
+              dates={results ? results.dates : null}
+              label={formattedDate}
+              value={date}
+              onChange={handleDateSlider}
+              playing={playing}
+              setPlaying={setPlaying}
+            />
+            <div className='border border-gray-200 mx-6 hidden md:block' />
+            <LocationFilter
+              className='w-80 relative'
+              {...locationFilter}
+            >
+              {NOButton}
+            </LocationFilter>
+          </Card>
+        </div> }
+      <Card className={classNames('flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
+        <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
+          <div className='flex justify-between items-center space-x-6'>
             <Heading>Map</Heading>
             {isMobile &&
-              <Button onClick={() => setView('chart')}>
-                View charts
-              </Button>}
+              <PillButton
+                className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+                onClick={() => setView('chart')}
+              >
+                <span className='truncate'>{locationFilter.heading}</span>
+                <BsArrowRightShort className='w-6 h-6' />
+              </PillButton> }
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
@@ -221,7 +217,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         </div>
         <LocalIncidence
           className={classNames(
-            'transition-opacity', {
+            'transition-opacity pb-14 md:pb-0', {
               hidden: view === 'map',
               'opacity-50 pointer-events-none': ladState.status === 'LOADING'
             }
@@ -235,6 +231,25 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           lineColor={lineColor}
         />
       </Card>
+      { isMobile && view === 'map' &&
+        <DateFilter
+          className='p-3 bg-white border-t border-gray-100'
+          dates={results ? results.dates : null}
+          label={formattedDate}
+          value={date}
+          onChange={handleDateSlider}
+          playing={playing}
+          setPlaying={setPlaying}
+        /> }
+      { isMobile && view === 'chart' &&
+        <div className='fixed z-40 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
+          <PillButton
+            className='shadow-xl'
+            onClick={() => setView('map')}
+          >
+            View map on {formattedDate}
+          </PillButton>
+        </div> }
     </>
   )
 }
