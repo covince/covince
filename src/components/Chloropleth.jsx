@@ -139,6 +139,10 @@ const Chloropleth = (props) => {
     if (max_val === 0) {
       return [0, '#fff']
     }
+
+    if (color_scale_type === 'R_scale') {
+      return [0, "#0000FF", 1, "#FFFFFF", 3.5, "#FF0000"]
+    }
     const scale = []
 
     const range = color_scale_type === 'quadratic'
@@ -153,7 +157,6 @@ const Chloropleth = (props) => {
       scale.unshift(rgb)
       scale.unshift(range * (1 - index))
     }
-
     return scale
   }, [max_val, min_val, color_scale_type])
 
@@ -194,12 +197,13 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'lads',
         paint: {
-          'line-color': [
-            'case',
-            ['get', 'selected'],
-            tailwindColors[lineColor][900],
-            tailwindColors[lineColor][600]
-          ],
+          'line-color': ['case', ['==', ['get', 'value'], null],
+            tailwindColors[lineColor][300], [
+              'case',
+              ['get', 'selected'],
+              tailwindColors[lineColor][900],
+              tailwindColors[lineColor][600]
+            ]],
           // 'line-color-transition': { duration: 300 },
           'line-width': [
             'case',
