@@ -20,7 +20,13 @@ const colorStops = [
   { index: 0.75, rgb: 'rgb(251, 135, 97)' },
   { index: 0.88, rgb: 'rgb(254, 194, 135)' },
   { index: 1, rgb: 'rgb(252, 253, 191)' }
-]
+].map(x => {
+  x.index = (x.index - 0.13) / (1 - 0.13)
+  return x
+
+}).slice(1,) // Cut off the first bit of magma with black
+
+
 
 const quadColorStops =
   colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
@@ -52,7 +58,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
     percentage
       ? v => `${v}%`
       : v => Math.round(v).toLocaleString()
-  , [percentage])
+    , [percentage])
 
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
@@ -197,7 +203,7 @@ const Chloropleth = (props) => {
     percentage
       ? v => `${v.toFixed(1)}%`
       : v => v.toFixed(2)
-  , [percentage])
+    , [percentage])
 
   return (
     <Measure
@@ -244,7 +250,7 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />
-            { popupFeature &&
+            {popupFeature &&
               <Popup
                 closeButton={false}
                 captureDrag={false}
@@ -259,7 +265,7 @@ const Chloropleth = (props) => {
                 <p className='text-sm'>
                   {popupFeature.lad19nm}
                 </p>
-              </Popup> }
+              </Popup>}
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
             <ColourBar
