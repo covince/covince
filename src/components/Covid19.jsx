@@ -180,7 +180,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.parameter != 'R' &&
+            </div> {lineageState.parameter !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
                   Scale
@@ -201,7 +201,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={lineageState.parameter == "R" ? "R_scale" : lineageState.scale}
+              color_scale_type={lineageState.parameter === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               index={results ? results.index : null}
@@ -222,9 +222,9 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         <LocalIncidence
           className={classNames(
             'transition-opacity', {
-            hidden: view === 'map',
-            'opacity-50 pointer-events-none': ladState.status === 'LOADING'
-          }
+              hidden: view === 'map',
+              'opacity-50 pointer-events-none': ladState.status === 'LOADING'
+            }
           )}
           name={LALookupTable[ladState.currentLad]}
           date={date}

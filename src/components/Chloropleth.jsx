@@ -24,10 +24,7 @@ const colorStops = [
 ].map(x => {
   x.index = (x.index - 0.13) / (1 - 0.13)
   return x
-
-}).slice(1,) // Cut off the first bit of magma with black
-
-
+}).slice(1) // Cut off the first bit of magma with black
 
 const quadColorStops =
   colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
@@ -59,7 +56,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
     percentage
       ? v => `${v}%`
       : v => Math.round(v).toLocaleString()
-    , [percentage])
+  , [percentage])
 
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
@@ -90,21 +87,19 @@ const Chloropleth = (props) => {
     zoom: props.isMobile ? 4.5 : 5
   })
 
-  const clampAndSetViewport = (newViewport => {
+  const clampAndSetViewport = newViewport => {
     if (newViewport.longitude < bounds.minLongitude) {
-      newViewport.longitude = bounds.minLongitude;
-    }
-    else if (newViewport.longitude > bounds.maxLongitude) {
-      newViewport.longitude = bounds.maxLongitude;
+      newViewport.longitude = bounds.minLongitude
+    } else if (newViewport.longitude > bounds.maxLongitude) {
+      newViewport.longitude = bounds.maxLongitude
     }
     if (newViewport.latitude < bounds.minLatitude) {
-      newViewport.latitude = bounds.minLatitude;
-    }
-    else if (newViewport.latitude > bounds.maxLatitude) {
-      newViewport.latitude = bounds.maxLatitude;
+      newViewport.latitude = bounds.minLatitude
+    } else if (newViewport.latitude > bounds.maxLatitude) {
+      newViewport.latitude = bounds.maxLatitude
     }
     setViewport(newViewport)
-  })
+  }
 
   const { tiles, date, index, lad } = props
 
@@ -141,7 +136,7 @@ const Chloropleth = (props) => {
     }
 
     if (color_scale_type === 'R_scale') {
-      return [0, "#0000FF", 1, "#FFFFFF", 3.5, "#FF0000"]
+      return [0, '#0000FF', 1, '#FFFFFF', 3.5, '#FF0000']
     }
     const scale = []
 
@@ -224,7 +219,7 @@ const Chloropleth = (props) => {
     percentage
       ? v => `${v.toFixed(1)}%`
       : v => v.toFixed(2)
-    , [percentage])
+  , [percentage])
 
   return (
     <Measure
