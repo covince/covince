@@ -218,7 +218,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
       { isMobile && view === 'map' &&
         <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }
       { isMobile && view === 'chart' &&
-        <div className='fixed z-40 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
+        <div className='fixed z-30 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
           <PillButton
             className='shadow-xl'
             onClick={() => setView('map')}
