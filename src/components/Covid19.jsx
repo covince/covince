@@ -96,7 +96,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
   const NOButton = (
-    <div className='absolute top-2 right-3 md:top-0 md:right-0'>
+    <div className='absolute top-3 right-4 md:top-0 md:right-0'>
       { ladState.loadingLad !== 'national' && ladState.currentLad !== 'national' &&
         <CircleButton
           title='Return to national overview'
@@ -217,7 +217,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         </div>
         <LocalIncidence
           className={classNames(
-            'transition-opacity pb-14 md:pb-0', {
+            'transition-opacity pb-14 md:pb-0 flex-grow', {
               hidden: view === 'map',
               'opacity-50 pointer-events-none': ladState.status === 'LOADING'
             }
