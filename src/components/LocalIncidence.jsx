@@ -71,7 +71,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2 h-full -ml-3 md:mx-0 md:grid', className)}>
+        <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2', className)}>
           <IncidenceChart
             width={width}
             isMobile={isMobile}

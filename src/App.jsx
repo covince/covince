@@ -6,7 +6,7 @@ const LazyContainer = lazy(() => import('./components/Covid19'))
 
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
-    <Spinner className='w-10 h-10' />
+    <Spinner className='w-10 h-10 text-gray-500' />
   </div>
 )
 
@@ -15,7 +15,7 @@ function App () {
     <>
       <Suspense fallback={<Loading />}>
         <NavBar />
-        <div className='container md:py-4 flex-header-stretch'>
+        <div className='container md:py-4 flex flex-col'>
           <LazyContainer />
         </div>
       </Suspense>
