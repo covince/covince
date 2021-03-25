@@ -43,7 +43,7 @@ const DateFilter = ({ className, dates, label, value, onChange, playing, setPlay
         </div>
       </>
       : <div className='h-20 grid place-content-center'>
-        <Spinner className='text-gray-700 w-6 h-6' />
+        <Spinner className='text-gray-500 w-6 h-6' />
       </div>}
   </div>
 )

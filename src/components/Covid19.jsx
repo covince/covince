@@ -193,7 +193,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
             />
             <FadeTransition in={lineageState.status === 'LOADING'}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-700 w-6 h-6' />
+                <Spinner className='text-gray-500 w-6 h-6' />
               </div>
             </FadeTransition>
             <div className='absolute inset-0 shadow-inner pointer-events-none' />
