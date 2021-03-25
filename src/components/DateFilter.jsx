@@ -1,7 +1,8 @@
 import React from 'react'
+import { BsPlay, BsPause } from 'react-icons/bs'
 
 import Slider from './Slider'
-import PlayButton from './PlayButton'
+import Button from './Button'
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 
@@ -13,10 +14,20 @@ const DateFilter = ({ className, dates, label, value, onChange, playing, setPlay
           <DescriptiveHeading>
             Select date
           </DescriptiveHeading>
-          <PlayButton
-            playing={playing}
-            toggleState={setPlaying}
-          />
+          <Button
+            className='fill-current flex items-center pl-3 pr-1 h-9'
+            onClick={() => setPlaying(!playing)}
+          >
+            { playing
+              ? <>
+                  <span>Pause</span>
+                  <BsPause className='w-6 h-6 text-gray-400' />
+                </>
+              : <>
+                  <span>Play</span>
+                  <BsPlay className='w-6 h-6 text-gray-400' />
+                </> }
+          </Button>
         </div>
         <div className='flex items-center justify-between h-6'>
           <Heading>{label}</Heading>

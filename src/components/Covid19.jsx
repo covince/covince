@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
-import { BsArrowCounterclockwise, BsArrowRightShort } from 'react-icons/bs'
+import { BsArrowRightShort } from 'react-icons/bs'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
 import { Heading } from './Typography'
-import { CircleButton, PillButton } from './Button'
+import { PillButton } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
@@ -89,23 +89,22 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
     return {
       category: 'Local authority',
       heading: LALookupTable[ladState.currentLad],
-      subheading: ladState.currentLad
+      subheading: ladState.currentLad,
+      showNationalButton: ladState.loadingLad !== 'national',
+      loadNationalOverview: () => ladActions.load('national')
     }
-  }, [ladState.currentLad, isMobile])
+  }, [ladState, isMobile])
 
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
-  const NOButton = (
-    <div className='absolute top-3 right-4 md:top-0 md:right-0'>
-      { ladState.loadingLad !== 'national' && ladState.currentLad !== 'national' &&
-        <CircleButton
-          title='Return to national overview'
-          onClick={() => ladActions.load('national')}
-        >
-          <BsArrowCounterclockwise className='h-5 w-5 text-gray-500' />
-        </CircleButton> }
-    </div>
-  )
+  const dateFilter = {
+    dates: results ? results.dates : null,
+    label: formattedDate,
+    value: date,
+    onChange: handleDateSlider,
+    playing: playing,
+    setPlaying: setPlaying
+  }
 
   return (
     <>
@@ -113,27 +112,12 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         <LocationFilter
           className='px-4 pt-3 pb-0 bg-white relative'
           {...locationFilter}
-        >
-          {NOButton}
-        </LocationFilter>}
+        /> }
       { !isMobile && <div className='mb-3 -mt-20 sticky top-1 z-10 mx-auto'>
           <Card className='w-full md:w-auto border-t border-gray-100 md:border-0 md:flex mx-auto'>
-            <DateFilter
-              className='w-80'
-              dates={results ? results.dates : null}
-              label={formattedDate}
-              value={date}
-              onChange={handleDateSlider}
-              playing={playing}
-              setPlaying={setPlaying}
-            />
+            <DateFilter className='w-80' {...dateFilter} />
             <div className='border border-gray-200 mx-6 hidden md:block' />
-            <LocationFilter
-              className='w-80 relative'
-              {...locationFilter}
-            >
-              {NOButton}
-            </LocationFilter>
+            <LocationFilter className='w-80 relative' {...locationFilter} />
           </Card>
         </div> }
       <Card className={classNames('flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
@@ -232,15 +216,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         />
       </Card>
       { isMobile && view === 'map' &&
-        <DateFilter
-          className='p-3 bg-white border-t border-gray-100'
-          dates={results ? results.dates : null}
-          label={formattedDate}
-          value={date}
-          onChange={handleDateSlider}
-          playing={playing}
-          setPlaying={setPlaying}
-        /> }
+        <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }
       { isMobile && view === 'chart' &&
         <div className='fixed z-40 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
           <PillButton
