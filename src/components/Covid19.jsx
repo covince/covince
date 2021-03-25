@@ -242,7 +242,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           setPlaying={setPlaying}
         /> }
       { isMobile && view === 'chart' &&
-        <div className='fixed z-40 bottom-12 left-0 right-0 h-0 flex justify-center items-end'>
+        <div className='fixed z-40 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
           <PillButton
             className='shadow-xl'
             onClick={() => setView('map')}
