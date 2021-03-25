@@ -117,7 +117,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
   }), [percentage, type])
 
   const yAxisDomain = useMemo(() => {
-    if (type === 'area') {
+    if (type === 'area' && parameter === 'p') {
       return [0, 1]
     } else if (parameter === 'R') {
       return [0, 3]
