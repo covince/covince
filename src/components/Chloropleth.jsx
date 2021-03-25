@@ -245,10 +245,10 @@ const Chloropleth = (props) => {
             interactiveLayerIds={['lads-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
-              if (feature && 'value' in feature.properties) {
-                props.handleOnClick(feature.properties.lad19cd)
-              } else {
+              if (!feature) {
                 props.handleOnClick('national')
+              } else if ('value' in feature.properties) {
+                props.handleOnClick(feature.properties.lad19cd)
               }
             }}
             onHover={e => {
