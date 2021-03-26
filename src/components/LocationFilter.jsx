@@ -11,7 +11,7 @@ const LocationFilter = ({ className, category, heading, subheading, showNational
       </DescriptiveHeading>
       {showNationalButton && <button
         title='Return to national overview'
-        className='py-0 px-1 text-xs uppercase tracking-wider rounded flex items-center font-bold text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none'
+        className='py-0 px-1 text-xs uppercase tracking-wider rounded flex items-center font-bold text-primary focus:ring-2 focus:ring-primary focus:outline-none'
         onClick={loadNationalOverview}
       >
         <BsArrowUpShort className=' h-6 w-6 mr-0.25 fill-current' />

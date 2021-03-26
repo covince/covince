@@ -196,7 +196,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
                 <Spinner className='text-gray-500 w-6 h-6' />
               </div>
             </FadeTransition>
-            <div className='absolute inset-0 shadow-inner pointer-events-none' />
+            <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
         <LocalIncidence
