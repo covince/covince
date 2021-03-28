@@ -13,6 +13,7 @@ import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
+import FilterSection from './FilterSection'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
@@ -113,13 +114,12 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           className='px-4 pt-3 pb-0 bg-white relative'
           {...locationFilter}
         /> }
-      { !isMobile && <div className='mb-3 -mt-20 sticky top-1 z-10 mx-auto'>
-          <Card className='w-full md:w-auto border-t border-gray-100 md:border-0 md:flex mx-auto'>
-            <DateFilter className='w-80' {...dateFilter} />
-            <div className='border border-gray-200 mx-6 hidden md:block' />
-            <LocationFilter className='w-80 relative' {...locationFilter} />
-          </Card>
-        </div> }
+      { !isMobile &&
+        <FilterSection>
+          <DateFilter className='w-80' {...dateFilter} />
+          <div className='border border-gray-200 mx-6 hidden md:block' />
+          <LocationFilter className='w-80 relative' {...locationFilter} />
+        </FilterSection> }
       <Card className={classNames('flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
           <div className='flex justify-between items-center space-x-6'>
