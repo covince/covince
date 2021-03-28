@@ -18,7 +18,8 @@ input[type=range]:focus-visible {
 .heron-slider-thumb {
   @apply
     bg-white
-    h-5 w-5
+    h-6 w-6
+    md:h-5 md:w-5
     box-border
     border
     border-solid
@@ -26,6 +27,8 @@ input[type=range]:focus-visible {
     rounded-full
     shadow
     cursor-pointer
+    -mt-2 /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+    md:-mt-1.5
   ;
 }
 
@@ -33,7 +36,6 @@ input[type=range]:focus-visible {
 input[type=range]::-webkit-slider-thumb {
   @apply heron-slider-thumb;
   -webkit-appearance: none;
-  margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 }
 
 /* All the same stuff for Firefox */
