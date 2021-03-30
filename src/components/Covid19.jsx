@@ -201,7 +201,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
         </div>
         <LocalIncidence
           className={classNames(
-            'transition-opacity pb-14 md:pb-0 flex-grow', {
+            'transition-opacity flex-grow', {
               hidden: view === 'map',
               'opacity-50 pointer-events-none': ladState.status === 'LOADING'
             }
@@ -214,18 +214,18 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           isMobile={isMobile}
           lineColor={lineColor}
         />
+        { isMobile && view === 'chart' &&
+          <div className='sticky z-30 bottom-6 mx-auto my-6'>
+            <PillButton
+              className='shadow-xl'
+              onClick={() => setView('map')}
+            >
+              View map on {formattedDate}
+            </PillButton>
+          </div> }
       </Card>
       { isMobile && view === 'map' &&
         <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }
-      { isMobile && view === 'chart' &&
-        <div className='fixed z-30 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
-          <PillButton
-            className='shadow-xl'
-            onClick={() => setView('map')}
-          >
-            View map on {formattedDate}
-          </PillButton>
-        </div> }
     </>
   )
 }
