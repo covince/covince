@@ -227,8 +227,8 @@ const Chloropleth = (props) => {
       onResize={rect => {
         setViewport({
           ...viewport,
-          width: rect.bounds.width,
-          height: rect.bounds.height
+          width: rect.bounds.width || viewport.width,
+          height: rect.bounds.height || viewport.height
         })
       }}
     >
