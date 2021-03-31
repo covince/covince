@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -69,6 +69,10 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
   const [view, setView] = useState('chart')
+  const handleSetView = useCallback(view => {
+    window.scrollTo({ top: 0 })
+    setView(view)
+  }, [setView])
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
@@ -80,7 +84,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           <span className='flex items-center text-subheading'>
             Explore local authorities {
             isMobile
-              ? <button onClick={() => setView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
+              ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
             }
           </span>
@@ -127,7 +131,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
             {isMobile &&
               <PillButton
                 className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                onClick={() => setView('chart')}
+                onClick={() => handleSetView('chart')}
               >
                 <span className='truncate'>{locationFilter.heading}</span>
                 <BsArrowRightShort className='w-6 h-6' />
@@ -218,7 +222,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           <div className='sticky z-30 bottom-6 mx-auto my-6'>
             <PillButton
               className='shadow-xl'
-              onClick={() => setView('map')}
+              onClick={() => handleSetView('map')}
             >
               View map on {formattedDate}
             </PillButton>
