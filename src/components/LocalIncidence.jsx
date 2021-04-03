@@ -13,8 +13,6 @@ const ChartHeading = ({ isMobile, ...props }) =>
 
 const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
-  console.log(props.width)
-
   const chart = (
     <>
       <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>

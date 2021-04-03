@@ -14,6 +14,7 @@ import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
+import StickyActionButton from './StickyActionButton'
 
 import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
@@ -219,14 +220,11 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           lineColor={lineColor}
         />
         { isMobile && view === 'chart' &&
-          <div className='sticky z-30 bottom-6 mx-auto my-6'>
-            <PillButton
-              className='shadow-xl'
-              onClick={() => handleSetView('map')}
-            >
-              View map on {formattedDate}
-            </PillButton>
-          </div> }
+          <StickyActionButton
+            onClick={() => handleSetView('map')}
+          >
+            View map on {formattedDate}
+          </StickyActionButton> }
       </Card>
       { isMobile && view === 'map' &&
         <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }

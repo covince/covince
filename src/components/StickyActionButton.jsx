@@ -2,26 +2,25 @@ import React, { useMemo } from 'react'
 import classNames from 'classnames'
 import { useInView } from 'react-intersection-observer'
 
-import Card from './Card'
+import { PillButton } from './Button'
 
-const FilterSection = props => {
+const StickyActionButton = props => {
   const options = useMemo(() => ({
     threshold: [1]
   }), [])
   const { ref, inView } = useInView(options)
   return (
     <>
+      <PillButton
+        className={classNames('sticky z-30 bottom-6 mx-auto mt-6 transition-shadow', { 'shadow-xl': !inView })}
+        onClick={props.onClick}
+      >
+        {props.children}
+      </PillButton>
       {/* "sentinel" element - https://developers.google.com/web/updates/2017/09/sticky-headers */}
-      <div ref={ref} className='-mt-20 h-1' />
-      <Card
-        {...props}
-        className={classNames(
-          'mb-3 sticky top-1 z-10 flex mx-auto transition-shadow',
-          { 'md:shadow-md': !inView }
-        )}
-      />
+      <div className='h-6' ref={ref} />
     </>
   )
 }
 
-export default FilterSection
+export default StickyActionButton
