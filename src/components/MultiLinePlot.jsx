@@ -149,7 +149,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     <Tooltip
       content={CustomTooltip}
       percentage={parameter === 'p'}
-      cursor={{ stroke: tailwindColors[stroke][300] }}
+      cursor={{ stroke: tailwindColors[stroke][type === 'area' ? '500' : '300'] }}
     />
 
   const xAxis =
@@ -179,6 +179,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
     return (
       <ComposedChart {...chartProps}>
         {grid}
+        {tooltip /* placed here to put the cursor underneath the dots */}
         {lineages.map((lineage, index) =>
           <Area
             key={lineage}
@@ -196,13 +197,13 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {xAxis}
         {yAxis}
         {dateLine}
-        {tooltip}
       </ComposedChart>
     )
   } else {
     return (
       <ComposedChart {...chartProps} >
         {grid}
+        {tooltip /* placed here to put the cursor underneath the dots */}
         {lineages.map((lineage, index) => {
           const key = `${lineage}_range`
           return (
@@ -233,7 +234,6 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
         {xAxis}
         {yAxis}
         {dateLine}
-        {tooltip}
         {parameter === 'R' &&
           <ReferenceLine
             y={1}
