@@ -227,7 +227,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           </StickyActionButton> }
       </Card>
       { isMobile && view === 'map' &&
-        <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }
+        <DateFilter className='p-3 bg-white shadow border-t border-gray-100' {...dateFilter} /> }
     </>
   )
 }
