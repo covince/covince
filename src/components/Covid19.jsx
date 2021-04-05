@@ -16,17 +16,18 @@ import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
 import StickyActionButton from './StickyActionButton'
 
-import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
+import { useTiles, useLALookupTable } from '../hooks/useTiles'
 
-const LALookupTable = getLALookupTable()
-const tiles = loadTiles()
 const data = loadData()
 
 const Covid19 = ({ lineColor = 'blueGray' }) => {
+  const tiles = useTiles()
+  const LALookupTable = useLALookupTable(tiles)
+
   const unique_lineages = data.lineages
 
   const [playing, setPlaying] = useState(false)
