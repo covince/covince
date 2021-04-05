@@ -4,7 +4,8 @@ import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
 
-const LazyContent = lazy(() => import('./components/Covid19'))
+const TileProvider = lazy(() => import('./components/TileProvider'))
+const Covid19 = lazy(() => import('./components/Covid19'))
 
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
@@ -18,7 +19,9 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-          <LazyContent />
+          <TileProvider>
+            <Covid19 />
+          </TileProvider>
         </AppContainer>
       </Suspense>
     </>
