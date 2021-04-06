@@ -75,7 +75,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading='Incidence'
+            heading='Raw genome numbers'
             controls={
               <Checkbox
                 id='lambda_display_type'
@@ -88,14 +88,14 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             lad_data={lad_data}
             date={date}
             setDate={setDate}
-            parameter='lambda'
+            parameter='raw_n'
             type={lambda_display_type}
             stroke={lineColor}
           />
           <IncidenceChart
             width={width}
             isMobile={isMobile}
-            heading='Proportion'
+            heading='Raw proportions'
             controls={
               <Checkbox
                 id='proportion_display_type'
@@ -108,7 +108,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             lad_data={lad_data}
             date={date}
             setDate={setDate}
-            parameter='p'
+            parameter='raw_p'
             type={proportion_display_type}
             stroke={lineColor}
           />
