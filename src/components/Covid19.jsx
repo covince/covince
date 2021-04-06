@@ -141,7 +141,9 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
             <Heading>Map</Heading>
             {isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
-                { ladState.status === 'LOADING' && <Spinner className='h-4 w-4 mr-2 text-gray-500' /> }
+                <FadeTransition in={ladState.status === 'LOADING'}>
+                  <Spinner className='h-4 w-4 mr-2 text-gray-500' />
+                </FadeTransition>
                 <PillButton
                   className='flex items-center space-x-1 min-w-0 h-8 pr-2'
                   onClick={() => handleSetView('chart')}
