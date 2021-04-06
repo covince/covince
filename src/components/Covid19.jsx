@@ -137,16 +137,19 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
         </FilterSection> }
       <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
-          <div className='flex justify-between items-center space-x-6'>
+          <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
             {isMobile &&
-              <PillButton
-                className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                onClick={() => handleSetView('chart')}
-              >
-                <span className='truncate'>{locationFilter.heading}</span>
-                <BsArrowRightShort className='w-6 h-6' />
-              </PillButton> }
+              <div className='flex items-center max-w-none min-w-0'>
+                { ladState.status === 'LOADING' && <Spinner className='h-4 w-4 mr-2 text-gray-500' /> }
+                <PillButton
+                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+                  onClick={() => handleSetView('chart')}
+                >
+                  <span className='truncate'>{locationFilter.heading}</span>
+                  <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
+                </PillButton>
+              </div> }
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
