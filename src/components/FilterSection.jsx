@@ -16,6 +16,7 @@ const FilterSection = props => {
       <Card
         {...props}
         className={classNames(
+          props.className,
           'mb-3 sticky top-1 z-10 flex mx-auto transition-shadow',
           { 'md:shadow-md': !inView }
         )}

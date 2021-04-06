@@ -20,7 +20,7 @@ import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
-import { useLALookupTable } from '../hooks/useTiles'
+import useLALookupTable from '../hooks/useLALookupTable'
 
 const data = loadData()
 
@@ -112,20 +112,30 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     setPlaying: setPlaying
   }
 
+  const isInitialLoad = useMemo(() => (
+    lineageState.lineage === null || ladState.currentLad === null
+  ), [lineageState.lineage, ladState.currentLad])
+
   return (
     <>
       { isMobile && view === 'chart' &&
         <LocationFilter
-          className='px-4 pt-3 pb-0 bg-white relative'
+          className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
+          loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection>
+        <FilterSection className='overflow-hidden'>
           <DateFilter className='w-80' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} />
+          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <FadeTransition in={isInitialLoad}>
+            <div className='bg-white absolute inset-0 grid place-content-center'>
+              <Spinner className='text-gray-500 w-6 h-6' />
+            </div>
+          </FadeTransition>
         </FilterSection> }
-      <Card className={classNames('flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
+      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
           <div className='flex justify-between items-center space-x-6'>
             <Heading>Map</Heading>
@@ -140,7 +150,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
-            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' }
+            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
               <label className='block font-medium mb-1'>
@@ -196,7 +206,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
               percentage={lineageState.parameter === 'p'}
               lineColor={lineColor}
             />
-            <FadeTransition in={lineageState.status === 'LOADING'}>
+            <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 w-6 h-6' />
               </div>
@@ -208,7 +218,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           className={classNames(
             'transition-opacity flex-grow', {
               hidden: view === 'map',
-              'opacity-50 pointer-events-none': ladState.status === 'LOADING'
+              'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
             }
           )}
           name={LALookupTable[ladState.currentLad]}
@@ -225,9 +235,15 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           >
             View map on {formattedDate}
           </StickyActionButton> }
+        <FadeTransition in={isInitialLoad}>
+          <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
+        </FadeTransition>
       </Card>
       { isMobile && view === 'map' &&
-        <DateFilter className='p-3 bg-white shadow border-t border-gray-100' {...dateFilter} /> }
+        <DateFilter
+          className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
+          {...dateFilter}
+        /> }
     </>
   )
 }
