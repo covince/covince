@@ -88,7 +88,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             lad_data={lad_data}
             date={date}
             setDate={setDate}
-            parameter='lambda'
+            parameter='raw_n'
             type={lambda_display_type}
             stroke={lineColor}
           />
@@ -108,7 +108,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             lad_data={lad_data}
             date={date}
             setDate={setDate}
-            parameter='p'
+            parameter='raw_p'
             type={proportion_display_type}
             stroke={lineColor}
           />
