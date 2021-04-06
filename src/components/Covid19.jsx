@@ -49,7 +49,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
     }
   }, [playing, date])
 
-  let unique_parameters = ['lambda', 'p', 'R']
+  let unique_parameters = ['raw_n', 'p', 'R']
 
   const handleOnClick = (lad) => {
     ladActions.load(lad)
@@ -61,7 +61,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
     setDate(set_to)
   }
 
-  unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
+  unique_parameters = [['raw_n', 'Raw genome numbers'], ['raw_p', 'Raw proportions'], ['R', 'R']]
   if (lineageState.lineage === 'total') {
     unique_parameters = unique_parameters[0]
   }
