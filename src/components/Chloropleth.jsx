@@ -104,13 +104,17 @@ const Chloropleth = (props) => {
   const { tiles, date, index, lad } = props
 
   const data = useMemo(() => {
-    if (tiles === null || index === null) {
+    if (tiles === null) {
       return null
+    }
+
+    if (index === null) {
+      return tiles
     }
 
     const features = tiles.features.map(f => {
       const { lad19cd } = f.properties
-      const values = index[lad19cd]
+      const values = index ? index[lad19cd] : null
       const value = values ? values[date] : undefined
       return {
         ...f,
@@ -227,8 +231,8 @@ const Chloropleth = (props) => {
       onResize={rect => {
         setViewport({
           ...viewport,
-          width: rect.bounds.width,
-          height: rect.bounds.height
+          width: rect.bounds.width || viewport.width,
+          height: rect.bounds.height || viewport.height
         })
       }}
     >

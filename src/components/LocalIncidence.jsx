@@ -8,11 +8,29 @@ import { Heading } from './Typography'
 
 const ChartHeading = ({ isMobile, ...props }) =>
   isMobile
-    ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
+    ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading')} />
     : <Heading {...props} />
 
 const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
+  const chart = (
+    <>
+      <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
+        {heading}
+        {controls}
+      </ChartHeading>
+      <MultiLinePlot
+        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
+        {...props}
+        className='-mt-1 md:m-0'
+      />
+    </>
+  )
+
+  if (isMobile) {
+    return <div>{chart}</div>
+  }
+
   return (
     <Measure
       bounds
@@ -23,15 +41,7 @@ const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
     >
       {({ measureRef }) => (
         <div ref={measureRef}>
-          <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
-            {heading}
-            {controls}
-          </ChartHeading>
-          <MultiLinePlot
-            height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
-            {...props}
-            className='-mt-1 md:m-0'
-          />
+          {chart}
         </div>
       )}
     </Measure>
@@ -67,7 +77,9 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
     <Measure
       bounds
       onResize={rect => {
-        setWidth(rect.bounds.width)
+        if (rect.bounds.width > 0) {
+          setWidth(rect.bounds.width)
+        }
       }}
     >
       {({ measureRef }) => (
