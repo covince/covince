@@ -161,13 +161,13 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
                 Color by
               </label>
               <Select
-                value={lineageState.loading.parameter || lineageState.parameter}
+                value={lineageState.loading.colorBy || lineageState.colorBy}
                 name='parameters'
                 onChange={e => lineageActions.colorBy(e.target.value)}
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.parameter !== 'R' &&
+            </div> {lineageState.colorBy !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
                   Scale
@@ -188,14 +188,14 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={lineageState.parameter === 'R' ? 'R_scale' : lineageState.scale}
+              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               index={results ? results.index : null}
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
-              percentage={lineageState.parameter === 'p'}
+              percentage={lineageState.colorBy === 'p'}
               lineColor={lineColor}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
