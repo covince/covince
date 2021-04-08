@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -21,6 +21,7 @@ import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
+import useDates from '../hooks/useDates'
 
 const data = loadData()
 
@@ -29,27 +30,12 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
 
   const unique_lineages = data.lineages
 
-  const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState(data.initialDate)
-
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
-
-  const bumpDate = () => {
-    let cur_index = results.dates.indexOf(date)
-    if (results.dates[cur_index + 1] === undefined) {
-      cur_index = -1
-    }
-    const set_to = results.dates[cur_index + 1]
-    setDate(set_to)
-  }
-
-  useEffect(() => {
-    if (playing) {
-      const timeout = setTimeout(bumpDate, 100)
-      return () => clearTimeout(timeout)
-    }
-  }, [playing, date])
+  const [
+    { date, playing },
+    { setDate, setPlaying, persistDate }
+  ] = useDates(results ? results.dates : [], data.initialDate)
 
   let unique_parameters = ['lambda', 'p', 'R']
 
@@ -109,7 +95,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     value: date,
     onChange: handleDateSlider,
     playing: playing,
-    setPlaying: setPlaying
+    setPlaying: setPlaying,
+    persistDate
   }
 
   const isInitialLoad = useMemo(() => (
