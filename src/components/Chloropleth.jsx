@@ -113,8 +113,8 @@ const Chloropleth = (props) => {
     }
   }, [lat, lon, zoom])
 
-  const debounceUpdateQuery = useCallback(debounce(updateQuery, 500))
-  const onViewportChange = useCallback(newViewport => {
+  const debounceUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
+  const onViewportChange = newViewport => {
     clampViewport(newViewport)
     setViewport(newViewport)
     debounceUpdateQuery({
@@ -122,7 +122,7 @@ const Chloropleth = (props) => {
       lon: newViewport.longitude.toFixed(6),
       zoom: newViewport.zoom.toFixed(2)
     })
-  }, [setViewport])
+  }
 
   const { tiles, date, index, lad } = props
 
