@@ -1,15 +1,29 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
 import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
+import debounce from 'lodash.debounce'
 
 import FadeTransition from './FadeTransition'
+import useQueryAsState from '../hooks/useQueryAsState'
 
 const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
+function clampViewport (viewport) {
+  if (viewport.longitude < bounds.minLongitude) {
+    viewport.longitude = bounds.minLongitude
+  } else if (viewport.longitude > bounds.maxLongitude) {
+    viewport.longitude = bounds.maxLongitude
+  }
+  if (viewport.latitude < bounds.minLatitude) {
+    viewport.latitude = bounds.minLatitude
+  } else if (viewport.latitude > bounds.maxLatitude) {
+    viewport.latitude = bounds.maxLatitude
+  }
+}
 // magma
 const colorStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
@@ -77,29 +91,38 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
 }
 
 const Chloropleth = (props) => {
+  const [{ lat = '52.561928', lon = '-1.464854', zoom = props.isMobile ? 4.5 : 5 }, updateQuery] = useQueryAsState()
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
-    // latitude: 53.5,
-    // longitude: -3,
-    latitude: 52.561928,
-    longitude: -1.464854,
-    zoom: props.isMobile ? 4.5 : 5
+    latitude: parseFloat(lat),
+    longitude: parseFloat(lon),
+    zoom: parseFloat(zoom)
   })
 
-  const clampAndSetViewport = newViewport => {
-    if (newViewport.longitude < bounds.minLongitude) {
-      newViewport.longitude = bounds.minLongitude
-    } else if (newViewport.longitude > bounds.maxLongitude) {
-      newViewport.longitude = bounds.maxLongitude
+  useEffect(() => {
+    if (lat !== viewport.latitude || lon !== viewport.longitude || zoom !== viewport.zoom) {
+      console.log(viewport, lat, lon, zoom)
+      const update = {
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lon),
+        zoom: parseFloat(zoom)
+      }
+      clampViewport(update)
+      setViewport({ ...viewport, ...update })
     }
-    if (newViewport.latitude < bounds.minLatitude) {
-      newViewport.latitude = bounds.minLatitude
-    } else if (newViewport.latitude > bounds.maxLatitude) {
-      newViewport.latitude = bounds.maxLatitude
-    }
+  }, [lat, lon, zoom])
+
+  const debounceUpdateQuery = useCallback(debounce(updateQuery, 500))
+  const onViewportChange = useCallback(newViewport => {
+    clampViewport(newViewport)
     setViewport(newViewport)
-  }
+    debounceUpdateQuery({
+      lat: newViewport.latitude.toFixed(6),
+      lon: newViewport.longitude.toFixed(6),
+      zoom: newViewport.zoom.toFixed(2)
+    })
+  }, [setViewport])
 
   const { tiles, date, index, lad } = props
 
@@ -242,7 +265,7 @@ const Chloropleth = (props) => {
             {...viewport}
             minZoom={4}
             disableTokenWarning
-            onViewportChange={nextViewport => clampAndSetViewport(nextViewport)}
+            onViewportChange={onViewportChange}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'
