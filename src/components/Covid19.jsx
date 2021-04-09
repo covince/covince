@@ -43,12 +43,6 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     ladActions.load(lad)
   }
 
-  const handleDateSlider = (e) => {
-    const { value } = e.target
-    const set_to = results.dates[value]
-    setDate(set_to)
-  }
-
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
   if (lineageState.lineage === 'total') {
     unique_parameters = unique_parameters[0]
@@ -93,10 +87,18 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     dates: results ? results.dates : null,
     label: formattedDate,
     value: date,
-    onChange: handleDateSlider,
+    onChange: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      setDate(set_to)
+    },
     playing: playing,
     setPlaying: setPlaying,
-    persistDate
+    persistDate: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      persistDate(set_to)
+    }
   }
 
   const isInitialLoad = useMemo(() => (
@@ -215,7 +217,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           )}
           name={LALookupTable[ladState.currentLad]}
           date={date}
-          setDate={setDate}
+          setDate={persistDate}
           lad={ladState.currentLad}
           values={ladState.data}
           isMobile={isMobile}

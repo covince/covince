@@ -32,7 +32,7 @@ export default (datesList, initialDate) => {
     playing
   }))
 
-  const persistDate = useCallback(() => updateQuery({ date }), [updateQuery, date])
+  const persistDate = useCallback((date) => updateQuery({ date }), [updateQuery])
 
   const actions = {
     setPlaying,
