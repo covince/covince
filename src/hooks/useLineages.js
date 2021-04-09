@@ -3,10 +3,10 @@ import axios from 'axios'
 
 import useQueryAsState from './useQueryAsState'
 
-const setScale = (x) => {
+const getDefaultScale = (x) => {
   if (x === 'p') return 'linear'
   if (x === 'lambda') return 'quadratic'
-  if (x === 'R') return 'linear'
+  if (x === 'R') return undefined
 }
 
 const useLineages = () => {
@@ -26,8 +26,7 @@ const useLineages = () => {
             ...current,
             data: res.data,
             lineage,
-            colorBy,
-            scale
+            colorBy
           })
         })
     }
@@ -35,11 +34,8 @@ const useLineages = () => {
 
   const actions = {
     setLineage: lineage => updateQuery({ lineage }),
-    colorBy: colorBy => updateQuery({ colorBy, scale: colorBy !== current.colorBy ? setScale(colorBy) : scale }),
-    setScale: scale => {
-      updateQuery({ scale })
-      setCurrent({ ...current, scale })
-    }
+    colorBy: colorBy => updateQuery({ colorBy, scale: undefined }),
+    setScale: scale => updateQuery({ scale })
   }
 
   const results = useMemo(() => {
@@ -75,12 +71,13 @@ const useLineages = () => {
   const state = useMemo(() => {
     return {
       ...current,
+      scale: scale || getDefaultScale(current.colorBy),
       loading: {
         lineage,
         colorBy
       }
     }
-  }, [current, lineage, colorBy])
+  }, [current, lineage, colorBy, scale])
 
   return [state, actions, results]
 }
