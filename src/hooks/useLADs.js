@@ -31,7 +31,7 @@ const useLAD = () => {
     }
   }, {
     status: 'LOADING',
-    loadingLad: 'national',
+    loadingLad: 'E07000139',
     currentLad: null,
     data: null
   })
