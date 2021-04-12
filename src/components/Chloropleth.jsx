@@ -91,37 +91,60 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
 }
 
 const Chloropleth = (props) => {
-  const [{ lat = '52.561928', lon = '-1.464854', zoom = props.isMobile ? 4.5 : 5 }, updateQuery] = useQueryAsState()
+  const [{
+    lat = '52.561928',
+    lon = '-1.464854',
+    zoom = props.isMobile ? 4.5 : 5,
+    pitch = 0,
+    bearing = 0
+  }, updateQuery] = useQueryAsState()
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
     latitude: parseFloat(lat),
     longitude: parseFloat(lon),
-    zoom: parseFloat(zoom)
+    zoom: parseFloat(zoom),
+    pitch: parseFloat(pitch),
+    bearing: parseFloat(bearing)
   })
 
   useEffect(() => {
-    if (lat !== viewport.latitude || lon !== viewport.longitude || zoom !== viewport.zoom) {
-      console.log(viewport, lat, lon, zoom)
+    if (
+      lat !== viewport.latitude ||
+      lon !== viewport.longitude ||
+      zoom !== viewport.zoom ||
+      pitch !== viewport.pitch ||
+      bearing !== viewport.bearing
+    ) {
       const update = {
         latitude: parseFloat(lat),
         longitude: parseFloat(lon),
-        zoom: parseFloat(zoom)
+        zoom: parseFloat(zoom),
+        pitch: parseFloat(pitch),
+        bearing: parseFloat(bearing)
       }
       clampViewport(update)
       setViewport({ ...viewport, ...update })
     }
-  }, [lat, lon, zoom])
+  }, [lat, lon, zoom, pitch, bearing])
+
+  const [rendered, setRendered] = useState(false)
 
   const debounceUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
   const onViewportChange = newViewport => {
     clampViewport(newViewport)
     setViewport(newViewport)
-    debounceUpdateQuery({
-      lat: newViewport.latitude.toFixed(6),
-      lon: newViewport.longitude.toFixed(6),
-      zoom: newViewport.zoom.toFixed(2)
-    })
+    if (rendered) {
+      debounceUpdateQuery({
+        lat: newViewport.latitude.toFixed(6),
+        lon: newViewport.longitude.toFixed(6),
+        zoom: newViewport.zoom.toFixed(2),
+        pitch: newViewport.pitch !== 0 ? newViewport.pitch.toFixed(6) : undefined,
+        bearing: newViewport.bearing !== 0 ? newViewport.bearing.toFixed(6) : undefined
+      })
+    } else {
+      setRendered(true)
+    }
   }
 
   const { tiles, date, index, lad } = props
