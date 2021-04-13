@@ -14,7 +14,8 @@ import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
-import StickyActionButton from './StickyActionButton'
+import StickyMobileSection from './StickyMobileSection'
+import LineageFilter from './LineageFilter'
 
 import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
@@ -22,6 +23,7 @@ import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
 import useDates from '../hooks/useDates'
+import useLineageFilter from '../hooks/useLineageFilter'
 
 const data = loadData()
 
@@ -105,6 +107,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     lineageState.lineage === null || ladState.currentLad === null
   ), [lineageState.lineage, ladState.currentLad])
 
+  const lineageFilter = useLineageFilter(unique_lineages)
+
   return (
     <>
       { isMobile && view === 'chart' &&
@@ -114,10 +118,12 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection className='overflow-hidden'>
-          <DateFilter className='w-80' {...dateFilter} />
+        <FilterSection className='max-w-full overflow-x-auto flex justify-start'>
+          <DateFilter className='w-80 flex-shrink-0' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <LocationFilter className='flex-shrink-0 relative w-80' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <div className='border border-gray-200 mx-6 hidden md:block' />
+          <LineageFilter className='w-80 h-20 flex-shrink-0' {...lineageFilter} />
           <FadeTransition in={isInitialLoad}>
             <div className='bg-white absolute inset-0 grid place-content-center'>
               <Spinner className='text-gray-500 w-6 h-6' />
@@ -222,13 +228,17 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           values={ladState.data}
           isMobile={isMobile}
           lineColor={lineColor}
+          activeLineages={lineageFilter.activeLineages}
         />
         { isMobile && view === 'chart' &&
-          <StickyActionButton
-            onClick={() => handleSetView('map')}
-          >
-            View map on {formattedDate}
-          </StickyActionButton> }
+          <StickyMobileSection className='p-3 space-y-2'>
+            <div className='flex justify-center'>
+              <PillButton onClick={() => handleSetView('map')}>
+                View map on {formattedDate}
+              </PillButton>
+            </div>
+            <LineageFilter {...lineageFilter} />
+          </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>

@@ -67,10 +67,10 @@ const colors = [
   '#777'
 ]
 
-const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, stroke = 'blueGray', className }) => {
+const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, stroke = 'blueGray', className, activeLineages }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
-    const lineages = new Set()
+    const presentLineages = new Set()
 
     for (const d of lad_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
@@ -80,15 +80,23 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
           [d.lineage]: d.mean,
           [`${d.lineage}_range`]: d.range
         }
-        lineages.add(d.lineage)
+        presentLineages.add(d.lineage)
+      }
+    }
+
+    const lineages = []
+    for (const lineage of Array.from(presentLineages)) {
+      const { active, colour } = activeLineages[lineage]
+      if (active) {
+        lineages.push({ lineage, colour })
       }
     }
 
     return {
-      lineages: Array.from(lineages),
+      lineages,
       data: Object.values(dataByDate)
     }
-  }, [lad_data])
+  }, [lad_data, activeLineages])
 
   const { lineages, data } = chart
 
@@ -180,17 +188,17 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
       <ComposedChart {...chartProps}>
         {grid}
         {tooltip /* placed here to put the cursor underneath the dots */}
-        {lineages.map((lineage, index) =>
+        {lineages.map(({ lineage, colour }) =>
           <Area
             key={lineage}
             activeDot={{ stroke: tailwindColors[stroke][400] }}
             dataKey={lineage}
             dot={false}
-            fill={colors[index]}
+            fill={colour}
             isAnimationActive={false}
             name={lineage}
             stackId='1'
-            stroke={colors[index]}
+            stroke={colour}
             type='monotone'
           />
         )}
@@ -204,14 +212,14 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
       <ComposedChart {...chartProps} >
         {grid}
         {tooltip /* placed here to put the cursor underneath the dots */}
-        {lineages.map((lineage, index) => {
+        {lineages.map(({ lineage, colour }) => {
           const key = `${lineage}_range`
           return (
             <Area
               key={key}
               activeDot={false}
               dataKey={key}
-              fill={colors[index]}
+              fill={colour}
               isAnimationActive={false}
               name='_range'
               strokeWidth={0}
@@ -219,7 +227,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
             />
           )
         })}
-        {lineages.map((lineage, index) =>
+        {lineages.map(({ lineage, colour }) =>
           <Line
             key={lineage}
             activeDot={{ stroke: tailwindColors[stroke][400] }}
@@ -227,7 +235,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height
             dot={false}
             isAnimationActive={false}
             name={lineage}
-            stroke={colors[index]}
+            stroke={colour}
             type='monotone'
           />
         )}

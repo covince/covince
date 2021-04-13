@@ -50,7 +50,7 @@ const Chart = ({ heading, controls, isMobile, ...props }) => {
   )
 }
 
-function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
+function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor, activeLineages }) {
   const lad_data = useMemo(() => values || [], [values])
 
   const [{ proportion = 'area', incidence = 'line' }, updateQuery] = useQueryAsState()
@@ -95,6 +95,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             parameter='lambda'
             type={incidence}
             stroke={lineColor}
+            activeLineages={activeLineages}
           />
           <Chart
             width={width}
@@ -115,6 +116,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             parameter='p'
             type={proportion}
             stroke={lineColor}
+            activeLineages={activeLineages}
           />
           <Chart
             width={width}
@@ -125,6 +127,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             setDate={setDate}
             parameter='R'
             stroke={lineColor}
+            activeLineages={activeLineages}
           />
         </div>
       )}
