@@ -1,7 +1,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
 import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
@@ -11,19 +11,6 @@ import debounce from 'lodash.debounce'
 import FadeTransition from './FadeTransition'
 import useQueryAsState from '../hooks/useQueryAsState'
 
-const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
-function clampViewport (viewport) {
-  if (viewport.longitude < bounds.minLongitude) {
-    viewport.longitude = bounds.minLongitude
-  } else if (viewport.longitude > bounds.maxLongitude) {
-    viewport.longitude = bounds.maxLongitude
-  }
-  if (viewport.latitude < bounds.minLatitude) {
-    viewport.latitude = bounds.minLatitude
-  } else if (viewport.latitude > bounds.maxLatitude) {
-    viewport.latitude = bounds.maxLatitude
-  }
-}
 // magma
 const colorStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
@@ -90,60 +77,71 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   )
 }
 
+const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
+function clampViewport (viewport) {
+  if (viewport.longitude < bounds.minLongitude) {
+    viewport.longitude = bounds.minLongitude
+  } else if (viewport.longitude > bounds.maxLongitude) {
+    viewport.longitude = bounds.maxLongitude
+  }
+  if (viewport.latitude < bounds.minLatitude) {
+    viewport.latitude = bounds.minLatitude
+  } else if (viewport.latitude > bounds.maxLatitude) {
+    viewport.latitude = bounds.maxLatitude
+  }
+}
+
+const viewportDoesNotMatch = (a, b) => (
+  a.latitude !== b.latitude ||
+  a.longitude !== b.longitude ||
+  a.zoom !== b.zoom ||
+  a.pitch !== b.pitch ||
+  a.bearing !== b.bearing
+)
+
+const mapQueryToViewport = query => {
+  const viewport = {
+    latitude: parseFloat(query.latitude),
+    longitude: parseFloat(query.longitude),
+    zoom: parseFloat(query.zoom),
+    pitch: parseFloat(query.pitch),
+    bearing: parseFloat(query.bearing)
+  }
+  clampViewport(viewport)
+  return viewport
+}
+
 const Chloropleth = (props) => {
-  const [{
-    lat = '52.561928',
-    lon = '-1.464854',
-    zoom = props.isMobile ? 4.5 : 5,
-    pitch = 0,
-    bearing = 0
-  }, updateQuery] = useQueryAsState()
+  const [query, updateQuery] = useQueryAsState({
+    latitude: '52.561928',
+    longitude: '-1.464854',
+    zoom: props.isMobile ? '4.50' : '5.00',
+    pitch: '0',
+    bearing: '0'
+  })
+
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
-    latitude: parseFloat(lat),
-    longitude: parseFloat(lon),
-    zoom: parseFloat(zoom),
-    pitch: parseFloat(pitch),
-    bearing: parseFloat(bearing)
+    ...mapQueryToViewport(query)
   })
 
   useEffect(() => {
-    if (
-      lat !== viewport.latitude ||
-      lon !== viewport.longitude ||
-      zoom !== viewport.zoom ||
-      pitch !== viewport.pitch ||
-      bearing !== viewport.bearing
-    ) {
-      const update = {
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lon),
-        zoom: parseFloat(zoom),
-        pitch: parseFloat(pitch),
-        bearing: parseFloat(bearing)
-      }
-      clampViewport(update)
-      setViewport({ ...viewport, ...update })
-    }
-  }, [lat, lon, zoom, pitch, bearing])
+    setViewport({ ...viewport, ...mapQueryToViewport(query) })
+  }, [query.latitude, query.longitude, query.zoom, query.pitch, query.bearing])
 
-  const [rendered, setRendered] = useState(false)
-
-  const debounceUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
+  const debouncedUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
   const onViewportChange = newViewport => {
     clampViewport(newViewport)
     setViewport(newViewport)
-    if (rendered) {
-      debounceUpdateQuery({
-        lat: newViewport.latitude.toFixed(6),
-        lon: newViewport.longitude.toFixed(6),
+    if (viewportDoesNotMatch(viewport, newViewport)) {
+      debouncedUpdateQuery({
+        latitude: newViewport.latitude.toFixed(6),
+        longitude: newViewport.longitude.toFixed(6),
         zoom: newViewport.zoom.toFixed(2),
         pitch: newViewport.pitch !== 0 ? newViewport.pitch.toFixed(6) : undefined,
         bearing: newViewport.bearing !== 0 ? newViewport.bearing.toFixed(6) : undefined
       })
-    } else {
-      setRendered(true)
     }
   }
 
