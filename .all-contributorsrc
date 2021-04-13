@@ -18,6 +18,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "theosanderson",
+      "name": "Theo Sanderson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19732295?v=4",
+      "profile": "http://theo.io/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
