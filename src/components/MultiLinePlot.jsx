@@ -64,7 +64,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
 const colors = [
   'rgb(44,183,236)', // sky blue
   'rgb(243,100,13)', // vermillion
-  ,'#8a3ffc','#007d79','#fa4d56','#6fdc8c','#d12771','#ba4e00','#33b1ff','#ff7eb6','#777'
+  '#8a3ffc','#007d79','#fa4d56','#6fdc8c','#d12771','#ba4e00','#33b1ff','#ff7eb6','#777'
 ]
 
 const MultiLinePlot = ({ date, setDate, lad_data, parameter, type, width, height = 120, stroke = 'blueGray', className }) => {
