@@ -4,7 +4,6 @@ import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
 import axios from 'axios'
 
-const DataProvider = lazy(() => import('./components/DataProvider'))
 const Covid19 = lazy(() => import('./components/Covid19'))
 
 const Loading = () => (
