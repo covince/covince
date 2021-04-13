@@ -1,46 +1,13 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
+import useQueryAsState from './useQueryAsState'
 
 const useLAD = () => {
-  const [state, dispatch] = useReducer((state, { type, payload }) => {
-    if (state.status === 'LOADING') {
-      switch (type) {
-        case 'DATA':
-          return {
-            ...state,
-            status: 'READY',
-            loadingLad: null,
-            currentLad: state.loadingLad,
-            data: payload
-          }
-        default:
-          return state
-      }
-    }
-    switch (type) {
-      case 'LOAD': {
-        if (payload === state.currentLad) return state
-        return {
-          ...state,
-          status: 'LOADING',
-          loadingLad: payload
-        }
-      }
-      default:
-        return state
-    }
-  }, {
-    status: 'LOADING',
-    loadingLad: 'national',
-    currentLad: null,
-    data: null
-  })
+  const [{ lad }, updateQuery] = useQueryAsState({ lad: 'national' })
+  const [{ currentLad, data }, storeResult] = useState({})
 
   useEffect(() => {
-    if (state.loadingLad === null) {
-      return
-    }
-    axios.get(`./data/ltla/${state.loadingLad}.json`)
+    axios.get(`./data/ltla/${lad}.json`)
       .then(res => {
         const new_data = res.data.data.map(x => {
           if (x.parameter === 'p') {
@@ -55,13 +22,20 @@ const useLAD = () => {
             range: [x.lower, x.upper]
           }
         })
-        dispatch({ type: 'DATA', payload: new_data })
+        storeResult({ currentLad: lad, data: new_data })
       })
-  }, [state.loadingLad])
+  }, [lad])
 
   const actions = {
-    load: (lad) => dispatch({ type: 'LOAD', payload: lad })
+    load: (lad) => updateQuery({ lad })
   }
+
+  const state = useMemo(() => ({
+    status: lad === currentLad ? 'READY' : 'LOADING',
+    loadingLad: lad,
+    currentLad,
+    data
+  }))
 
   return [state, actions]
 }

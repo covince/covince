@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -21,6 +21,7 @@ import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
+import useDates from '../hooks/useDates'
 
 const data = loadData()
 
@@ -29,38 +30,17 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
 
   const unique_lineages = data.lineages
 
-  const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState(data.initialDate)
-
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
-
-  const bumpDate = () => {
-    let cur_index = results.dates.indexOf(date)
-    if (results.dates[cur_index + 1] === undefined) {
-      cur_index = -1
-    }
-    const set_to = results.dates[cur_index + 1]
-    setDate(set_to)
-  }
-
-  useEffect(() => {
-    if (playing) {
-      const timeout = setTimeout(bumpDate, 100)
-      return () => clearTimeout(timeout)
-    }
-  }, [playing, date])
+  const [
+    { date, playing },
+    { setDate, setPlaying, persistDate }
+  ] = useDates(results ? results.dates : [], data.initialDate)
 
   let unique_parameters = ['lambda', 'p', 'R']
 
   const handleOnClick = (lad) => {
     ladActions.load(lad)
-  }
-
-  const handleDateSlider = (e) => {
-    const { value } = e.target
-    const set_to = results.dates[value]
-    setDate(set_to)
   }
 
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
@@ -107,9 +87,18 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
     dates: results ? results.dates : null,
     label: formattedDate,
     value: date,
-    onChange: handleDateSlider,
+    onChange: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      setDate(set_to)
+    },
     playing: playing,
-    setPlaying: setPlaying
+    setPlaying: setPlaying,
+    persistDate: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      persistDate(set_to)
+    }
   }
 
   const isInitialLoad = useMemo(() => (
@@ -174,13 +163,13 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
                 Color by
               </label>
               <Select
-                value={lineageState.loading.parameter || lineageState.parameter}
+                value={lineageState.loading.colorBy || lineageState.colorBy}
                 name='parameters'
                 onChange={e => lineageActions.colorBy(e.target.value)}
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.parameter !== 'R' &&
+            </div> {lineageState.colorBy !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
                   Scale
@@ -201,14 +190,14 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={lineageState.parameter === 'R' ? 'R_scale' : lineageState.scale}
+              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               index={results ? results.index : null}
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
-              percentage={lineageState.parameter === 'p'}
+              percentage={lineageState.colorBy === 'p'}
               lineColor={lineColor}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
@@ -228,7 +217,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           )}
           name={LALookupTable[ladState.currentLad]}
           date={date}
-          setDate={setDate}
+          setDate={persistDate}
           lad={ladState.currentLad}
           values={ladState.data}
           isMobile={isMobile}

@@ -5,7 +5,7 @@ import Slider from './Slider'
 import Button from './Button'
 import { Heading, DescriptiveHeading } from './Typography'
 
-const DateFilter = ({ className, dates = [], label, value, onChange, playing, setPlaying }) => (
+const DateFilter = ({ className, dates = [], label, value, onChange, persistDate, playing, setPlaying }) => (
   <div className={className}>
     <div className='h-6 flex justify-between items-start'>
       <DescriptiveHeading>
@@ -36,6 +36,9 @@ const DateFilter = ({ className, dates = [], label, value, onChange, playing, se
         onChange={onChange}
         value={dates ? dates.indexOf(value) : 0.5}
         disabled={!dates}
+        onMouseUp={persistDate}
+        onTouchEnd={persistDate}
+        onKeyUp={persistDate}
       />
     </div>
   </div>
