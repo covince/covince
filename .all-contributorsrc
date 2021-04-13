@@ -11,10 +11,10 @@
   "commitConvention": "angular",
   "contributors": [
     {
-      "login": "sagar87",
-      "name": "Harald Vöhringer",
-      "avatar_url": "https://avatars.githubusercontent.com/u/7542594?v=4",
-      "profile": "https://github.com/sagar87",
+      "login": "richardgoater",
+      "name": "Richard Goater",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1429721?v=4",
+      "profile": "https://github.com/richardgoater",
       "contributions": [
         "code"
       ]
@@ -29,14 +29,15 @@
       ]
     },
     {
-      "login": "richardgoater",
-      "name": "Richard Goater",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1429721?v=4",
-      "profile": "https://github.com/richardgoater",
+      "login": "sagar87",
+      "name": "Harald Vöhringer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7542594?v=4",
+      "profile": "https://github.com/sagar87",
       "contributions": [
         "code"
       ]
     }
+    
   ],
   "contributorsPerLine": 7
 }
