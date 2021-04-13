@@ -16,15 +16,12 @@ import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
 import StickyActionButton from './StickyActionButton'
 
-import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
 
-const data = loadData()
-
-const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
+const Covid19 = ({ lineColor = 'blueGray', tiles = null, data = null }) => {
   const LALookupTable = useLALookupTable(tiles)
 
   const unique_lineages = data.lineages
