@@ -38,6 +38,7 @@ const DateFilter = ({ className, dates = [], label, value, onChange, persistDate
         disabled={!dates}
         onMouseUp={persistDate}
         onTouchEnd={persistDate}
+        onKeyUp={persistDate}
       />
     </div>
   </div>
