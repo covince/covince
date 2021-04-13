@@ -5,12 +5,12 @@ import geojson from '../assets/Local_Authority_Districts__December_2019__Boundar
 geojson.features.reverse()
 
 const DataProvider =
-  ({ children, spinner }) => {
+  ({ children, default_data_url }) => {
     const [data, setData] = useState(null)
 
     useEffect(() => {
       if (data === null) {
-        axios.get('./data/lists.json')
+        axios.get(default_data_url)
           .then(res => {
             setData(res.data)
           })

@@ -18,7 +18,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-            <DataProvider url="./data/lists.json">
+            <DataProvider default_data_url="./data/lists.json">
               <Covid19 />
             </DataProvider>
         </AppContainer>
