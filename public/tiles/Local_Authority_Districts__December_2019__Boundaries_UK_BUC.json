@@ -1,5 +1,6 @@
 {
     "type": "FeatureCollection",
+    "name": "Local_Authority_Districts__December_2019__Boundaries_UK_BUC",
     "config": {
         "default_lat": 52.561928,
         "default_lon": -1.464854,
@@ -12,7 +13,6 @@
             "maxLatitude": 60
         }
     },
-    "name": "Local_Authority_Districts__December_2019__Boundaries_UK_BUC",
     "crs": {
         "type": "name",
         "properties": {
