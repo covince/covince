@@ -1,0 +1,24 @@
+{
+  "projectName": "covince",
+  "projectOwner": "theosanderson",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 200,
+  "commit": true,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "sagar87",
+      "name": "Harald Vöhringer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7542594?v=4",
+      "profile": "https://github.com/sagar87",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
