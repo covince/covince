@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -13,52 +13,34 @@ import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
+import FilterSection from './FilterSection'
+import StickyActionButton from './StickyActionButton'
 
-import { loadTiles, getLALookupTable } from '../utils/loadTiles'
 import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
+import useLALookupTable from '../hooks/useLALookupTable'
+import useDates from '../hooks/useDates'
 
-const LALookupTable = getLALookupTable()
-const tiles = loadTiles()
 const data = loadData()
 
-const Covid19 = ({ lineColor = 'blueGray' }) => {
-  const unique_lineages = data.lineages
+const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
+  const LALookupTable = useLALookupTable(tiles)
 
-  const [playing, setPlaying] = useState(false)
-  const [date, setDate] = useState(data.initialDate)
+  const unique_lineages = data.lineages
 
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
-
-  const bumpDate = () => {
-    let cur_index = results.dates.indexOf(date)
-    if (results.dates[cur_index + 1] === undefined) {
-      cur_index = -1
-    }
-    const set_to = results.dates[cur_index + 1]
-    setDate(set_to)
-  }
-
-  useEffect(() => {
-    if (playing) {
-      const timeout = setTimeout(bumpDate, 100)
-      return () => clearTimeout(timeout)
-    }
-  }, [playing, date])
+  const [
+    { date, playing },
+    { setDate, setPlaying, persistDate }
+  ] = useDates(results ? results.dates : [], data.initialDate)
 
   let unique_parameters = ['lambda', 'p', 'R']
 
   const handleOnClick = (lad) => {
     ladActions.load(lad)
-  }
-
-  const handleDateSlider = (e) => {
-    const { value } = e.target
-    const set_to = results.dates[value]
-    setDate(set_to)
   }
 
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
@@ -68,6 +50,10 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
   const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
 
   const [view, setView] = useState('chart')
+  const handleSetView = useCallback(view => {
+    window.scrollTo({ top: 0 })
+    setView(view)
+  }, [setView])
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
@@ -79,7 +65,7 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
           <span className='flex items-center text-subheading'>
             Explore local authorities {
             isMobile
-              ? <button onClick={() => setView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
+              ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
             }
           </span>
@@ -101,41 +87,64 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
     dates: results ? results.dates : null,
     label: formattedDate,
     value: date,
-    onChange: handleDateSlider,
+    onChange: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      setDate(set_to)
+    },
     playing: playing,
-    setPlaying: setPlaying
+    setPlaying: setPlaying,
+    persistDate: (e) => {
+      const { value } = e.target
+      const set_to = results.dates[value]
+      persistDate(set_to)
+    }
   }
+
+  const isInitialLoad = useMemo(() => (
+    lineageState.lineage === null || ladState.currentLad === null
+  ), [lineageState.lineage, ladState.currentLad])
 
   return (
     <>
       { isMobile && view === 'chart' &&
         <LocationFilter
-          className='px-4 pt-3 pb-0 bg-white relative'
+          className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
+          loading={isInitialLoad}
         /> }
-      { !isMobile && <div className='mb-3 -mt-20 sticky top-1 z-10 mx-auto'>
-          <Card className='w-full md:w-auto border-t border-gray-100 md:border-0 md:flex mx-auto'>
-            <DateFilter className='w-80' {...dateFilter} />
-            <div className='border border-gray-200 mx-6 hidden md:block' />
-            <LocationFilter className='w-80 relative' {...locationFilter} />
-          </Card>
-        </div> }
-      <Card className={classNames('flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
+      { !isMobile &&
+        <FilterSection className='overflow-hidden'>
+          <DateFilter className='w-80' {...dateFilter} />
+          <div className='border border-gray-200 mx-6 hidden md:block' />
+          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <FadeTransition in={isInitialLoad}>
+            <div className='bg-white absolute inset-0 grid place-content-center'>
+              <Spinner className='text-gray-500 w-6 h-6' />
+            </div>
+          </FadeTransition>
+        </FilterSection> }
+      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
-          <div className='flex justify-between items-center space-x-6'>
+          <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
             {isMobile &&
-              <PillButton
-                className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                onClick={() => setView('chart')}
-              >
-                <span className='truncate'>{locationFilter.heading}</span>
-                <BsArrowRightShort className='w-6 h-6' />
-              </PillButton> }
+              <div className='flex items-center max-w-none min-w-0'>
+                <FadeTransition in={ladState.status === 'LOADING'}>
+                  <Spinner className='h-4 w-4 mr-2 text-gray-500' />
+                </FadeTransition>
+                <PillButton
+                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+                  onClick={() => handleSetView('chart')}
+                >
+                  <span className='truncate'>{locationFilter.heading}</span>
+                  <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
+                </PillButton>
+              </div> }
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
-            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' }
+            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
               <label className='block font-medium mb-1'>
@@ -154,13 +163,13 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
                 Color by
               </label>
               <Select
-                value={lineageState.loading.parameter || lineageState.parameter}
+                value={lineageState.loading.colorBy || lineageState.colorBy}
                 name='parameters'
                 onChange={e => lineageActions.colorBy(e.target.value)}
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.parameter !== 'R' &&
+            </div> {lineageState.colorBy !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
                   Scale
@@ -181,51 +190,54 @@ const Covid19 = ({ lineColor = 'blueGray' }) => {
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
-              color_scale_type={lineageState.parameter === 'R' ? 'R_scale' : lineageState.scale}
+              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               index={results ? results.index : null}
               date={date}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
-              percentage={lineageState.parameter === 'p'}
+              percentage={lineageState.colorBy === 'p'}
               lineColor={lineColor}
             />
-            <FadeTransition in={lineageState.status === 'LOADING'}>
+            <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 w-6 h-6' />
               </div>
             </FadeTransition>
-            <div className='absolute inset-0 shadow-inner pointer-events-none' />
+            <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
         <LocalIncidence
           className={classNames(
-            'transition-opacity pb-14 md:pb-0 flex-grow', {
+            'transition-opacity flex-grow', {
               hidden: view === 'map',
-              'opacity-50 pointer-events-none': ladState.status === 'LOADING'
+              'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
             }
           )}
           name={LALookupTable[ladState.currentLad]}
           date={date}
-          setDate={setDate}
+          setDate={persistDate}
           lad={ladState.currentLad}
           values={ladState.data}
           isMobile={isMobile}
           lineColor={lineColor}
         />
-      </Card>
-      { isMobile && view === 'map' &&
-        <DateFilter className='p-3 bg-white border-t border-gray-100' {...dateFilter} /> }
-      { isMobile && view === 'chart' &&
-        <div className='fixed z-40 bottom-6 left-0 right-0 h-0 flex justify-center items-end'>
-          <PillButton
-            className='shadow-xl'
-            onClick={() => setView('map')}
+        { isMobile && view === 'chart' &&
+          <StickyActionButton
+            onClick={() => handleSetView('map')}
           >
             View map on {formattedDate}
-          </PillButton>
-        </div> }
+          </StickyActionButton> }
+        <FadeTransition in={isInitialLoad}>
+          <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
+        </FadeTransition>
+      </Card>
+      { isMobile && view === 'map' &&
+        <DateFilter
+          className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
+          {...dateFilter}
+        /> }
     </>
   )
 }

@@ -1,15 +1,16 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
 import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
+import debounce from 'lodash.debounce'
 
 import FadeTransition from './FadeTransition'
+import useQueryAsState from '../hooks/useQueryAsState'
 
-const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
 // magma
 const colorStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
@@ -76,41 +77,88 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   )
 }
 
+const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
+function clampViewport (viewport) {
+  if (viewport.longitude < bounds.minLongitude) {
+    viewport.longitude = bounds.minLongitude
+  } else if (viewport.longitude > bounds.maxLongitude) {
+    viewport.longitude = bounds.maxLongitude
+  }
+  if (viewport.latitude < bounds.minLatitude) {
+    viewport.latitude = bounds.minLatitude
+  } else if (viewport.latitude > bounds.maxLatitude) {
+    viewport.latitude = bounds.maxLatitude
+  }
+}
+
+const viewportDoesNotMatch = (a, b) => (
+  a.latitude !== b.latitude ||
+  a.longitude !== b.longitude ||
+  a.zoom !== b.zoom ||
+  a.pitch !== b.pitch ||
+  a.bearing !== b.bearing
+)
+
+const mapQueryToViewport = query => {
+  const viewport = {
+    latitude: parseFloat(query.latitude),
+    longitude: parseFloat(query.longitude),
+    zoom: parseFloat(query.zoom),
+    pitch: parseFloat(query.pitch),
+    bearing: parseFloat(query.bearing)
+  }
+  clampViewport(viewport)
+  return viewport
+}
+
 const Chloropleth = (props) => {
+  const [query, updateQuery] = useQueryAsState({
+    latitude: '52.561928',
+    longitude: '-1.464854',
+    zoom: props.isMobile ? '4.50' : '5.00',
+    pitch: '0',
+    bearing: '0'
+  })
+
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
-    // latitude: 53.5,
-    // longitude: -3,
-    latitude: 52.561928,
-    longitude: -1.464854,
-    zoom: props.isMobile ? 4.5 : 5
+    ...mapQueryToViewport(query)
   })
 
-  const clampAndSetViewport = newViewport => {
-    if (newViewport.longitude < bounds.minLongitude) {
-      newViewport.longitude = bounds.minLongitude
-    } else if (newViewport.longitude > bounds.maxLongitude) {
-      newViewport.longitude = bounds.maxLongitude
-    }
-    if (newViewport.latitude < bounds.minLatitude) {
-      newViewport.latitude = bounds.minLatitude
-    } else if (newViewport.latitude > bounds.maxLatitude) {
-      newViewport.latitude = bounds.maxLatitude
-    }
+  useEffect(() => {
+    setViewport({ ...viewport, ...mapQueryToViewport(query) })
+  }, [query.latitude, query.longitude, query.zoom, query.pitch, query.bearing])
+
+  const debouncedUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
+  const onViewportChange = newViewport => {
+    clampViewport(newViewport)
     setViewport(newViewport)
+    if (viewportDoesNotMatch(viewport, newViewport)) {
+      debouncedUpdateQuery({
+        latitude: newViewport.latitude.toFixed(6),
+        longitude: newViewport.longitude.toFixed(6),
+        zoom: newViewport.zoom.toFixed(2),
+        pitch: newViewport.pitch !== 0 ? newViewport.pitch.toFixed(6) : undefined,
+        bearing: newViewport.bearing !== 0 ? newViewport.bearing.toFixed(6) : undefined
+      })
+    }
   }
 
   const { tiles, date, index, lad } = props
 
   const data = useMemo(() => {
-    if (tiles === null || index === null) {
+    if (tiles === null) {
       return null
+    }
+
+    if (index === null) {
+      return tiles
     }
 
     const features = tiles.features.map(f => {
       const { lad19cd } = f.properties
-      const values = index[lad19cd]
+      const values = index ? index[lad19cd] : null
       const value = values ? values[date] : undefined
       return {
         ...f,
@@ -227,8 +275,8 @@ const Chloropleth = (props) => {
       onResize={rect => {
         setViewport({
           ...viewport,
-          width: rect.bounds.width,
-          height: rect.bounds.height
+          width: rect.bounds.width || viewport.width,
+          height: rect.bounds.height || viewport.height
         })
       }}
     >
@@ -238,7 +286,7 @@ const Chloropleth = (props) => {
             {...viewport}
             minZoom={4}
             disableTokenWarning
-            onViewportChange={nextViewport => clampAndSetViewport(nextViewport)}
+            onViewportChange={onViewportChange}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'

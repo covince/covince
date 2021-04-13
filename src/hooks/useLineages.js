@@ -1,102 +1,57 @@
-import { useEffect, useReducer, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
 
-const setScale = (x) => {
+import useQueryAsState from './useQueryAsState'
+
+const getDefaultScale = (x) => {
   if (x === 'p') return 'linear'
   if (x === 'lambda') return 'quadratic'
-  if (x === 'R') return 'linear'
+  if (x === 'R') return undefined
 }
 
 const useLineages = () => {
-  const [state, dispatch] = useReducer((state, { type, payload }) => {
-    if (state.status === 'LOADING') {
-      switch (type) {
-        case 'DATA': {
-          return {
-            ...state,
-            status: 'READY',
-            data: payload,
-            loading: {},
-            ...state.loading,
-            scale: state.parameter !== state.loading.parameter
-              ? setScale(state.loading.parameter)
-              : state.scale
-          }
-        }
-        default:
-          return state
-      }
-    }
-    switch (type) {
-      case 'LINEAGE': {
-        return {
-          ...state,
-          status: 'LOADING',
-          loading: {
-            lineage: payload,
-            parameter: state.parameter
-          }
-        }
-      }
-      case 'COLOR_BY':
-        return {
-          ...state,
-          status: 'LOADING',
-          loading: {
-            lineage: state.lineage,
-            parameter: payload
-          }
-        }
-      case 'SCALE':
-        return {
-          ...state,
-          scale: payload
-        }
-      default:
-        return state
-    }
-  }, {
-    status: 'LOADING',
-    loading: {
-      lineage: 'B.1.1.7',
-      parameter: 'p'
-    },
-    lineage: null,
-    parameter: null,
-    scale: null,
-    data: null
-  })
+  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: 'B.1.1.7', colorBy: 'p' })
+  const [current, setCurrent] = useState({ lineage: null, colorBy: null, data: null })
+
+  const isLoading = useMemo(() =>
+    lineage !== current.lineage ||
+    colorBy !== current.colorBy
+  , [current, lineage, colorBy])
 
   useEffect(() => {
-    if (state.status === 'LOADING') {
-      const { lineage, parameter } = state.loading
-      axios.get(`./data/lineage/${lineage}/${parameter}.json`)
+    if (isLoading) {
+      axios.get(`./data/lineage/${lineage}/${colorBy}.json`)
         .then(res => {
-          dispatch({ type: 'DATA', payload: res.data })
+          setCurrent({
+            ...current,
+            data: res.data,
+            lineage,
+            colorBy
+          })
         })
     }
-  }, [state.status])
+  }, [isLoading])
 
   const actions = {
-    setLineage: lineage => dispatch({ type: 'LINEAGE', payload: lineage }),
-    colorBy: param => dispatch({ type: 'COLOR_BY', payload: param }),
-    setScale: scale => dispatch({ type: 'SCALE', payload: scale })
+    setLineage: lineage => updateQuery({ lineage }),
+    colorBy: colorBy => updateQuery({ colorBy, scale: undefined }),
+    setScale: scale => updateQuery({ scale })
   }
 
   const results = useMemo(() => {
-    if (state.data === null) {
+    if (current.data === null) {
       return null
     }
 
-    const { dates, ltlas, values } = state.data
+    const { dates, ltlas, values } = current.data
 
     let max = 0
     for (const row of values) {
       max = Math.max(max, ...row)
     }
-    if (state.parameter === 'p') max *= 100
-    if (state.parameter === 'R') max = 4
-    if (state.parameter === 'lambda') max = Math.min(max, 1000)
+    if (current.colorBy === 'p') max *= 100
+    if (current.colorBy === 'R') max = 4
+    if (current.colorBy === 'lambda') max = Math.min(max, 1000)
 
     const index = {}
 
@@ -105,13 +60,24 @@ const useLineages = () => {
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
         const value = values[i][j]
-        lookup[dates[j]] = state.parameter === 'p' ? value * 100 : value
+        lookup[dates[j]] = current.colorBy === 'p' ? value * 100 : value
       }
       index[ltla] = lookup
     }
 
     return { min: 0, max, index, dates }
-  }, [state.data])
+  }, [current.data])
+
+  const state = useMemo(() => {
+    return {
+      ...current,
+      scale: scale || getDefaultScale(current.colorBy),
+      loading: {
+        lineage,
+        colorBy
+      }
+    }
+  }, [current, lineage, colorBy, scale])
 
   return [state, actions, results]
 }

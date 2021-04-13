@@ -19,6 +19,7 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-icons": "^4.1.0",
+    "react-intersection-observer": "^8.31.0",
     "react-map-gl": "^6.1.10",
     "react-measure": "^2.5.2",
     "react-router-dom": "^5.2.0",
@@ -29,6 +30,7 @@
     "web-vitals": "^0.2.4"
   },
   "devDependencies": {
+    "all-contributors-cli": "^6.20.0",
     "eslint": "^7.21.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",

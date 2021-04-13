@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import Measure from 'react-measure'
 import classNames from 'classnames'
 
@@ -6,13 +6,33 @@ import MultiLinePlot from './MultiLinePlot'
 import Checkbox from './Checkbox'
 import { Heading } from './Typography'
 
+import useQueryAsState from '../hooks/useQueryAsState'
+
 const ChartHeading = ({ isMobile, ...props }) =>
   isMobile
-    ? <h2 {...props} className={classNames(props.className, 'font-bold text-gray-700')} />
+    ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading')} />
     : <Heading {...props} />
 
-const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
+const Chart = ({ heading, controls, isMobile, ...props }) => {
   const [height, setHeight] = useState(0)
+  const chart = (
+    <>
+      <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
+        {heading}
+        {controls}
+      </ChartHeading>
+      <MultiLinePlot
+        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
+        {...props}
+        className='-mt-1 md:m-0'
+      />
+    </>
+  )
+
+  if (isMobile) {
+    return <div>{chart}</div>
+  }
+
   return (
     <Measure
       bounds
@@ -23,15 +43,7 @@ const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
     >
       {({ measureRef }) => (
         <div ref={measureRef}>
-          <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between' isMobile={isMobile}>
-            {heading}
-            {controls}
-          </ChartHeading>
-          <MultiLinePlot
-            height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
-            {...props}
-            className='-mt-1 md:m-0'
-          />
+          {chart}
         </div>
       )}
     </Measure>
@@ -41,25 +53,15 @@ const IncidenceChart = ({ heading, controls, isMobile, ...props }) => {
 function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
   const lad_data = useMemo(() => values || [], [values])
 
-  const [proportion_display_type, setProportionDisplayType] = useState('area')
-  const [lambda_display_type, setLambdaDisplayType] = useState('line')
+  const [{ proportion = 'area', incidence = 'line' }, updateQuery] = useQueryAsState()
 
-  const handlePropChange = function (event) {
-    const target = event.target
-    if (target.checked) {
-      setProportionDisplayType('area')
-    } else {
-      setProportionDisplayType('line')
-    }
-  }
-  const handleLambdaChange = function (event) {
-    const target = event.target
-    if (target.checked) {
-      setLambdaDisplayType('area')
-    } else {
-      setLambdaDisplayType('line')
-    }
-  }
+  const handlePropChange = useCallback(function (event) {
+    updateQuery({ proportion: event.target.checked ? undefined : 'line' })
+  }, [updateQuery])
+
+  const handleLambdaChange = useCallback(function (event) {
+    updateQuery({ incidence: event.target.checked ? 'area' : undefined })
+  }, [updateQuery])
 
   const [width, setWidth] = useState(0)
 
@@ -67,19 +69,21 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
     <Measure
       bounds
       onResize={rect => {
-        setWidth(rect.bounds.width)
+        if (rect.bounds.width > 0) {
+          setWidth(rect.bounds.width)
+        }
       }}
     >
       {({ measureRef }) => (
         <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2', className)}>
-          <IncidenceChart
+          <Chart
             width={width}
             isMobile={isMobile}
             heading='Incidence'
             controls={
               <Checkbox
                 id='lambda_display_type'
-                checked={lambda_display_type === 'area'}
+                checked={incidence === 'area'}
                 label='Stack'
                 onChange={handleLambdaChange}
                 toggle
@@ -89,17 +93,17 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             date={date}
             setDate={setDate}
             parameter='lambda'
-            type={lambda_display_type}
+            type={incidence}
             stroke={lineColor}
           />
-          <IncidenceChart
+          <Chart
             width={width}
             isMobile={isMobile}
             heading='Proportion'
             controls={
               <Checkbox
                 id='proportion_display_type'
-                checked={proportion_display_type === 'area'}
+                checked={proportion === 'area'}
                 label='Stack'
                 onChange={handlePropChange}
                 toggle
@@ -109,10 +113,10 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             date={date}
             setDate={setDate}
             parameter='p'
-            type={proportion_display_type}
+            type={proportion}
             stroke={lineColor}
           />
-          <IncidenceChart
+          <Chart
             width={width}
             isMobile={isMobile}
             heading='R'
