@@ -77,8 +77,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   )
 }
 
-const bounds = { minLongitude: -9, maxLongitude: 5, minLatitude: 48, maxLatitude: 60 }
-function clampViewport (viewport) {
+function clampViewport (viewport, bounds) {
   if (viewport.longitude < bounds.minLongitude) {
     viewport.longitude = bounds.minLongitude
   } else if (viewport.longitude > bounds.maxLongitude) {
@@ -99,27 +98,26 @@ const viewportDoesNotMatch = (a, b) => (
   a.bearing !== b.bearing
 )
 
-const mapQueryToViewport = query => {
-  const viewport = {
-    latitude: parseFloat(query.latitude),
-    longitude: parseFloat(query.longitude),
-    zoom: parseFloat(query.zoom),
-    pitch: parseFloat(query.pitch),
-    bearing: parseFloat(query.bearing)
-  }
-  clampViewport(viewport)
-  return viewport
-}
-
 const Chloropleth = (props) => {
+  const { tiles, date, index, lad } = props
   const [query, updateQuery] = useQueryAsState({
-    latitude: '52.561928',
-    longitude: '-1.464854',
-    zoom: props.isMobile ? '4.50' : '5.00',
+    latitude: tiles.config.default_lat,
+    longitude: tiles.config.default_lon,
+    zoom: props.isMobile ? tiles.config.default_zoom_mob : tiles.config.default_zoom,
     pitch: '0',
     bearing: '0'
   })
-
+  const mapQueryToViewport = query => {
+    const viewport = {
+      latitude: parseFloat(query.latitude),
+      longitude: parseFloat(query.longitude),
+      zoom: parseFloat(query.zoom),
+      pitch: parseFloat(query.pitch),
+      bearing: parseFloat(query.bearing)
+    }
+    clampViewport(viewport, tiles.config.bounds)
+    return viewport
+  }
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
@@ -132,7 +130,8 @@ const Chloropleth = (props) => {
 
   const debouncedUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
   const onViewportChange = newViewport => {
-    clampViewport(newViewport)
+    clampViewport(newViewport, tiles.config.bounds)
+
     setViewport(newViewport)
     if (viewportDoesNotMatch(viewport, newViewport)) {
       debouncedUpdateQuery({
@@ -144,8 +143,6 @@ const Chloropleth = (props) => {
       })
     }
   }
-
-  const { tiles, date, index, lad } = props
 
   const data = useMemo(() => {
     if (tiles === null) {
