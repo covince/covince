@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import axios from 'axios'
 
 // import { features } from '../assets/hex.json'
 
@@ -6,28 +7,14 @@ function useTiles () {
   const [tiles, setTiles] = useState(null)
 
   useEffect(() => {
-    import('../assets/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json')
-      .then(result => {
-        result.features.reverse()
-        setTiles(result)
+    axios.get('./tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json')
+      .then(res => {
+        res.data.features.reverse() // Hack to get Z order with England last
+        setTiles(res.data)
       })
   }, [])
 
   return tiles
 }
 
-function useLALookupTable (tiles) {
-  return useMemo(() => {
-    const lookupTable = {
-      national: 'National'
-    }
-    if (tiles !== null) {
-      for (const feature of tiles.features) {
-        lookupTable[feature.properties.lad19cd] = feature.properties.lad19nm
-      }
-    }
-    return lookupTable
-  }, [tiles])
-}
-
-export { useTiles, useLALookupTable }
+export default useTiles

@@ -20,12 +20,16 @@ import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
+import useTiles from '../hooks/useTiles'
+import useLists from '../hooks/useLists'
 import useDates from '../hooks/useDates'
 
-const Covid19 = ({ lineColor = 'blueGray', tiles = null, data = null }) => {
+const Covid19 = ({ lineColor = 'blueGray' }) => {
+  const tiles = useTiles()
+  const data = useLists()
   const LALookupTable = useLALookupTable(tiles)
 
-  const unique_lineages = data.lineages
+  const unique_lineages = data ? data.lineages : null
 
   const [ladState, ladActions] = useLADs()
   const [lineageState, lineageActions, results] = useLineages()
@@ -127,7 +131,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null, data = null }) => {
             <Heading>Map</Heading>
             {isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={ladState.status === 'LOADING'}>
+                <FadeTransition in={ladState.status === 'LOADING' | tiles === null}>
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
@@ -183,7 +187,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null, data = null }) => {
               </div>}
           </form>
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
-            <Chloropleth
+            {tiles && <Chloropleth
               className='flex-grow'
               lad={ladState.loadingLad || ladState.currentLad}
               tiles={tiles}
@@ -196,7 +200,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null, data = null }) => {
               isMobile={isMobile}
               percentage={lineageState.colorBy === 'p'}
               lineColor={lineColor}
-            />
+            />}
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 w-6 h-6' />

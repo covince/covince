@@ -27,7 +27,7 @@ const DataProvider =
     }, [tiles])
 
     if (data === null | tiles === null) {
-      return (<div className='fixed inset-0 grid place-content-center'>
+      return (<div>
       <Spinner className='w-6 h-6 text-gray-500' />
     </div>)
     }
