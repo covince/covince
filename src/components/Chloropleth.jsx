@@ -100,6 +100,7 @@ const viewportDoesNotMatch = (a, b) => (
 
 const Chloropleth = (props) => {
   const { tiles, date, index, lad } = props
+
   const [query, updateQuery] = useQueryAsState({
     latitude: tiles.config.default_lat,
     longitude: tiles.config.default_lon,
