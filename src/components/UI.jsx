@@ -14,7 +14,8 @@ import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
-import StickyActionButton from './StickyActionButton'
+import StickyMobileSection from './StickyMobileSection'
+import LineageFilter from './LineageFilter'
 
 import useMobile from '../hooks/useMobile'
 import useAreas from '../hooks/useAreas'
@@ -22,6 +23,7 @@ import useLineages from '../hooks/useLineages'
 import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
+import useLineageFilter from '../hooks/useLineageFilter'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
@@ -65,9 +67,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       heading: AreaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
+      overviewButtonText: AreaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile])
+  }, [areaState, isMobile, AreaLookupTable.overview])
 
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
@@ -93,24 +96,23 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     lineageState.lineage === null || areaState.currentArea === null
   ), [lineageState.lineage, areaState.currentArea])
 
+  const lineageFilter = useLineageFilter(unique_lineages)
+
   return (
     <>
       { mobileView === 'chart' &&
-        <LocationFilter overviewButtonText={AreaLookupTable.overview}
+        <LocationFilter
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
           loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection className='overflow-hidden'>
-          <DateFilter className='w-80' {...dateFilter} />
+        <FilterSection className='max-w-full overflow-x-auto flex justify-start'>
+          <DateFilter className='w-80 flex-shrink-0' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter overviewButtonText={AreaLookupTable.overview} className='w-80 relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
-          <FadeTransition in={isInitialLoad}>
-            <div className='bg-white absolute inset-0 grid place-content-center'>
-              <Spinner className='text-gray-500 w-6 h-6' />
-            </div>
-          </FadeTransition>
+          <LocationFilter className='flex-shrink-0 relative w-80' {...locationFilter} loading={areaState.status === 'LOADING'} />
+          <div className='border border-gray-200 mx-6 hidden md:block' />
+          <LineageFilter className='w-80 h-20 flex-shrink-0' {...lineageFilter} />
         </FilterSection> }
       <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
@@ -212,11 +214,17 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           values={areaState.data}
           isMobile={isMobile}
           lineColor={lineColor}
+          activeLineages={lineageFilter.activeLineages}
         />
         { mobileView === 'chart' &&
-          <StickyActionButton onClick={() => setMobileView('map')}>
-            View map on {formattedDate}
-          </StickyActionButton> }
+          <StickyMobileSection className='p-3 space-y-2'>
+            <div className='flex justify-center'>
+              <PillButton onClick={() => setMobileView('map')}>
+                View map on {formattedDate}
+              </PillButton>
+            </div>
+            <LineageFilter {...lineageFilter} />
+          </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
