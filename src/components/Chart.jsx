@@ -29,6 +29,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
         { allowStack &&
           <Checkbox
             id={line_type_accessor}
+            className='text-primary'
             checked={query[line_type_accessor] === 'area'}
             label='Stack'
             onChange={handleGraphTypeChange}

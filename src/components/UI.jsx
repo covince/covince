@@ -17,7 +17,7 @@ import FilterSection from './FilterSection'
 import StickyMobileSection from './StickyMobileSection'
 import LineageFilter from './LineageFilter'
 
-import useMobile from '../hooks/useMobile'
+import { useMobile } from '../hooks/useMediaQuery'
 import useAreas from '../hooks/useAreas'
 import useLineages from '../hooks/useLineages'
 import useAreaLookupTable from '../hooks/useAreaLookupTable'
@@ -107,12 +107,16 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection className='max-w-full overflow-x-auto flex justify-start'>
-          <DateFilter className='w-80 flex-shrink-0' {...dateFilter} />
-          <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='flex-shrink-0 relative w-80' {...locationFilter} loading={areaState.status === 'LOADING'} />
-          <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LineageFilter className='w-80 h-20 flex-shrink-0' {...lineageFilter} />
+        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
+          <Card className='w-80 box-content flex-shrink-0'>
+            <DateFilter {...dateFilter} />
+          </Card>
+          <Card className='w-80 box-content flex-shrink-0'>
+            <LocationFilter className='relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
+          </Card>
+          <Card className='max-w-lg flex-shrink-0 xl:flex-shrink'>
+            <LineageFilter className='h-20' {...lineageFilter} />
+          </Card>
         </FilterSection> }
       <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
@@ -217,13 +221,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           activeLineages={lineageFilter.activeLineages}
         />
         { mobileView === 'chart' &&
-          <StickyMobileSection className='p-3 space-y-2'>
-            <div className='flex justify-center'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-3 pt-3'>
+            <LineageFilter {...lineageFilter} />
+            <div className='grid place-items-center h-18'>
               <PillButton onClick={() => setMobileView('map')}>
                 View map on {formattedDate}
               </PillButton>
             </div>
-            <LineageFilter {...lineageFilter} />
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
