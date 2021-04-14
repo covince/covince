@@ -84,9 +84,9 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
               <Checkbox
                 id='lambda_display_type'
                 checked={incidence === 'area'}
+                className='text-primary'
                 label='Stack'
                 onChange={handleLambdaChange}
-                toggle
               />
             }
             lad_data={lad_data}
@@ -105,9 +105,9 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
               <Checkbox
                 id='proportion_display_type'
                 checked={proportion === 'area'}
+                className='text-primary'
                 label='Stack'
                 onChange={handlePropChange}
-                toggle
               />
             }
             lad_data={lad_data}

@@ -15,8 +15,8 @@ const Checkbox = ({ id, name, label, checked, onChange, className, style, childr
         className="outline-none focus:ring-2 ring-current ring-offset-2 h-4 w-4 text-current border-gray-300 rounded"
       />
     </div>
-    <div className='ml-2 text-sm'>
-      <label className='font-medium text-gray-700' htmlFor={id}>
+    <div className='text-sm'>
+      <label className='pl-2 font-medium text-gray-700' htmlFor={id}>
         {label}
       </label>
       {children}
