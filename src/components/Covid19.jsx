@@ -20,13 +20,10 @@ import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
-import useTiles from '../hooks/useTiles'
-import useLists from '../hooks/useLists'
+
 import useDates from '../hooks/useDates'
 
-const Covid19 = ({ lineColor = 'blueGray' }) => {
-  const tiles = useTiles()
-  const data = useLists()
+const Covid19 = ({ lineColor = 'blueGray', data, tiles }) => {
   const LALookupTable = useLALookupTable(tiles)
 
   const unique_lineages = data ? data.lineages : null
