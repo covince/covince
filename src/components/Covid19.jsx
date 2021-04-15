@@ -230,7 +230,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           activeLineages={lineageFilter.activeLineages}
         />
         { isMobile && view === 'chart' &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-3 pt-3'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
             <LineageFilter {...lineageFilter} />
             <div className='grid place-items-center h-18'>
               <PillButton onClick={() => handleSetView('map')}>
