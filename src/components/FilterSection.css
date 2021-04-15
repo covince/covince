@@ -1,0 +1,20 @@
+/* Works on Firefox */
+.heron-filter-section {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.gray.300') transparent;
+
+  @apply pb-1.5 mb-1.5
+}
+
+/* Works on Chrome, Edge, and Safari */
+.heron-filter-section::-webkit-scrollbar {
+  @apply h-1.5;
+}
+
+.heron-filter-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.heron-filter-section::-webkit-scrollbar-thumb {
+  @apply rounded bg-gray-300;
+}
