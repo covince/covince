@@ -22,6 +22,7 @@
     "react-intersection-observer": "^8.31.0",
     "react-map-gl": "^6.1.10",
     "react-measure": "^2.5.2",
+    "react-query": "^3.13.8",
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.1",
     "recharts": "^2.0.4",

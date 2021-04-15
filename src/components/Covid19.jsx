@@ -16,22 +16,19 @@ import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
 import StickyActionButton from './StickyActionButton'
 
-import { loadData } from '../utils/loadData'
 import useMobile from '../hooks/useMobile'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
 import useDates from '../hooks/useDates'
 
-const data = loadData()
-
-const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
+const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const LALookupTable = useLALookupTable(tiles)
 
   const unique_lineages = data.lineages
 
-  const [ladState, ladActions] = useLADs()
-  const [lineageState, lineageActions, results] = useLineages()
+  const [ladState, ladActions] = useLADs(dataPath)
+  const [lineageState, lineageActions, results] = useLineages(dataPath)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
@@ -209,6 +206,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles = null }) => {
           </div>
         </div>
         <LocalIncidence
+          colors={data.colors}
           className={classNames(
             'transition-opacity flex-grow', {
               hidden: view === 'map',

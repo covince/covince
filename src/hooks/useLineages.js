@@ -9,7 +9,7 @@ const getDefaultScale = (x) => {
   if (x === 'R') return undefined
 }
 
-const useLineages = () => {
+const useLineages = (dataPath) => {
   const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: 'B.1.1.7', colorBy: 'p' })
   const [current, setCurrent] = useState({ lineage: null, colorBy: null, data: null })
 
@@ -20,7 +20,7 @@ const useLineages = () => {
 
   useEffect(() => {
     if (isLoading) {
-      axios.get(`./data/lineage/${lineage}/${colorBy}.json`)
+      axios.get(`${dataPath}/lineage/${lineage}/${colorBy}.json`)
         .then(res => {
           setCurrent({
             ...current,
