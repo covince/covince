@@ -77,7 +77,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
       {({ measureRef }) => (
         <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2', className)}>
           <Chart
-          colors = {colors}
+            colors = {colors}
             width={width}
             isMobile={isMobile}
             heading='Incidence'
@@ -98,7 +98,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             stroke={lineColor}
           />
           <Chart
-          colors= {colors}
+            colors= {colors}
             width={width}
             isMobile={isMobile}
             heading='Proportion'
