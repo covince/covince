@@ -50,7 +50,7 @@ const Chart = ({ heading, controls, isMobile, ...props }) => {
   )
 }
 
-function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor }) {
+function LocalIncidence ({ values, date, setDate, className, isMobile = false, lineColor, colors }) {
   const lad_data = useMemo(() => values || [], [values])
 
   const [{ proportion = 'area', incidence = 'line' }, updateQuery] = useQueryAsState()
@@ -77,6 +77,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
       {({ measureRef }) => (
         <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2', className)}>
           <Chart
+          colors = {colors}
             width={width}
             isMobile={isMobile}
             heading='Incidence'
@@ -97,6 +98,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             stroke={lineColor}
           />
           <Chart
+          colors= {colors}
             width={width}
             isMobile={isMobile}
             heading='Proportion'
@@ -117,6 +119,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             stroke={lineColor}
           />
           <Chart
+          colors = {colors}
             width={width}
             isMobile={isMobile}
             heading='R'
