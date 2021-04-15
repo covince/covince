@@ -4,6 +4,7 @@ import React, { useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
+import classNames from 'classnames'
 
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
@@ -82,7 +83,6 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         lineages.push({ lineage, colour })
       }
     }
-
     return {
       lineages,
       data: Object.values(dataByDate)
@@ -91,19 +91,12 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
 
   const { lineages, data } = chart
 
-  const chartProps = {
+  const chartProps = useMemo(() => ({
     data,
     width,
     height,
-    margin: { top: 12, left: 0, right: 24 },
-    onClick: item => {
-      if (item) {
-        setDate(item.activeLabel)
-      }
-    },
-    cursor: 'pointer',
-    className
-  }
+    margin: { top: 12, left: 0, right: 24 }
+  }), [data, width, height])
 
   const percentage = parameter === 'p'
   const yAxisTicks = useMemo(() => ({
@@ -135,23 +128,15 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
 
-  const dateLine =
-    <ReferenceLine
-      x={date}
-      stroke={tailwindColors[stroke][400]}
-      label=''
-      strokeWidth={2}
-      style={{ mixBlendMode: 'multiply' }}
-    />
-
-  const tooltip =
+  const tooltip = useMemo(() =>
     <Tooltip
       content={CustomTooltip}
       percentage={parameter === 'p'}
       cursor={{ stroke: tailwindColors[stroke][type === 'area' ? '500' : '300'] }}
     />
+  , [parameter, stroke])
 
-  const xAxis =
+  const xAxis = useMemo(() =>
     <XAxis
       dataKey='date'
       fontSize='12'
@@ -160,6 +145,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
       tickMargin='4'
       stroke='currentcolor'
     />
+  , [data])
 
   const yAxis =
     <YAxis
@@ -174,77 +160,114 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
       {...yAxisTicks}
     />
 
-  if (type === 'area') {
-    return (
-      <ComposedChart {...chartProps}>
-        {grid}
-        {tooltip /* placed here to put the cursor underneath the dots */}
-        {lineages.map(({ lineage, colour }) =>
-          <Area
-            key={lineage}
-            activeDot={{ stroke: tailwindColors[stroke][400] }}
-            dataKey={lineage}
-            dot={false}
-            fill={colour}
-            isAnimationActive={false}
-            name={lineage}
-            stackId='1'
-            stroke={colour}
-            type='monotone'
-          />
-        )}
-        {xAxis}
-        {yAxis}
-        {dateLine}
-      </ComposedChart>
+  const areas = useMemo(() => {
+    if (type === 'area') {
+      return lineages.map(({ lineage, colour }) => (
+        <Area
+          key={lineage}
+          activeDot={{ stroke: tailwindColors[stroke][400] }}
+          dataKey={lineage}
+          dot={false}
+          fill={colour}
+          isAnimationActive={false}
+          name={lineage}
+          stackId='1'
+          stroke={colour}
+          type='monotone'
+        />
+      ))
+    }
+    return lineages.map(({ lineage, colour }) => {
+      const key = `${lineage}_range`
+      return (
+        <Area
+          key={key}
+          activeDot={false}
+          dataKey={key}
+          fill={colour}
+          isAnimationActive={false}
+          name='_range'
+          strokeWidth={0}
+          type='monotone'
+        />
+      )
+    })
+  }, [lineages, stroke, type])
+
+  const lines = useMemo(() => {
+    if (type === 'area') return null
+    return lineages.map(({ lineage, colour }) =>
+      <Line
+        key={lineage}
+        activeDot={{ stroke: tailwindColors[stroke][400] }}
+        dataKey={lineage}
+        dot={false}
+        isAnimationActive={false}
+        name={lineage}
+        stroke={colour}
+        type='monotone'
+      />
     )
-  } else {
+  }, [lineages, stroke, type])
+
+  const rLine = useMemo(() => {
+    if (parameter !== 'R') return null
     return (
-      <ComposedChart {...chartProps} >
+      <ReferenceLine
+        y={1}
+        stroke={tailwindColors[stroke][600]}
+        strokeDasharray={[8, 8]}
+        label=''
+        strokeWidth={2}
+        style={{ mixBlendMode: 'multiply' }}
+      />
+    )
+  }, [parameter, stroke])
+
+  return (
+    <div className={classNames('relative', className)}>
+      <ComposedChart
+        {...chartProps}
+        onClick={item => {
+          if (item) {
+            setDate(item.activeLabel)
+          }
+        }}
+        cursor='pointer'
+      >
         {grid}
-        {tooltip /* placed here to put the cursor underneath the dots */}
-        {lineages.map(({ lineage, colour }) => {
-          const key = `${lineage}_range`
-          return (
-            <Area
-              key={key}
-              activeDot={false}
-              dataKey={key}
-              fill={colour}
-              isAnimationActive={false}
-              name='_range'
-              strokeWidth={0}
-              type='monotone'
-            />
-          )
-        })}
-        {lineages.map(({ lineage, colour }) =>
-          <Line
-            key={lineage}
-            activeDot={{ stroke: tailwindColors[stroke][400] }}
-            dataKey={lineage}
-            dot={false}
-            isAnimationActive={false}
-            name={lineage}
-            stroke={colour}
-            type='monotone'
-          />
-        )}
+        {areas}
         {xAxis}
         {yAxis}
-        {dateLine}
-        {parameter === 'R' &&
+        {tooltip}
+        {rLine}
+        {lines}
+      </ComposedChart>
+      <div className='absolute top-0 left-0 pointer-events-none'>
+        <ComposedChart {...chartProps}>
+          <XAxis
+            dataKey='date'
+            tick={false}
+            stroke='none'
+          />
+          <YAxis
+            type='number'
+            domain={yAxisDomain}
+            width={48}
+            tick={false}
+            stroke='none'
+          />
           <ReferenceLine
-            y={1}
-            stroke={tailwindColors[stroke][600]}
-            strokeDasharray={[8, 8]}
+            x={date}
+            stroke={tailwindColors[stroke][400]}
             label=''
             strokeWidth={2}
             style={{ mixBlendMode: 'multiply' }}
-          /> }
-      </ComposedChart>
-    )
-  }
+          />
+        </ComposedChart>
+      </div>
+    </div>
+  )
 }
 
 export default MultiLinePlot

@@ -221,7 +221,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           activeLineages={lineageFilter.activeLineages}
         />
         { mobileView === 'chart' &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-3 pt-3'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
             <LineageFilter {...lineageFilter} />
             <div className='grid place-items-center h-18'>
               <PillButton onClick={() => setMobileView('map')}>
