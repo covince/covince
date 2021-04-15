@@ -22,13 +22,13 @@ import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
 import useDates from '../hooks/useDates'
 
-const Covid19 = ({ lineColor = 'blueGray', tiles, data }) => {
+const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const LALookupTable = useLALookupTable(tiles)
 
   const unique_lineages = data.lineages
 
-  const [ladState, ladActions] = useLADs()
-  const [lineageState, lineageActions, results] = useLineages()
+  const [ladState, ladActions] = useLADs(dataPath)
+  const [lineageState, lineageActions, results] = useLineages(dataPath)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
