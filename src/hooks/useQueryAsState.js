@@ -1,6 +1,6 @@
 // https://github.com/baruchiro/use-route-as-state
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useEffect, useRef } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 
 const queryParamsToObject = (search) => {
@@ -41,9 +41,15 @@ export default (defaultValues) => {
 
   const decodedSearch = useMemo(() => queryParamsToObject(search), [search])
 
+  const updateRef = useRef({ decodedSearch, pathname })
+  useEffect(() => {
+    updateRef.current = { decodedSearch, pathname }
+  }, [decodedSearch, pathname])
+
   const updateQuery = useCallback((updatedParams) => {
+    const { pathname, decodedSearch } = updateRef.current
     history.push(pathname + objectToQueryParams(encodeValues({ ...decodedSearch, ...updatedParams })))
-  }, [decodedSearch, pathname, history])
+  }, [history])
 
   const queryWithDefault = useMemo(() =>
     Object.assign({}, defaultValues, removeUndefined(decodedSearch))
