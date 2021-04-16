@@ -281,7 +281,7 @@ const Chloropleth = (props) => {
         <div ref={measureRef} className={classnames(props.className, 'relative z-0')}>
           <ReactMapGL
             {...viewport}
-            minZoom={4}
+            minZoom={tiles.config.min_zoom}
             disableTokenWarning
             onViewportChange={onViewportChange}
             mapStyle={mapStyle}
