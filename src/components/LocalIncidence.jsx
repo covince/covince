@@ -22,7 +22,7 @@ const Chart = ({ heading, controls, isMobile, ...props }) => {
         {controls}
       </ChartHeading>
       <MultiLinePlot
-        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 3), 168)}
+        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / 2), 168)}
         {...props}
         className='-mt-1 md:m-0'
       />
@@ -75,12 +75,12 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classNames('grid grid-rows-3 gap-2', className)}>
+        <div ref={measureRef} className={classNames('grid grid-rows-2 gap-2', className)}>
           <Chart
             colors = {colors}
             width={width}
             isMobile={isMobile}
-            heading='Incidence'
+            heading='Genomes'
             controls={
               <Checkbox
                 id='lambda_display_type'
@@ -120,18 +120,7 @@ function LocalIncidence ({ values, date, setDate, className, isMobile = false, l
             stroke={lineColor}
             activeLineages={activeLineages}
           />
-          <Chart
-          colors = {colors}
-            width={width}
-            isMobile={isMobile}
-            heading='R'
-            lad_data={lad_data}
-            date={date}
-            setDate={setDate}
-            parameter='R'
-            stroke={lineColor}
-            activeLineages={activeLineages}
-          />
+
         </div>
       )}
     </Measure>

@@ -221,7 +221,7 @@ const Chloropleth = (props) => {
             ['==', ['get', 'value'], null],
             '#fff', [
               'case',
-              ['==', ['get', 'value'], 0],
+              ['==', ['get', 'value'], -99],
               '#fff',
               [
                 'interpolate',

@@ -20,7 +20,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-        <DataProvider default_data_url="./covince-data/data" default_tiles_url='./custom.geo.json'>
+        <DataProvider default_data_url="https://theosanderson.github.io/covince-data/data" default_tiles_url='./custom.geo.json'>
               <Covid19 />
             </DataProvider>
         </AppContainer>

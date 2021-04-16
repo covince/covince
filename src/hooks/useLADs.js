@@ -21,7 +21,8 @@ const useLAD = (dataPath) => {
             ...x,
             range: [x.lower, x.upper]
           }
-        })
+        }).filter(x => x.mean >= 0)
+
         storeResult({ currentLad: lad, data: new_data })
       })
   }, [lad])
