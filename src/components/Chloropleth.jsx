@@ -6,7 +6,6 @@ import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
 import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
-import debounce from 'lodash.debounce'
 
 import FadeTransition from './FadeTransition'
 import useQueryAsState from '../hooks/useQueryAsState'
@@ -90,7 +89,30 @@ function clampViewport (viewport, bounds) {
   }
 }
 
-const viewportDoesNotMatch = (a, b) => (
+const mapQueryToViewport = ({ latitude, longitude, zoom, pitch = '0', bearing = '0' }, bounds) => {
+  const viewport = {
+    latitude: parseFloat(latitude),
+    longitude: parseFloat(longitude),
+    zoom: parseFloat(zoom),
+    pitch: parseFloat(pitch),
+    bearing: parseFloat(bearing)
+  }
+  clampViewport(viewport, bounds)
+  return viewport
+}
+
+const mapViewportToQuery = ({ latitude, longitude, zoom, pitch, bearing }) => ({
+  latitude: latitude.toFixed(6),
+  longitude: longitude.toFixed(6),
+  zoom: zoom.toFixed(2),
+  pitch: pitch !== 0 ? pitch.toFixed(6) : undefined,
+  bearing: bearing !== 0 ? bearing.toFixed(6) : undefined
+})
+
+const getDependencyArray = obj =>
+  [obj.latitude, obj.longitude, obj.zoom, obj.pitch, obj.bearing]
+
+const doesNotMatch = (a, b) => (
   a.latitude !== b.latitude ||
   a.longitude !== b.longitude ||
   a.zoom !== b.zoom ||
@@ -100,48 +122,39 @@ const viewportDoesNotMatch = (a, b) => (
 
 const Chloropleth = (props) => {
   const { tiles, date, index, lad } = props
-  const [query, updateQuery] = useQueryAsState({
-    latitude: tiles.config.default_lat,
-    longitude: tiles.config.default_lon,
-    zoom: props.isMobile ? tiles.config.default_zoom_mob : tiles.config.default_zoom,
-    pitch: '0',
-    bearing: '0'
-  })
-  const mapQueryToViewport = query => {
-    const viewport = {
-      latitude: parseFloat(query.latitude),
-      longitude: parseFloat(query.longitude),
-      zoom: parseFloat(query.zoom),
-      pitch: parseFloat(query.pitch),
-      bearing: parseFloat(query.bearing)
-    }
-    clampViewport(viewport, tiles.config.bounds)
-    return viewport
-  }
+  const [query, updateQuery] = useQueryAsState(
+    mapViewportToQuery({
+      latitude: tiles.config.default_lat,
+      longitude: tiles.config.default_lon,
+      zoom: props.isMobile ? tiles.config.default_zoom_mob : tiles.config.default_zoom,
+      pitch: 0,
+      bearing: 0
+    })
+  )
+
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
-    ...mapQueryToViewport(query)
+    ...mapQueryToViewport(query, tiles.config.bounds)
   })
 
   useEffect(() => {
-    setViewport({ ...viewport, ...mapQueryToViewport(query) })
-  }, [query.latitude, query.longitude, query.zoom, query.pitch, query.bearing])
+    setViewport({ ...viewport, ...mapQueryToViewport(query, tiles.config.bounds) })
+  }, getDependencyArray(query))
 
-  const debouncedUpdateQuery = useMemo(() => debounce(updateQuery, 500), [updateQuery])
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const update = mapViewportToQuery(viewport)
+      if (doesNotMatch(update, query)) {
+        updateQuery(update)
+      }
+    }, 500)
+    return () => clearTimeout(timeout)
+  }, getDependencyArray(viewport))
+
   const onViewportChange = newViewport => {
     clampViewport(newViewport, tiles.config.bounds)
-
     setViewport(newViewport)
-    if (viewportDoesNotMatch(viewport, newViewport)) {
-      debouncedUpdateQuery({
-        latitude: newViewport.latitude.toFixed(6),
-        longitude: newViewport.longitude.toFixed(6),
-        zoom: newViewport.zoom.toFixed(2),
-        pitch: newViewport.pitch !== 0 ? newViewport.pitch.toFixed(6) : undefined,
-        bearing: newViewport.bearing !== 0 ? newViewport.bearing.toFixed(6) : undefined
-      })
-    }
   }
 
   const data = useMemo(() => {
