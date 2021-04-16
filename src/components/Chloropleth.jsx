@@ -219,16 +219,19 @@ const Chloropleth = (props) => {
           'fill-color': [
             'case',
             ['==', ['get', 'value'], null],
-            '#fff',
-            [
-              'interpolate',
-              ['linear'],
-              color_scale_type === 'quadratic'
-                ? ['sqrt', ['get', 'value']]
-                : ['get', 'value'],
-              ...colorScale
-            ]
-          ]
+            '#fff', [
+              'case',
+              ['==', ['get', 'value'], 0],
+              '#fff',
+              [
+                'interpolate',
+                ['linear'],
+                color_scale_type === 'quadratic'
+                  ? ['sqrt', ['get', 'value']]
+                  : ['get', 'value'],
+                ...colorScale
+              ]
+            ]]
           // 'fill-color-transition': { duration: 150 }
         }
       },
