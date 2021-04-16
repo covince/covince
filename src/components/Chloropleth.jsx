@@ -146,7 +146,7 @@ const Chloropleth = (props) => {
     const timeout = setTimeout(() => {
       const update = mapViewportToQuery(viewport)
       if (doesNotMatch(update, query)) {
-        updateQuery(update)
+        updateQuery(update, 'replace')
       }
     }, 500)
     return () => clearTimeout(timeout)

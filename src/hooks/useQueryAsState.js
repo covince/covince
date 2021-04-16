@@ -46,9 +46,9 @@ export default (defaultValues) => {
     updateRef.current = { decodedSearch, pathname }
   }, [decodedSearch, pathname])
 
-  const updateQuery = useCallback((updatedParams) => {
+  const updateQuery = useCallback((updatedParams, method = 'push') => {
     const { pathname, decodedSearch } = updateRef.current
-    history.push(pathname + objectToQueryParams(encodeValues({ ...decodedSearch, ...updatedParams })))
+    history[method](pathname + objectToQueryParams(encodeValues({ ...decodedSearch, ...updatedParams })))
   }, [history])
 
   const queryWithDefault = useMemo(() =>
