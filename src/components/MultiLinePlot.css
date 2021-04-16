@@ -2,6 +2,10 @@
   z-index: 1;
 }
 
+.recharts-surface {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .recharts-cartesian-axis-tick-value {
   @apply tracking-wide;
 }

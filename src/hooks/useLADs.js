@@ -4,7 +4,7 @@ import useQueryAsState from './useQueryAsState'
 
 const useLAD = (dataPath) => {
   const [{ lad }, updateQuery] = useQueryAsState({ lad: 'national' })
-  const [{ currentLad, data }, storeResult] = useState({})
+  const [{ currentLad = null, data }, storeResult] = useState({})
 
   useEffect(() => {
     axios.get(`${dataPath}/ltla/${lad}.json`)

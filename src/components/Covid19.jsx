@@ -14,13 +14,15 @@ import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
 import LocationFilter from './LocationFilter'
 import FilterSection from './FilterSection'
-import StickyActionButton from './StickyActionButton'
+import StickyMobileSection from './StickyMobileSection'
+import LineageFilter from './LineageFilter'
 
-import useMobile from '../hooks/useMobile'
+import { useMobile } from '../hooks/useMediaQuery'
 import useLADs from '../hooks/useLADs'
 import useLineages from '../hooks/useLineages'
 import useLALookupTable from '../hooks/useLALookupTable'
 import useDates from '../hooks/useDates'
+import useLineageFilter from '../hooks/useLineageFilter'
 
 const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const LALookupTable = useLALookupTable(tiles)
@@ -70,7 +72,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       }
     }
     return {
-      category: 'Local authority',
+      category: 'Country',
       heading: LALookupTable[ladState.currentLad],
       subheading: ladState.currentLad,
       showNationalButton: ladState.loadingLad !== 'national',
@@ -81,7 +83,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
   const dateFilter = {
-    dates: results ? results.dates : null,
+    dates: results ? results.dates.slice(0, 360) : null,
     label: formattedDate,
     value: date,
     onChange: (e) => {
@@ -102,6 +104,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     lineageState.lineage === null || ladState.currentLad === null
   ), [lineageState.lineage, ladState.currentLad])
 
+  const lineageFilter = useLineageFilter(unique_lineages)
+
   return (
     <>
       { isMobile && view === 'chart' &&
@@ -111,15 +115,16 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection className='overflow-hidden'>
-          <DateFilter className='w-80' {...dateFilter} />
-          <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
-          <FadeTransition in={isInitialLoad}>
-            <div className='bg-white absolute inset-0 grid place-content-center'>
-              <Spinner className='text-gray-500 w-6 h-6' />
-            </div>
-          </FadeTransition>
+        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
+          <Card className='w-80 box-content flex-shrink-0'>
+            <DateFilter {...dateFilter} />
+          </Card>
+          <Card className='w-80 box-content flex-shrink-0'>
+            <LocationFilter className='relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          </Card>
+          <Card className='max-w-lg flex-shrink-0 xl:flex-shrink'>
+            <LineageFilter className='h-20' {...lineageFilter} />
+          </Card>
         </FilterSection> }
       <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
         <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
@@ -220,13 +225,17 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           values={ladState.data}
           isMobile={isMobile}
           lineColor={lineColor}
+          activeLineages={lineageFilter.activeLineages}
         />
         { isMobile && view === 'chart' &&
-          <StickyActionButton
-            onClick={() => handleSetView('map')}
-          >
-            View map on {formattedDate}
-          </StickyActionButton> }
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
+            <LineageFilter {...lineageFilter} />
+            <div className='grid place-items-center h-18'>
+              <PillButton onClick={() => handleSetView('map')}>
+                View map on {formattedDate}
+              </PillButton>
+            </div>
+          </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
