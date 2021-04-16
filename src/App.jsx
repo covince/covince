@@ -20,7 +20,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-        <DataProvider default_data_url="./data" default_tiles_url='./tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json'>
+        <DataProvider default_data_url="./covince-data/data" default_tiles_url='./covince-data/World_Countries_(Generalized).geojson'>
               <Covid19 />
             </DataProvider>
         </AppContainer>

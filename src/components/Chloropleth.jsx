@@ -281,7 +281,7 @@ const Chloropleth = (props) => {
         <div ref={measureRef} className={classnames(props.className, 'relative z-0')}>
           <ReactMapGL
             {...viewport}
-            minZoom={4}
+            minZoom={1}
             disableTokenWarning
             onViewportChange={onViewportChange}
             mapStyle={mapStyle}
@@ -299,6 +299,12 @@ const Chloropleth = (props) => {
             onHover={e => {
               const [feature] = e.features
               if (feature && 'value' in feature.properties) {
+                if (feature.properties.latitude === undefined) {
+                  feature.properties.lat = e.lngLat[1]
+                  feature.properties.long = e.lngLat[0]
+                }
+                // setPopupFeature(feature.properties)
+                console.log(feature)
                 setPopupFeature(feature.properties)
               } else {
                 setPopupFeature(null)
@@ -325,7 +331,7 @@ const Chloropleth = (props) => {
                     {formatValue(popupFeature.value)}
                   </p>
                   <p className='text-sm'>
-                    {popupFeature.lad19nm}
+                    {popupFeature.lad19cd}
                   </p>
                 </div>
               </Popup>}

@@ -7,7 +7,7 @@ function useLALookupTable (tiles) {
     }
     if (tiles !== null) {
       for (const feature of tiles.features) {
-        lookupTable[feature.properties.lad19cd] = feature.properties.lad19nm
+        lookupTable[feature.properties.lad19cd] = feature.properties.lad19cd
       }
     }
     return lookupTable

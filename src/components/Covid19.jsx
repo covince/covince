@@ -56,11 +56,11 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const locationFilter = useMemo(() => {
     if (ladState.currentLad === 'national') {
       return {
-        category: 'National overview',
-        heading: 'England',
+        category: 'Overview',
+        heading: 'World',
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore local authorities {
+            Explore countries {
             isMobile
               ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'

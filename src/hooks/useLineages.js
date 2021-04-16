@@ -46,6 +46,7 @@ const useLineages = (dataPath) => {
     const { dates, ltlas, values } = current.data
 
     let max = 0
+    console.log(current.data)
     for (const row of values) {
       max = Math.max(max, ...row)
     }
