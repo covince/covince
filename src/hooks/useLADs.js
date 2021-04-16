@@ -3,7 +3,7 @@ import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
 const useLAD = (dataPath) => {
-  const [{ lad }, updateQuery] = useQueryAsState({ lad: 'national' })
+  const [{ lad }, updateQuery] = useQueryAsState({ lad: 'United Kingdom' })
   const [{ currentLad = null, data }, storeResult] = useState({})
 
   useEffect(() => {
