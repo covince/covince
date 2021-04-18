@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useReducer } from 'react'
 import axios from 'axios'
 
 import useQueryAsState from './useQueryAsState'
@@ -11,26 +11,53 @@ const getDefaultScale = (x) => {
 
 const useLineages = (dataPath) => {
   const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: 'B.1.1.7', colorBy: 'p' })
-  const [current, setCurrent] = useState({ lineage: null, colorBy: null, data: null })
-
-  const isLoading = useMemo(() =>
-    lineage !== current.lineage ||
-    colorBy !== current.colorBy
-  , [current, lineage, colorBy])
+  const [{ current, status, data }, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'LOADING':
+        return {
+          ...state,
+          status: 'LOADING',
+          loading: {
+            lineage: action.payload.lineage,
+            colorBy: action.payload.colorBy
+          }
+        }
+      case 'FETCHED': {
+        if (
+          state.loading.lineage !== action.payload.lineage ||
+          state.loading.colorBy !== action.payload.colorBy
+        ) {
+          return state
+        }
+        return {
+          ...state,
+          status: 'READY',
+          loading: {
+            lineage: null,
+            colorBy: null
+          },
+          current: {
+            lineage: action.payload.lineage,
+            colorBy: action.payload.colorBy
+          },
+          data: action.payload.data
+        }
+      }
+    }
+  }, {
+    status: 'INIT',
+    current: { lineage: null, colorBy: null },
+    loading: { lineage: null, colorBy: null },
+    data: null
+  })
 
   useEffect(() => {
-    if (isLoading) {
-      axios.get(`${dataPath}/lineage/${lineage}/${colorBy}.json`)
-        .then(res => {
-          setCurrent({
-            ...current,
-            data: res.data,
-            lineage,
-            colorBy
-          })
-        })
-    }
-  }, [isLoading])
+    dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
+    axios.get(`${dataPath}/lineage/${lineage}/${colorBy}.json`)
+      .then(res => {
+        dispatch({ type: 'FETCHED', payload: { data: res.data, lineage, colorBy } })
+      })
+  }, [lineage, colorBy])
 
   const actions = {
     setLineage: lineage => updateQuery({ lineage }),
@@ -39,11 +66,11 @@ const useLineages = (dataPath) => {
   }
 
   const results = useMemo(() => {
-    if (current.data === null) {
+    if (data === null) {
       return null
     }
 
-    const { dates, ltlas, values } = current.data
+    const { dates, ltlas, values } = data
 
     let max = 0
     for (const row of values) {
@@ -66,10 +93,11 @@ const useLineages = (dataPath) => {
     }
 
     return { min: 0, max, index, dates }
-  }, [current.data])
+  }, [data])
 
   const state = useMemo(() => {
     return {
+      status,
       ...current,
       scale: scale || getDefaultScale(current.colorBy),
       loading: {
@@ -77,7 +105,7 @@ const useLineages = (dataPath) => {
         colorBy
       }
     }
-  }, [current, lineage, colorBy, scale])
+  }, [current, status, lineage, colorBy, scale])
 
   return [state, actions, results]
 }
