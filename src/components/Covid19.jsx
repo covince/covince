@@ -198,7 +198,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               lineColor={lineColor}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
-              <div className='bg-white bg-opacity-50 absolute inset-0 grid place-content-center'>
+              <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 w-6 h-6' />
               </div>
             </FadeTransition>

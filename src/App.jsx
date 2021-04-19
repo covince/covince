@@ -16,15 +16,19 @@ const Loading = () => (
 
 function App () {
   return (
-    <><QueryClientProvider client={queryClient}>
-      <Suspense fallback={<Loading />}>
-        <NavBar />
-        <AppContainer>
-        <DataProvider default_data_url="./data" default_tiles_url='./tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json'>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={<Loading />}>
+          <NavBar />
+          <AppContainer>
+            <DataProvider
+              default_data_url="./data"
+              default_tiles_url='./tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json'
+            >
               <Covid19 />
             </DataProvider>
-        </AppContainer>
-      </Suspense>
+          </AppContainer>
+        </Suspense>
       </QueryClientProvider>
     </>
   )
