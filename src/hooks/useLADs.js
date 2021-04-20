@@ -39,7 +39,7 @@ const useLAD = (dataPath) => {
 
   useEffect(() => {
     dispatch({ type: 'LOADING', payload: lad })
-    axios.get(`${dataPath}/ltla/${lad}.json`)
+    axios.get(`${dataPath}/area/${lad}.json`)
       .then(res => {
         dispatch({ type: 'FETCHED', payload: { lad, data: res.data.data } })
       })

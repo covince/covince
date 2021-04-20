@@ -70,7 +70,7 @@ const useLineages = (dataPath) => {
       return null
     }
 
-    const { dates, ltlas, values } = data
+    const { dates, areas, values } = data
 
     let max = 0
     for (const row of values) {
@@ -82,14 +82,14 @@ const useLineages = (dataPath) => {
 
     const index = {}
 
-    for (let i = 0; i < ltlas.length; i++) {
-      const ltla = ltlas[i]
+    for (let i = 0; i < areas.length; i++) {
+      const area = areas[i]
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
         const value = values[i][j]
         lookup[dates[j]] = current.colorBy === 'p' ? value * 100 : value
       }
-      index[ltla] = lookup
+      index[area] = lookup
     }
 
     return { min: 0, max, index, dates }
