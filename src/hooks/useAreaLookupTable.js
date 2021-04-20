@@ -1,6 +1,7 @@
+
 import { useMemo } from 'react'
 
-function useLALookupTable (tiles) {
+function useAreaLookupTable (tiles) {
   return useMemo(() => {
     const lookupTable = {
       national: 'National'
@@ -14,4 +15,4 @@ function useLALookupTable (tiles) {
   }, [tiles])
 }
 
-export default useLALookupTable
+export default useAreaLookupTable

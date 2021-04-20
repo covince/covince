@@ -17,17 +17,17 @@ import FilterSection from './FilterSection'
 import StickyActionButton from './StickyActionButton'
 
 import useMobile from '../hooks/useMobile'
-import useLADs from '../hooks/useLADs'
+import useAreas from '../hooks/useAreas'
 import useLineages from '../hooks/useLineages'
-import useLALookupTable from '../hooks/useLALookupTable'
+import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 
 const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
-  const LALookupTable = useLALookupTable(tiles)
+  const AreaLookupTable = useAreaLookupTable(tiles)
 
   const unique_lineages = data.lineages
 
-  const [ladState, ladActions] = useLADs(dataPath)
+  const [ladState, ladActions] = useAreas(dataPath)
   const [lineageState, lineageActions, results] = useLineages(dataPath)
   const [
     { date, playing },
@@ -71,7 +71,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     }
     return {
       category: 'Local authority',
-      heading: LALookupTable[ladState.currentLad],
+      heading: AreaLookupTable[ladState.currentLad],
       subheading: ladState.currentLad,
       showNationalButton: ladState.loadingLad !== 'national',
       loadNationalOverview: () => ladActions.load('national')
@@ -213,7 +213,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
             }
           )}
-          name={LALookupTable[ladState.currentLad]}
+          name={AreaLookupTable[ladState.currentLad]}
           date={date}
           setDate={persistDate}
           lad={ladState.currentLad}

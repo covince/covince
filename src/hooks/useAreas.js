@@ -2,7 +2,7 @@ import { useEffect, useReducer } from 'react'
 import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
-const useLAD = (dataPath) => {
+const useAreas = (dataPath) => {
   const [{ lad }, updateQuery] = useQueryAsState({ lad: 'national' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -52,4 +52,4 @@ const useLAD = (dataPath) => {
   return [state, actions]
 }
 
-export default useLAD
+export default useAreas

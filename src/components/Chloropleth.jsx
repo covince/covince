@@ -169,7 +169,7 @@ const Chloropleth = (props) => {
 
     const features = tiles.features.map(f => {
       const { area_id } = f.properties
-      console.log(area_id)
+
       const values = index ? index[area_id] : null
       const value = values ? values[date] : undefined
       return {
@@ -220,16 +220,16 @@ const Chloropleth = (props) => {
   const mapStyle = useMemo(() => ({
     version: 8,
     sources: {
-      lads: {
+      areas: {
         type: 'geojson',
         data
       }
     },
     layers: [
       {
-        id: 'lads-fill',
+        id: 'areas-fill',
         type: 'fill',
-        source: 'lads',
+        source: 'areas',
         paint: {
           'fill-color': [
             'case',
@@ -248,9 +248,9 @@ const Chloropleth = (props) => {
         }
       },
       {
-        id: 'lads-line',
+        id: 'areas-line',
         type: 'line',
-        source: 'lads',
+        source: 'areas',
         paint: {
           'line-color': ['case', ['==', ['get', 'value'], null],
             tailwindColors[lineColor][300], [
@@ -302,7 +302,7 @@ const Chloropleth = (props) => {
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'
-            interactiveLayerIds={['lads-fill']}
+            interactiveLayerIds={['areas-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (!feature) {
