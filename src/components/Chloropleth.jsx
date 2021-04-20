@@ -122,6 +122,7 @@ const doesNotMatch = (a, b) => (
 
 const Chloropleth = (props) => {
   const { tiles, date, index, lad } = props
+
   const [query, updateQuery] = useQueryAsState(
     mapViewportToQuery({
       latitude: tiles.config.default_lat,
@@ -167,15 +168,16 @@ const Chloropleth = (props) => {
     }
 
     const features = tiles.features.map(f => {
-      const { lad19cd } = f.properties
-      const values = index ? index[lad19cd] : null
+      const { area_id } = f.properties
+      console.log(area_id)
+      const values = index ? index[area_id] : null
       const value = values ? values[date] : undefined
       return {
         ...f,
         properties: {
           ...f.properties,
           value,
-          selected: lad19cd === lad
+          selected: area_id === lad
         }
       }
     })
@@ -306,7 +308,7 @@ const Chloropleth = (props) => {
               if (!feature) {
                 props.handleOnClick('national')
               } else if ('value' in feature.properties) {
-                props.handleOnClick(feature.properties.lad19cd)
+                props.handleOnClick(feature.properties.area_id)
               }
             }}
             onHover={e => {
@@ -333,12 +335,12 @@ const Chloropleth = (props) => {
                 className='text-center text-current leading-none font-sans'
                 tipSize={8}
               >
-                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.lad19cd)}>
+                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.area_id)}>
                   <p className='font-bold text-gray-700'>
                     {formatValue(popupFeature.value)}
                   </p>
                   <p className='text-sm'>
-                    {popupFeature.lad19nm}
+                    {popupFeature.area_name}
                   </p>
                 </div>
               </Popup>}
