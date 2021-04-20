@@ -3,7 +3,7 @@ import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
 const useAreas = (dataPath) => {
-  const [{ area }, updateQuery] = useQueryAsState({ area: 'national' })
+  const [{ area }, updateQuery] = useQueryAsState({ area: 'overview' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':

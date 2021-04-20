@@ -54,7 +54,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
-    if (areaState.currentArea === 'national') {
+    if (areaState.currentArea === 'overview') {
       return {
         category: 'National overview',
         heading: 'England',
@@ -73,8 +73,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       category: 'Local authority',
       heading: AreaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
-      showNationalButton: areaState.loadingArea !== 'national',
-      loadNationalOverview: () => areaActions.load('national')
+      showNationalButton: areaState.loadingArea !== 'overview',
+      loadNationalOverview: () => areaActions.load('overview')
     }
   }, [areaState, isMobile])
 

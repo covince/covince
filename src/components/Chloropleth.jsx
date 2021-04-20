@@ -306,7 +306,7 @@ const Chloropleth = (props) => {
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (!feature) {
-                props.handleOnClick('national')
+                props.handleOnClick('overview')
               } else if ('value' in feature.properties) {
                 props.handleOnClick(feature.properties.area_id)
               }
@@ -321,7 +321,7 @@ const Chloropleth = (props) => {
             }}
             getCursor={({ isHovering, isDragging }) => {
               if (isDragging) return 'grabbing'
-              if (isHovering || selected_area !== 'national') return 'pointer'
+              if (isHovering || selected_area !== 'overview') return 'pointer'
               return 'grab'
             }}
           >
