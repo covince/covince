@@ -27,7 +27,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   const unique_lineages = data.lineages
 
-  const [ladState, ladActions] = useAreas(dataPath)
+  const [areaState, areaActions] = useAreas(dataPath)
   const [lineageState, lineageActions, results] = useLineages(dataPath)
   const [
     { date, playing },
@@ -37,7 +37,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   let unique_parameters = ['lambda', 'p', 'R']
 
   const handleOnClick = (lad) => {
-    ladActions.load(lad)
+    areaActions.load(lad)
   }
 
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
@@ -54,7 +54,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
-    if (ladState.currentArea === 'national') {
+    if (areaState.currentArea === 'national') {
       return {
         category: 'National overview',
         heading: 'England',
@@ -71,12 +71,12 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     }
     return {
       category: 'Local authority',
-      heading: AreaLookupTable[ladState.currentArea],
-      subheading: ladState.currentArea,
-      showNationalButton: ladState.loadingArea !== 'national',
-      loadNationalOverview: () => ladActions.load('national')
+      heading: AreaLookupTable[areaState.currentArea],
+      subheading: areaState.currentArea,
+      showNationalButton: areaState.loadingArea !== 'national',
+      loadNationalOverview: () => areaActions.load('national')
     }
-  }, [ladState, isMobile])
+  }, [areaState, isMobile])
 
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
@@ -99,8 +99,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   }
 
   const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || ladState.currentArea === null
-  ), [lineageState.lineage, ladState.currentArea])
+    lineageState.lineage === null || areaState.currentArea === null
+  ), [lineageState.lineage, areaState.currentArea])
 
   return (
     <>
@@ -114,7 +114,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
         <FilterSection className='overflow-hidden'>
           <DateFilter className='w-80' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <LocationFilter className='w-80 relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
           <FadeTransition in={isInitialLoad}>
             <div className='bg-white absolute inset-0 grid place-content-center'>
               <Spinner className='text-gray-500 w-6 h-6' />
@@ -127,7 +127,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             <Heading>Map</Heading>
             {isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={ladState.status === 'LOADING'}>
+                <FadeTransition in={areaState.status === 'LOADING'}>
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
@@ -185,7 +185,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              lad={ladState.loadingArea || ladState.currentArea}
+              lad={areaState.loadingArea || areaState.currentArea}
               tiles={tiles}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
@@ -210,14 +210,14 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           className={classNames(
             'transition-opacity flex-grow', {
               hidden: view === 'map',
-              'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
+              'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
             }
           )}
-          name={AreaLookupTable[ladState.currentArea]}
+          name={AreaLookupTable[areaState.currentArea]}
           date={date}
           setDate={persistDate}
-          lad={ladState.currentArea}
-          values={ladState.data}
+          lad={areaState.currentArea}
+          values={areaState.data}
           isMobile={isMobile}
           lineColor={lineColor}
         />
