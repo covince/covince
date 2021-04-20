@@ -54,7 +54,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
-    if (ladState.currentLad === 'national') {
+    if (ladState.currentArea === 'national') {
       return {
         category: 'National overview',
         heading: 'England',
@@ -71,8 +71,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     }
     return {
       category: 'Local authority',
-      heading: AreaLookupTable[ladState.currentLad],
-      subheading: ladState.currentLad,
+      heading: AreaLookupTable[ladState.currentArea],
+      subheading: ladState.currentArea,
       showNationalButton: ladState.loadingLad !== 'national',
       loadNationalOverview: () => ladActions.load('national')
     }
@@ -99,8 +99,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   }
 
   const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || ladState.currentLad === null
-  ), [lineageState.lineage, ladState.currentLad])
+    lineageState.lineage === null || ladState.currentArea === null
+  ), [lineageState.lineage, ladState.currentArea])
 
   return (
     <>
@@ -185,7 +185,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              lad={ladState.loadingLad || ladState.currentLad}
+              lad={ladState.loadingLad || ladState.currentArea}
               tiles={tiles}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
@@ -213,10 +213,10 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
             }
           )}
-          name={AreaLookupTable[ladState.currentLad]}
+          name={AreaLookupTable[ladState.currentArea]}
           date={date}
           setDate={persistDate}
-          lad={ladState.currentLad}
+          lad={ladState.currentArea}
           values={ladState.data}
           isMobile={isMobile}
           lineColor={lineColor}

@@ -18,7 +18,7 @@ const useAreas = (dataPath) => {
           ...state,
           status: 'READY',
           loadingLad: null,
-          currentLad: action.payload.lad,
+          currentArea: action.payload.lad,
           data: action.payload.data.map(x => {
             if (x.parameter === 'p') {
               return {
