@@ -58,12 +58,12 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
   return null
 }
 
-const MultiLinePlot = ({ date, setDate, lad_data, colors, parameter, type, width, height = 120, stroke = 'blueGray', className }) => {
+const MultiLinePlot = ({ date, setDate, area_data, colors, parameter, type, width, height = 120, stroke = 'blueGray', className }) => {
   const chart = useMemo(() => {
     const dataByDate = {}
     const lineages = new Set()
 
-    for (const d of lad_data) {
+    for (const d of area_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
         dataByDate[d.date] = {
           ...dataByDate[d.date],
@@ -79,7 +79,7 @@ const MultiLinePlot = ({ date, setDate, lad_data, colors, parameter, type, width
       lineages: Array.from(lineages),
       data: Object.values(dataByDate)
     }
-  }, [lad_data])
+  }, [area_data])
 
   const { lineages, data } = chart
 
