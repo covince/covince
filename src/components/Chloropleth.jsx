@@ -121,7 +121,7 @@ const doesNotMatch = (a, b) => (
 )
 
 const Chloropleth = (props) => {
-  const { tiles, date, index, lad } = props
+  const { tiles, date, index, selected_area } = props
 
   const [query, updateQuery] = useQueryAsState(
     mapViewportToQuery({
@@ -177,7 +177,7 @@ const Chloropleth = (props) => {
         properties: {
           ...f.properties,
           value,
-          selected: area_id === lad
+          selected: area_id === selected_area
         }
       }
     })
@@ -186,7 +186,7 @@ const Chloropleth = (props) => {
       ...tiles,
       features
     }
-  }, [tiles, date, index, lad])
+  }, [tiles, date, index, selected_area])
 
   const { color_scale_type, min_val, max_val } = props
 
@@ -321,7 +321,7 @@ const Chloropleth = (props) => {
             }}
             getCursor={({ isHovering, isDragging }) => {
               if (isDragging) return 'grabbing'
-              if (isHovering || lad !== 'national') return 'pointer'
+              if (isHovering || selected_area !== 'national') return 'pointer'
               return 'grab'
             }}
           >

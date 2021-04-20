@@ -3,7 +3,7 @@ import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
 const useAreas = (dataPath) => {
-  const [{ lad }, updateQuery] = useQueryAsState({ lad: 'national' })
+  const [{ area }, updateQuery] = useQueryAsState({ area: 'national' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':
@@ -13,12 +13,12 @@ const useAreas = (dataPath) => {
           status: 'LOADING'
         }
       case 'FETCHED': {
-        if (action.payload.lad !== state.loadingArea) return state
+        if (action.payload.area !== state.loadingArea) return state
         return {
           ...state,
           status: 'READY',
           loadingArea: null,
-          currentArea: action.payload.lad,
+          currentArea: action.payload.area,
           data: action.payload.data.map(x => {
             if (x.parameter === 'p') {
               return {
@@ -38,15 +38,15 @@ const useAreas = (dataPath) => {
   }, { status: 'INIT' })
 
   useEffect(() => {
-    dispatch({ type: 'LOADING', payload: lad })
-    axios.get(`${dataPath}/area/${lad}.json`)
+    dispatch({ type: 'LOADING', payload: area })
+    axios.get(`${dataPath}/area/${area}.json`)
       .then(res => {
-        dispatch({ type: 'FETCHED', payload: { lad, data: res.data.data } })
+        dispatch({ type: 'FETCHED', payload: { area, data: res.data.data } })
       })
-  }, [lad])
+  }, [area])
 
   const actions = {
-    load: (lad) => updateQuery({ lad })
+    load: (area) => updateQuery({ area })
   }
 
   return [state, actions]

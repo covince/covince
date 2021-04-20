@@ -36,8 +36,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   let unique_parameters = ['lambda', 'p', 'R']
 
-  const handleOnClick = (lad) => {
-    areaActions.load(lad)
+  const handleOnClick = (area) => {
+    areaActions.load(area)
   }
 
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
@@ -185,7 +185,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              lad={areaState.loadingArea || areaState.currentArea}
+              selected_area={areaState.loadingArea || areaState.currentArea}
               tiles={tiles}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
@@ -216,7 +216,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           name={AreaLookupTable[areaState.currentArea]}
           date={date}
           setDate={persistDate}
-          lad={areaState.currentArea}
+          selected_area={areaState.currentArea}
           values={areaState.data}
           isMobile={isMobile}
           lineColor={lineColor}
