@@ -73,7 +73,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       category: 'Local authority',
       heading: AreaLookupTable[ladState.currentArea],
       subheading: ladState.currentArea,
-      showNationalButton: ladState.loadingLad !== 'national',
+      showNationalButton: ladState.loadingArea !== 'national',
       loadNationalOverview: () => ladActions.load('national')
     }
   }, [ladState, isMobile])
@@ -185,7 +185,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              lad={ladState.loadingLad || ladState.currentArea}
+              lad={ladState.loadingArea || ladState.currentArea}
               tiles={tiles}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}

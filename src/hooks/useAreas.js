@@ -9,15 +9,15 @@ const useAreas = (dataPath) => {
       case 'LOADING':
         return {
           ...state,
-          loadingLad: action.payload,
+          loadingArea: action.payload,
           status: 'LOADING'
         }
       case 'FETCHED': {
-        if (action.payload.lad !== state.loadingLad) return state
+        if (action.payload.lad !== state.loadingArea) return state
         return {
           ...state,
           status: 'READY',
-          loadingLad: null,
+          loadingArea: null,
           currentArea: action.payload.lad,
           data: action.payload.data.map(x => {
             if (x.parameter === 'p') {
