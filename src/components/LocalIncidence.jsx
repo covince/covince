@@ -20,7 +20,7 @@ function LocalIncidence ({ chartDefinitions, values, date, setDate, className, i
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef} className={classNames(`grid grid-rows-${numCharts} gap-2`, className)}>
+        <div ref={measureRef} className={classNames(`grid gap-2`, className)}>
           {
             chartDefinitions.map(chart => <Chart
               colors = {colors}
