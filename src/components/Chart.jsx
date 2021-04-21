@@ -3,7 +3,7 @@ import React, { useState, useMemo, useCallback } from 'react'
 import Measure from 'react-measure'
 import MultiLinePlot from './MultiLinePlot'
 import { Heading } from './Typography'
-
+import classNames from 'classnames'
 const ChartHeading = ({ isMobile, ...props }) =>
   isMobile
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading')} />
