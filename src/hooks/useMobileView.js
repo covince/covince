@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import useQueryAsState from './useQueryAsState'
 
-export default () => {
+export default (isMobile) => {
   const [{ view }, setQuery] = useQueryAsState({ view: 'chart' })
 
   const setView = useCallback(view => {
@@ -9,5 +9,5 @@ export default () => {
     setQuery({ view })
   }, [setQuery])
 
-  return [view, setView]
+  return [isMobile ? view : null, setView]
 }
