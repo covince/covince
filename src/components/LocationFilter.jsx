@@ -5,7 +5,7 @@ import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 
-const LocationFilter = ({ className, loading, category, heading, subheading, showNationalButton, loadNationalOverview }) => (
+const LocationFilter = ({ className, loading, category, heading, subheading, showNationalButton, loadNationalOverview, overviewButtonText }) => (
   <div className={className}>
     <div className='flex justify-between items-center h-6'>
       <DescriptiveHeading className='whitespace-nowrap'>
@@ -17,7 +17,7 @@ const LocationFilter = ({ className, loading, category, heading, subheading, sho
         onClick={loadNationalOverview}
       >
         <BsArrowUpShort className=' h-6 w-6 mr-0.25 fill-current' />
-        National
+        {overviewButtonText}
       </button> }
     </div>
     <Heading className='flex items-center space-x-3 h-6'>

@@ -56,11 +56,11 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const locationFilter = useMemo(() => {
     if (areaState.currentArea === 'overview') {
       return {
-        category: 'National overview',
-        heading: 'England',
+        category: data.overview.category,
+        heading: data.overview.heading,
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore local authorities {
+            Explore {data.overview.subnoun_plural} {
             isMobile
               ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
@@ -70,7 +70,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       }
     }
     return {
-      category: 'Local authority',
+      category: data.overview.subnoun_singular,
       heading: AreaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showNationalButton: areaState.loadingArea !== 'overview',
@@ -105,7 +105,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   return (
     <>
       { isMobile && view === 'chart' &&
-        <LocationFilter
+        <LocationFilter overviewButtonText={AreaLookupTable.overview}
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
           loading={isInitialLoad}
@@ -114,7 +114,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
         <FilterSection className='overflow-hidden'>
           <DateFilter className='w-80' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
+          <LocationFilter overviewButtonText={AreaLookupTable.overview} className='w-80 relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
           <FadeTransition in={isInitialLoad}>
             <div className='bg-white absolute inset-0 grid place-content-center'>
               <Spinner className='text-gray-500 w-6 h-6' />

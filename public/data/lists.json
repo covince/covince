@@ -1,5 +1,11 @@
 {
     "initialDate": "2020-12-01",
+    "overview": {
+        "heading": "England",
+        "category": "National Overview",
+        "subnoun_singular": "Local authority",
+        "subnoun_plural": "local authorities"
+    },
     "colors": [
         "rgb(44,183,236)",
         "rgb(243,100,13)",
