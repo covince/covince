@@ -1,5 +1,24 @@
 {
     "initialDate": "2020-12-01",
+    "chartDefinitions": [
+        {
+            "parameter": "lambda",
+            "heading": "Incidence",
+            "defaultType": "line",
+            "allowStack": true
+        },
+        {
+            "parameter": "p",
+            "heading": "Proportion",
+            "defaultType": "area",
+            "allowStack": true
+        },
+        {
+            "parameter": "R",
+            "heading": "R",
+            "defaultType": "line"
+        }
+    ],
     "overview": {
         "heading": "England",
         "category": "National Overview",
