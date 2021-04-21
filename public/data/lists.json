@@ -4,7 +4,8 @@
         "heading": "England",
         "category": "National Overview",
         "subnoun_singular": "Local authority",
-        "subnoun_plural": "local authorities"
+        "subnoun_plural": "local authorities",
+        "short_text": "National"
     },
     "colors": [
         "rgb(44,183,236)",

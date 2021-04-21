@@ -23,7 +23,7 @@ import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 
 const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
-  const AreaLookupTable = useAreaLookupTable(tiles)
+  const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
 
   const unique_lineages = data.lineages
 
@@ -73,8 +73,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       category: data.overview.subnoun_singular,
       heading: AreaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
-      showNationalButton: areaState.loadingArea !== 'overview',
-      loadNationalOverview: () => areaActions.load('overview')
+      showOverviewButton: areaState.loadingArea !== 'overview',
+      loadOverview: () => areaActions.load('overview')
     }
   }, [areaState, isMobile])
 

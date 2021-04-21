@@ -1,10 +1,10 @@
 
 import { useMemo } from 'react'
 
-function useAreaLookupTable (tiles) {
+function useAreaLookupTable (tiles, overview) {
   return useMemo(() => {
     const lookupTable = {
-      overview: 'National'
+      overview: overview.short_text
     }
     if (tiles !== null) {
       for (const feature of tiles.features) {
@@ -12,7 +12,7 @@ function useAreaLookupTable (tiles) {
       }
     }
     return lookupTable
-  }, [tiles])
+  }, [tiles, overview])
 }
 
 export default useAreaLookupTable
