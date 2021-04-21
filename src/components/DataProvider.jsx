@@ -22,9 +22,9 @@ const DataProvider =
       return data
     }
 
-    const { data } = useQuery('data', getData, { suspense: true })
+    const { data } = useQuery('data', getData, { suspense: true, staleTime: 8 * 60 * 60 * 1000 })
 
-    const { data: tiles } = useQuery('tiles', getTiles, { suspense: true })
+    const { data: tiles } = useQuery('tiles', getTiles, { suspense: true, staleTime: 8 * 60 * 60 * 1000 })
 
     return (
       React.cloneElement(children, { data: data, tiles: tiles, dataPath: dataPath })
