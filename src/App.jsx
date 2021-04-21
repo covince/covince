@@ -5,7 +5,18 @@ import AppContainer from './components/AppContainer'
 import DataProvider from './components/DataProvider'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-const queryClient = new QueryClient()
+const twentyFourHoursInMs = 1000 * 60 * 60 * 24
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnmount: false,
+      refetchOnReconnect: false,
+      staleTime: twentyFourHoursInMs*100
+    }
+  }
+})
+
 const Covid19 = lazy(() => import('./components/Covid19'))
 
 const Loading = () => (
