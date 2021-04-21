@@ -28,23 +28,17 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const unique_lineages = data.lineages
 
   const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath)
+  const [lineageState, lineageActions, results] = useLineages(dataPath, data)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
   ] = useDates(results ? results.dates : [], data.initialDate)
 
-  let unique_parameters = ['lambda', 'p', 'R']
-
   const handleOnClick = (area) => {
     areaActions.load(area)
   }
 
-  unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
-  if (lineageState.lineage === 'total') {
-    unique_parameters = unique_parameters[0]
-  }
-  const parameter_options = unique_parameters.map((x) => <option key={x[0]} value={x[0]}>{x[1]}</option>)
+  const parameter_options = data.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
   const [view, setView] = useState('chart')
   const handleSetView = useCallback(view => {
