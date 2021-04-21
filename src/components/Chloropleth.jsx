@@ -121,7 +121,8 @@ const doesNotMatch = (a, b) => (
 )
 
 const Chloropleth = (props) => {
-  const { tiles, date, index, lad } = props
+  const { tiles, date, index, selected_area } = props
+
   const [query, updateQuery] = useQueryAsState(
     mapViewportToQuery({
       latitude: tiles.config.default_lat,
@@ -167,15 +168,16 @@ const Chloropleth = (props) => {
     }
 
     const features = tiles.features.map(f => {
-      const { lad19cd } = f.properties
-      const values = index ? index[lad19cd] : null
+      const { area_id } = f.properties
+
+      const values = index ? index[area_id] : null
       const value = values ? values[date] : undefined
       return {
         ...f,
         properties: {
           ...f.properties,
           value,
-          selected: lad19cd === lad
+          selected: area_id === selected_area
         }
       }
     })
@@ -184,7 +186,7 @@ const Chloropleth = (props) => {
       ...tiles,
       features
     }
-  }, [tiles, date, index, lad])
+  }, [tiles, date, index, selected_area])
 
   const { color_scale_type, min_val, max_val } = props
 
@@ -218,16 +220,16 @@ const Chloropleth = (props) => {
   const mapStyle = useMemo(() => ({
     version: 8,
     sources: {
-      lads: {
+      areas: {
         type: 'geojson',
         data
       }
     },
     layers: [
       {
-        id: 'lads-fill',
+        id: 'areas-fill',
         type: 'fill',
-        source: 'lads',
+        source: 'areas',
         paint: {
           'fill-color': [
             'case',
@@ -246,9 +248,9 @@ const Chloropleth = (props) => {
         }
       },
       {
-        id: 'lads-line',
+        id: 'areas-line',
         type: 'line',
-        source: 'lads',
+        source: 'areas',
         paint: {
           'line-color': ['case', ['==', ['get', 'value'], null],
             tailwindColors[lineColor][300], [
@@ -300,13 +302,13 @@ const Chloropleth = (props) => {
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'
-            interactiveLayerIds={['lads-fill']}
+            interactiveLayerIds={['areas-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (!feature) {
-                props.handleOnClick('national')
+                props.handleOnClick('overview')
               } else if ('value' in feature.properties) {
-                props.handleOnClick(feature.properties.lad19cd)
+                props.handleOnClick(feature.properties.area_id)
               }
             }}
             onHover={e => {
@@ -319,7 +321,7 @@ const Chloropleth = (props) => {
             }}
             getCursor={({ isHovering, isDragging }) => {
               if (isDragging) return 'grabbing'
-              if (isHovering || lad !== 'national') return 'pointer'
+              if (isHovering || selected_area !== 'overview') return 'pointer'
               return 'grab'
             }}
           >
@@ -333,12 +335,12 @@ const Chloropleth = (props) => {
                 className='text-center text-current leading-none font-sans'
                 tipSize={8}
               >
-                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.lad19cd)}>
+                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.area_id)}>
                   <p className='font-bold text-gray-700'>
                     {formatValue(popupFeature.value)}
                   </p>
                   <p className='text-sm'>
-                    {popupFeature.lad19nm}
+                    {popupFeature.area_name}
                   </p>
                 </div>
               </Popup>}

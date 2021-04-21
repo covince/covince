@@ -17,17 +17,17 @@ import FilterSection from './FilterSection'
 import StickyActionButton from './StickyActionButton'
 
 import useMobile from '../hooks/useMobile'
-import useLADs from '../hooks/useLADs'
+import useAreas from '../hooks/useAreas'
 import useLineages from '../hooks/useLineages'
-import useLALookupTable from '../hooks/useLALookupTable'
+import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 
 const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
-  const LALookupTable = useLALookupTable(tiles)
+  const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
 
   const unique_lineages = data.lineages
 
-  const [ladState, ladActions] = useLADs(dataPath)
+  const [areaState, areaActions] = useAreas(dataPath)
   const [lineageState, lineageActions, results] = useLineages(dataPath)
   const [
     { date, playing },
@@ -36,8 +36,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   let unique_parameters = ['lambda', 'p', 'R']
 
-  const handleOnClick = (lad) => {
-    ladActions.load(lad)
+  const handleOnClick = (area) => {
+    areaActions.load(area)
   }
 
   unique_parameters = [['lambda', 'Incidence'], ['p', 'Proportion'], ['R', 'R']]
@@ -54,13 +54,13 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const isMobile = useMobile()
 
   const locationFilter = useMemo(() => {
-    if (ladState.currentLad === 'national') {
+    if (areaState.currentArea === 'overview') {
       return {
-        category: 'National overview',
-        heading: 'England',
+        category: data.overview.category,
+        heading: data.overview.heading,
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore local authorities {
+            Explore {data.overview.subnoun_plural} {
             isMobile
               ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
@@ -70,13 +70,13 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
       }
     }
     return {
-      category: 'Local authority',
-      heading: LALookupTable[ladState.currentLad],
-      subheading: ladState.currentLad,
-      showNationalButton: ladState.loadingLad !== 'national',
-      loadNationalOverview: () => ladActions.load('national')
+      category: data.overview.subnoun_singular,
+      heading: AreaLookupTable[areaState.currentArea],
+      subheading: areaState.currentArea,
+      showOverviewButton: areaState.loadingArea !== 'overview',
+      loadOverview: () => areaActions.load('overview')
     }
-  }, [ladState, isMobile])
+  }, [areaState, isMobile])
 
   const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
 
@@ -99,13 +99,13 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   }
 
   const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || ladState.currentLad === null
-  ), [lineageState.lineage, ladState.currentLad])
+    lineageState.lineage === null || areaState.currentArea === null
+  ), [lineageState.lineage, areaState.currentArea])
 
   return (
     <>
       { isMobile && view === 'chart' &&
-        <LocationFilter
+        <LocationFilter overviewButtonText={AreaLookupTable.overview}
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
           loading={isInitialLoad}
@@ -114,7 +114,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
         <FilterSection className='overflow-hidden'>
           <DateFilter className='w-80' {...dateFilter} />
           <div className='border border-gray-200 mx-6 hidden md:block' />
-          <LocationFilter className='w-80 relative' {...locationFilter} loading={ladState.status === 'LOADING'} />
+          <LocationFilter overviewButtonText={AreaLookupTable.overview} className='w-80 relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
           <FadeTransition in={isInitialLoad}>
             <div className='bg-white absolute inset-0 grid place-content-center'>
               <Spinner className='text-gray-500 w-6 h-6' />
@@ -127,7 +127,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             <Heading>Map</Heading>
             {isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={ladState.status === 'LOADING'}>
+                <FadeTransition in={areaState.status === 'LOADING'}>
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
@@ -185,7 +185,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              lad={ladState.loadingLad || ladState.currentLad}
+              selected_area={areaState.loadingArea || areaState.currentArea}
               tiles={tiles}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
@@ -210,14 +210,14 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           className={classNames(
             'transition-opacity flex-grow', {
               hidden: view === 'map',
-              'opacity-50 pointer-events-none': ladState.status === 'LOADING' && !isInitialLoad
+              'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
             }
           )}
-          name={LALookupTable[ladState.currentLad]}
+          name={AreaLookupTable[areaState.currentArea]}
           date={date}
           setDate={persistDate}
-          lad={ladState.currentLad}
-          values={ladState.data}
+          selected_area={areaState.currentArea}
+          values={areaState.data}
           isMobile={isMobile}
           lineColor={lineColor}
         />
