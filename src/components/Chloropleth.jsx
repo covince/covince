@@ -314,7 +314,7 @@ const Chloropleth = (props) => {
             onHover={e => {
               const [feature] = e.features
               if (feature && 'value' in feature.properties) {
-                if (feature.properties.latitude === undefined) {
+                if (feature.properties.lat === undefined) {
                   // Hack where if no central point is specified
                   // we use mouse position for popup
                   feature.properties.lat = e.lngLat[1]
