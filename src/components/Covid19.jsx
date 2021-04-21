@@ -206,6 +206,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           </div>
         </div>
         <LocalIncidence
+        chartDefinitions = {data.chartDefinitions}
           colors={data.colors}
           className={classNames(
             'transition-opacity flex-grow', {
