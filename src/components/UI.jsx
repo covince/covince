@@ -96,7 +96,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
     lineageState.lineage === null || areaState.currentArea === null
   ), [lineageState.lineage, areaState.currentArea])
 
-  const lineageFilter = useLineageFilter(unique_lineages)
+  const lineageFilter = useLineageFilter(unique_lineages, data.colors)
 
   return (
     <>

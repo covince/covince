@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
-const colours = [
+// https://personal.sron.nl/~pault/
+const tolMutedQualitative = [
   '#332288', // indigo
   '#88CCEE', // cyan
   '#44AA99', // teal
@@ -15,7 +16,7 @@ const colours = [
   '#DDDDDD' // grey
 ]
 
-export default (uniqueLineages) => {
+export default (uniqueLineages, colours = tolMutedQualitative) => {
   const [{ show }, updateQuery] = useQueryAsState()
 
   const queryLineages = useMemo(() =>
