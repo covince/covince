@@ -9,8 +9,6 @@ export default (uniqueLineages, colours) => {
     new Set(show === undefined ? uniqueLineages : show.split(',').filter(_ => _.length))
   , [show])
 
-  console.log(queryLineages)
-
   const activeLineages = useMemo(() =>
     uniqueLineages.reduce((memo, lineage, index) => {
       memo[lineage] = {
