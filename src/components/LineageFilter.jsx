@@ -31,7 +31,7 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
         </div>
       </header>
       <form
-        className='flex-grow grid grid-flow-row overflow-y-auto -mx-4 md:-mx-2'
+        className='flex-grow flex flex-wrap md:grid grid-flow-row overflow-y-auto -mx-4 md:-mx-2'
         style={formStyle}
       >
         {Object.keys(activeLineages)
