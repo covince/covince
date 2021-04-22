@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort } from 'react-icons/bs'
@@ -21,8 +21,9 @@ import useAreas from '../hooks/useAreas'
 import useLineages from '../hooks/useLineages'
 import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
+import useMobileView from '../hooks/useMobileView'
 
-const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
+const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
 
   const unique_lineages = data.lineages
@@ -40,12 +41,8 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   const parameter_options = data.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
-  const [view, setView] = useState('chart')
-  const handleSetView = useCallback(view => {
-    window.scrollTo({ top: 0 })
-    setView(view)
-  }, [setView])
   const isMobile = useMobile()
+  const [mobileView, setMobileView] = useMobileView(isMobile)
 
   const locationFilter = useMemo(() => {
     if (areaState.currentArea === 'overview') {
@@ -56,7 +53,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           <span className='flex items-center text-subheading'>
             Explore {data.overview.subnoun_plural} {
             isMobile
-              ? <button onClick={() => handleSetView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
+              ? <button onClick={() => setMobileView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
             }
           </span>
@@ -98,7 +95,7 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   return (
     <>
-      { isMobile && view === 'chart' &&
+      { mobileView === 'chart' &&
         <LocationFilter overviewButtonText={AreaLookupTable.overview}
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
@@ -115,18 +112,18 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             </div>
           </FadeTransition>
         </FilterSection> }
-      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': isMobile && view === 'map' })}>
-        <div className={classNames('flex flex-col flex-grow', { hidden: isMobile && view === 'chart' })}>
+      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
+        <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
-            {isMobile &&
+            { isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
                 <FadeTransition in={areaState.status === 'LOADING'}>
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
                   className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                  onClick={() => handleSetView('chart')}
+                  onClick={() => setMobileView('chart')}
                 >
                   <span className='truncate'>{locationFilter.heading}</span>
                   <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
@@ -200,11 +197,11 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           </div>
         </div>
         <LocalIncidence
-        chartDefinitions = {data.chartDefinitions}
+          chartDefinitions = {data.chartDefinitions}
           colors={data.colors}
           className={classNames(
             'transition-opacity flex-grow', {
-              hidden: view === 'map',
+              hidden: mobileView === 'map',
               'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
             }
           )}
@@ -216,17 +213,15 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           isMobile={isMobile}
           lineColor={lineColor}
         />
-        { isMobile && view === 'chart' &&
-          <StickyActionButton
-            onClick={() => handleSetView('map')}
-          >
+        { mobileView === 'chart' &&
+          <StickyActionButton onClick={() => setMobileView('map')}>
             View map on {formattedDate}
           </StickyActionButton> }
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
       </Card>
-      { isMobile && view === 'map' &&
+      { mobileView === 'map' &&
         <DateFilter
           className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
           {...dateFilter}
@@ -235,4 +230,4 @@ const Covid19 = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   )
 }
 
-export default Covid19
+export default UI
