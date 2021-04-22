@@ -60,6 +60,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
 }
 
 const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, height = 120, stroke = 'blueGray', className, activeLineages }) => {
+  const animationDuration = 500
   const chart = useMemo(() => {
     const dataByDate = {}
     const presentLineages = new Set()
@@ -169,7 +170,8 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
           dataKey={lineage}
           dot={false}
           fill={colour}
-          isAnimationActive={false}
+          isAnimationActive={true}
+          animationDuration={animationDuration}
           name={lineage}
           stackId='1'
           stroke={colour}
@@ -185,7 +187,8 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
           activeDot={false}
           dataKey={key}
           fill={colour}
-          isAnimationActive={false}
+          isAnimationActive={true}
+          animationDuration={animationDuration}
           name='_range'
           strokeWidth={0}
           type='monotone'
@@ -202,7 +205,8 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         activeDot={{ stroke: tailwindColors[stroke][400] }}
         dataKey={lineage}
         dot={false}
-        isAnimationActive={false}
+        isAnimationActive={true}
+        animationDuration={animationDuration}
         name={lineage}
         stroke={colour}
         type='monotone'

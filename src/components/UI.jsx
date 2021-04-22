@@ -31,6 +31,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const unique_lineages = data.lineages
 
   const [areaState, areaActions] = useAreas(dataPath)
+  console.log(areaState)
   const [lineageState, lineageActions, results] = useLineages(dataPath, data)
   const [
     { date, playing },
@@ -207,8 +208,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           colors={data.colors}
           className={classNames(
             'transition-opacity flex-grow', {
-              hidden: mobileView === 'map',
-              'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+              hidden: mobileView === 'map'//,
+            //  'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
             }
           )}
           name={AreaLookupTable[areaState.currentArea]}
