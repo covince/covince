@@ -1,5 +1,21 @@
 {
     "initialDate": "2020-12-01",
+    "defaultLineage": "B.1.1.7",
+    "defaultColorBy": "p",
+    "parameters": [
+        {
+            "id": "lambda",
+            "display": "Incidence"
+        },
+        {
+            "id": "p",
+            "display": "Proportion"
+        },
+        {
+            "id": "R",
+            "display": "R"
+        }
+    ],
     "chartDefinitions": [
         {
             "parameter": "lambda",
