@@ -87,7 +87,7 @@ const useLineages = (dataPath, options) => {
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
         const value = values[i][j]
-        lookup[dates[j]] = current.colorBy === 'p' ? value * 100 : value
+        lookup[dates[j]] = current.colorBy === 'p' && value !== null ? value * 100 : value
       }
       index[area] = lookup
     }
