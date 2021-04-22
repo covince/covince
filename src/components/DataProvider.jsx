@@ -28,6 +28,9 @@ const DataProvider = ({ children, default_data_url, default_tiles_url }) => {
     if (data.colors === undefined) {
       data.colors = tolMutedQualitative
     }
+    if (data.frameLength === undefined) {
+      data.frameLength = 100
+    }
     return data
   }
   const getTiles = async () => {
