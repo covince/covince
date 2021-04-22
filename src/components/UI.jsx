@@ -107,14 +107,14 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           loading={isInitialLoad}
         /> }
       { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
+        <FilterSection className='-mt-18 max-w-full mx-auto xl:mx-0' loading={isInitialLoad}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
           <Card className='w-80 box-content flex-shrink-0'>
             <LocationFilter className='relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
           </Card>
-          <Card className='max-w-lg flex-shrink-0 xl:flex-shrink'>
+          <Card className='box-content flex-shrink-0 xl:flex-grow'>
             <LineageFilter className='h-20' {...lineageFilter} />
           </Card>
         </FilterSection> }
