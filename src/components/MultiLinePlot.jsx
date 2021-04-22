@@ -108,7 +108,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         }
         return value.toLocaleString()
       },
-    ticks: percentage
+    ticks: percentage && activeLineages.length === lineages.length
       ? [0, 25, 50, 75, 100]
       : parameter === 'R'
         ? [0, 1, 2, 3]
