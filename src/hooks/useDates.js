@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import useQueryAState from '../hooks/useQueryAsState'
 
-export default (datesList, initialDate) => {
+export default (datesList, initialDate, frameLength) => {
   const [playing, setPlaying] = useState(false)
   const [query, updateQuery] = useQueryAState({ date: initialDate })
   const [date, setDate] = useState(query.date)
@@ -22,7 +22,7 @@ export default (datesList, initialDate) => {
         }
         const set_to = datesList[cur_index + 1]
         setDate(set_to)
-      }, 100)
+      }, frameLength)
       return () => clearTimeout(timeout)
     }
   }, [playing, date])

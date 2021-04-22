@@ -35,7 +35,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
-  ] = useDates(results ? results.dates : [], data.initialDate)
+  ] = useDates(results ? results.dates : [], data.initialDate, data.frameLength)
 
   const handleOnClick = (area) => {
     areaActions.load(area)
