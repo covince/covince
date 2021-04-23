@@ -15,11 +15,10 @@ const Checkbox = ({ id, name, label, checked, onChange, className, style }) => (
         className="outline-none focus:ring-2 ring-current ring-offset-2 h-4 w-4 text-current border-gray-300 rounded"
       />
     </div>
-    { label && <div className='text-sm'>
-      <label className='pl-2 font-medium text-gray-700' htmlFor={id}>
+    { label &&
+      <label className='pl-2 text-sm font-medium text-gray-700 leading-none' htmlFor={id}>
         {label}
-      </label>
-    </div> }
+      </label> }
   </div>
 )
 

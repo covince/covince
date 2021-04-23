@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import classNames from 'classnames'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
@@ -12,7 +11,7 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
   }, [activeLineages])
 
   return (
-    <div className={classNames('flex flex-col flew-grow', className)}>
+    <div className={className}>
       <header className='flex justify-between space-x-6'>
         <DescriptiveHeading>Lineages</DescriptiveHeading>
         <div className='flex items-center'>
