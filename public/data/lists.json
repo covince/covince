@@ -27,12 +27,29 @@
             "parameter": "p",
             "heading": "Proportion",
             "defaultType": "area",
-            "allowStack": true
+            "allowStack": true,
+            "preset": "percentage"
         },
         {
             "parameter": "R",
             "heading": "R",
-            "defaultType": "line"
+            "defaultType": "line",
+            "yAxis": {
+                "ticks": [
+                    "0",
+                    "1",
+                    "2",
+                    "3"
+                ],
+                "domain": [
+                    0,
+                    3
+                ],
+                "allowDataOverflow": true
+            },
+            "xAxis": {
+                "referenceLine": 1
+            }
         }
     ],
     "overview": {

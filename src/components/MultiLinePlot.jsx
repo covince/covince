@@ -59,7 +59,13 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
   return null
 }
 
-const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, height = 120, stroke = 'blueGray', className, activeLineages }) => {
+const MultiLinePlot = props => {
+  const {
+    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
+    yAxis: yAxisConfig = {}, xAxis: xAxisConfig = {},
+    date, setDate, area_data, activeLineages,
+    type, width, height = 120, stroke = 'blueGray', className
+  } = props
   const chart = useMemo(() => {
     const dataByDate = {}
     const presentLineages = new Set()
@@ -83,6 +89,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         lineages.push({ lineage, colour })
       }
     }
+
     return {
       lineages,
       data: Object.values(dataByDate)
@@ -98,32 +105,46 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
     margin: { top: 12, left: 0, right: 24 }
   }), [data, width, height])
 
-  const percentage = parameter === 'p'
-  const yAxisTicks = useMemo(() => ({
-    tickFormatter: percentage
-      ? value => `${Math.min(parseFloat(value), 100)}%`
-      : value => {
+  const yAxisTicks = useMemo(() => {
+    if (preset === 'percentage') {
+      if (lineages.length === 0) {
+        return { ticks: false }
+      }
+      const fullScale = lineages.length === Object.keys(activeLineages).length
+      if (fullScale) {
+        return {
+          tickFormatter: value => `${Math.min(parseFloat(value), 100)}%`,
+          ticks: [0, 25, 50, 75, 100]
+        }
+      }
+      return {
+        tickFormatter: value => {
+          if (value === 0) return '0%'
+          if (value >= 100) return '100%'
+          return `${parseFloat(value).toPrecision(2)}%`
+        }
+      }
+    }
+    return {
+      tickFormatter: value => {
         if (value >= 10e3) {
           return `${value.toString().slice(0, 2)}K`
         }
         return value.toLocaleString()
       },
-    ticks: percentage && activeLineages.length === lineages.length
-      ? [0, 25, 50, 75, 100]
-      : parameter === 'R'
-        ? [0, 1, 2, 3]
-        : undefined
-  }), [percentage, type])
+      ticks: yAxisConfig.ticks
+    }
+  }, [preset, lineages, activeLineages, yAxisConfig])
 
   const yAxisDomain = useMemo(() => {
-    if (type === 'area' && parameter === 'p') {
+    if (preset === 'percentage' && type === 'area' && lineages.length) {
       return [0, 1]
-    } else if (parameter === 'R') {
-      return [0, 3]
+    } else if (yAxisConfig.domain) {
+      return yAxisConfig.domain
     } else {
       return [0, 'auto']
     }
-  }, [type, parameter])
+  }, [preset, type, yAxisConfig.domain, lineages])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
@@ -131,10 +152,10 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
   const tooltip = useMemo(() =>
     <Tooltip
       content={CustomTooltip}
-      percentage={parameter === 'p'}
+      percentage={preset === 'percentage'}
       cursor={{ stroke: tailwindColors[stroke][type === 'area' ? '500' : '300'] }}
     />
-  , [parameter, stroke])
+  , [format, stroke])
 
   const xAxis = useMemo(() =>
     <XAxis
@@ -150,7 +171,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={parameter === 'R'}
+      allowDataOverflow={yAxisConfig.allowDataOverflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
@@ -210,11 +231,11 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
     )
   }, [lineages, stroke, type])
 
-  const rLine = useMemo(() => {
-    if (parameter !== 'R') return null
+  const xReference = useMemo(() => {
+    if (xAxisConfig.referenceLine === undefined) return null
     return (
       <ReferenceLine
-        y={1}
+        y={xAxisConfig.referenceLine}
         stroke={tailwindColors[stroke][600]}
         strokeDasharray={[8, 8]}
         label=''
@@ -222,7 +243,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         style={{ mixBlendMode: 'multiply' }}
       />
     )
-  }, [parameter, stroke])
+  }, [xAxisConfig.referenceLine, stroke])
 
   return (
     <div className={classNames('relative', className)}>
@@ -240,7 +261,7 @@ const MultiLinePlot = ({ date, setDate, area_data, parameter, type, width, heigh
         {xAxis}
         {yAxis}
         {tooltip}
-        {rLine}
+        {xReference}
         {lines}
       </ComposedChart>
       <div className='absolute top-0 left-0 pointer-events-none'>
