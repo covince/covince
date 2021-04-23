@@ -208,7 +208,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           className={classNames(
             'transition-opacity flex-grow', {
               hidden: mobileView === 'map',
-              'opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+              'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
             }
           )}
           name={AreaLookupTable[areaState.currentArea]}

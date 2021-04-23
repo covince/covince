@@ -60,6 +60,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
 }
 
 const MultiLinePlot = props => {
+  const animationDuration = 500
   const {
     parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
     yAxis: yAxisConfig = {}, xAxis: xAxisConfig = {},
@@ -190,11 +191,12 @@ const MultiLinePlot = props => {
           dataKey={lineage}
           dot={false}
           fill={colour}
-          isAnimationActive={false}
           name={lineage}
           stackId='1'
           stroke={colour}
           type='monotone'
+          animationDuration={animationDuration}
+          isAnimationActive={true}
         />
       ))
     }
@@ -206,10 +208,11 @@ const MultiLinePlot = props => {
           activeDot={false}
           dataKey={key}
           fill={colour}
-          isAnimationActive={false}
           name='_range'
           strokeWidth={0}
           type='monotone'
+          animationDuration={animationDuration}
+          isAnimationActive={true}
         />
       )
     })
@@ -223,10 +226,11 @@ const MultiLinePlot = props => {
         activeDot={{ stroke: tailwindColors[stroke][400] }}
         dataKey={lineage}
         dot={false}
-        isAnimationActive={false}
         name={lineage}
         stroke={colour}
         type='monotone'
+        animationDuration={animationDuration}
+        isAnimationActive={true}
       />
     )
   }, [lineages, stroke, type])
