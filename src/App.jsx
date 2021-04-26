@@ -31,7 +31,7 @@ function App () {
         <Suspense fallback={<Loading />}>
           <NavBar />
           <AppContainer>
-            <Covince />
+            <Covince default_data_url="/data" default_tiles_url="/map.json" />
           </AppContainer>
         </Suspense>
       </QueryClientProvider>

@@ -7,7 +7,7 @@ import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
-import { Heading } from './Typography'
+import { Heading, DescriptiveHeading } from './Typography'
 import { PillButton } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
@@ -106,22 +106,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           {...locationFilter}
           loading={isInitialLoad}
         /> }
-      { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
-          <Card className='w-80 box-content flex-shrink-0'>
+
+      <div className={classNames('-mt-18 relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-0 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
+        <Card className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
+
             <DateFilter {...dateFilter} />
-          </Card>
-          <Card className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
-          </Card>
-          <Card className='box-content flex-shrink-0 xl:flex-shrink'>
-            <LineageFilter className='h-20' {...lineageFilter} />
-          </Card>
-        </FilterSection> }
-      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
-        <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
+
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
-            <Heading>Map</Heading>
             { isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
                 <FadeTransition in={areaState.status === 'LOADING'}>
@@ -141,9 +132,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
-              <label className='block font-medium mb-1'>
+              <DescriptiveHeading className='block font-medium mb-1'>
                 Lineage
-              </label>
+              </DescriptiveHeading>
               <Select
                 value={lineageState.loading.lineage || lineageState.lineage}
                 name='lineages'
@@ -153,9 +144,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               </Select>
             </div>
             <div>
-              <label className='block font-medium mb-1'>
+              <DescriptiveHeading className='block font-medium mb-1'>
                 Color by
-              </label>
+              </DescriptiveHeading>
               <Select
                 value={lineageState.loading.colorBy || lineageState.colorBy}
                 name='parameters'
@@ -165,9 +156,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               </Select>
             </div> {lineageState.colorBy !== 'R' &&
               <div>
-                <label className='block font-medium mb-1'>
+                <DescriptiveHeading className='block font-medium mb-1'>
                   Scale
-              </label>
+              </DescriptiveHeading>
 
                 <Select
                   value={lineageState.scale || ''}
@@ -201,8 +192,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             </FadeTransition>
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
-        </div>
-        <LocalIncidence
+        </Card>
+        {/*  */}
+          <Card className="m-4 mt-10 p-0">
+           <div className='w-80 box-content flex-shrink-0'>
+            <LocationFilter className='relative mb-5' {...locationFilter} loading={areaState.status === 'LOADING'} />
+          </div>
+
+<div className=" h-full ">
+<LocalIncidence
           chartDefinitions = {data.chartDefinitions}
           colors={data.colors}
           className={classNames(
@@ -219,7 +217,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           isMobile={isMobile}
           lineColor={lineColor}
           activeLineages={lineageFilter.activeLineages}
-        />
+          />
+             <LineageFilter className='h-20' {...lineageFilter} />
+</div>
+<div className='box-content flex-shrink-0 xl:flex-shrink '>
+
+          </div>
+          </Card>
         { mobileView === 'chart' &&
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
             <LineageFilter {...lineageFilter} />
@@ -232,7 +236,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
         <FadeTransition in={isInitialLoad}>
           <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
-      </Card>
+      </div>
       { mobileView === 'map' &&
         <DateFilter
           className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
