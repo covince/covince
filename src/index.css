@@ -39,7 +39,7 @@ html, body {
   }
   
   .container {
-    @apply px-6;
+    @apply px-3;
   }
 }
 

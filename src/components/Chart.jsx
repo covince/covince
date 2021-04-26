@@ -24,7 +24,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
 
   const chart = (
     <>
-      <ChartHeading className='pl-0 font-bold  text-gray-600 pr-6 flex items-baseline justify-between 'isMobile={isMobile}>
+      <ChartHeading className='pl-12 -mb-1.5 font-bold  text-gray-600 pr-6 flex items-baseline justify-between 'isMobile={isMobile}>
         {heading}
         { allowStack &&
           <Checkbox

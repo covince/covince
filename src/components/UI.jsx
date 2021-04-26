@@ -109,9 +109,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
       <div className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-4', { 'pb-0': mobileView === 'map' })}>
         <Card className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
-
-            <DateFilter {...dateFilter} />
-
+          <DateFilter {...dateFilter} />
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             { isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
@@ -195,10 +193,11 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
         </Card>
         {/*  */}
           <Card className="my-6 p-0">
-           <div className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative mb-5' {...locationFilter} loading={areaState.status === 'LOADING'} />
-          </div>
-
+            <LocationFilter
+              className='relative h-12 flex justify-center items-center'
+              {...locationFilter}
+              loading={areaState.status === 'LOADING'}
+            />
           <div className=" h-full ">
             <LocalIncidence
               chartDefinitions = {data.chartDefinitions}
