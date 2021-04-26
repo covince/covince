@@ -107,7 +107,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           loading={isInitialLoad}
         /> }
 
-      <div className={classNames('-mt-18 relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-0 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
+      <div className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-4', { 'pb-0': mobileView === 'map' })}>
         <Card className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
 
             <DateFilter {...dateFilter} />
@@ -194,33 +194,33 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
           </div>
         </Card>
         {/*  */}
-          <Card className="m-4 mt-10 p-0">
+          <Card className="my-6 p-0">
            <div className='w-80 box-content flex-shrink-0'>
             <LocationFilter className='relative mb-5' {...locationFilter} loading={areaState.status === 'LOADING'} />
           </div>
 
-<div className=" h-full ">
-<LocalIncidence
-          chartDefinitions = {data.chartDefinitions}
-          colors={data.colors}
-          className={classNames(
-            'transition-opacity flex-grow', {
-              hidden: mobileView === 'map',
-              'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
-            }
-          )}
-          name={AreaLookupTable[areaState.currentArea]}
-          date={date}
-          setDate={persistDate}
-          selected_area={areaState.currentArea}
-          values={areaState.data}
-          isMobile={isMobile}
-          lineColor={lineColor}
-          activeLineages={lineageFilter.activeLineages}
-          />
-             <LineageFilter className='h-20' {...lineageFilter} />
-</div>
-<div className='box-content flex-shrink-0 xl:flex-shrink '>
+          <div className=" h-full ">
+            <LocalIncidence
+              chartDefinitions = {data.chartDefinitions}
+              colors={data.colors}
+              className={classNames(
+                'transition-opacity flex-grow', {
+                  hidden: mobileView === 'map',
+                  'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+                }
+              )}
+              name={AreaLookupTable[areaState.currentArea]}
+              date={date}
+              setDate={persistDate}
+              selected_area={areaState.currentArea}
+              values={areaState.data}
+              isMobile={isMobile}
+              lineColor={lineColor}
+              activeLineages={lineageFilter.activeLineages}
+            />
+            <LineageFilter className='h-20' {...lineageFilter} />
+          </div>
+          <div className='box-content flex-shrink-0 xl:flex-shrink '>
 
           </div>
           </Card>

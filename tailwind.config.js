@@ -23,7 +23,7 @@ module.exports = {
       },
       spacing: {
         header: defaultTheme.spacing[16],
-        'header-md': `calc(${defaultTheme.spacing[28]} + ${defaultTheme.spacing[2]})`,
+        'header-md': defaultTheme.spacing[20],
         18: '4.5rem' // 3 x 1.5rem / spacing.6
       },
       gridTemplateRows: {
