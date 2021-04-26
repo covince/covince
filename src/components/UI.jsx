@@ -100,33 +100,52 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   return (
     <>
-      { mobileView === 'chart' &&
+      <Chloropleth
+        className='flex-grow w-full h-full'
+        selected_area={areaState.loadingArea || areaState.currentArea}
+        tiles={tiles}
+        color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
+        max_val={results ? results.max : 0}
+        min_val={results ? results.min : 0}
+        index={results ? results.index : null}
+        date={date}
+        handleOnClick={handleOnClick}
+        isMobile={isMobile}
+        percentage={lineageState.colorBy === 'p'}
+        lineColor={lineColor}
+      />
+      <div className="absolute bg-white shadow p-6 top-0 right-0 bottom-0 overflow-y-auto w-1/2 max-w-screen-md flex flex-col">
         <LocationFilter
-          className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
+          className='relative h-12 flex justify-center items-center'
           {...locationFilter}
-          loading={isInitialLoad}
-        /> }
-
-      <div className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-4', { 'pb-0': mobileView === 'map' })}>
-        <Card className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
-          <DateFilter {...dateFilter} />
-          <div className='flex justify-between items-center space-x-3 overflow-hidden'>
-            { isMobile &&
-              <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={areaState.status === 'LOADING'}>
-                  <Spinner className='h-4 w-4 mr-2 text-gray-500' />
-                </FadeTransition>
-                <PillButton
-                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                  onClick={() => setMobileView('chart')}
-                >
-                  <span className='truncate'>{locationFilter.heading}</span>
-                  <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
-                </PillButton>
-              </div> }
-          </div>
+          loading={areaState.status === 'LOADING'}
+        />
+        <LineageFilter {...lineageFilter} className='pl-12 pr-6 my-3' />
+        <LocalIncidence
+          chartDefinitions = {data.chartDefinitions}
+          colors={data.colors}
+          className={classNames(
+            'transition-opacity flex-grow mb-3', {
+              hidden: mobileView === 'map',
+              'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+            }
+          )}
+          name={AreaLookupTable[areaState.currentArea]}
+          date={date}
+          setDate={persistDate}
+          selected_area={areaState.currentArea}
+          values={areaState.data}
+          isMobile={isMobile}
+          lineColor={lineColor}
+          activeLineages={lineageFilter.activeLineages}
+        />
+      </div>
+      <div className="absolute top-2 left-0 h-0" style={{ maxWidth: 'calc(100% - 768px)' }}>
+        <Card className='_mx-auto ml-2 flex'>
+          {/* <DateFilter {...dateFilter} className='w-96' />
+          <div className="border border-gray-200 mx-6" /> */}
           <form className={classNames(
-            'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
+            'self-center _h-20 pb-1 _w-96 grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm transition-opacity',
             { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
@@ -152,7 +171,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.colorBy !== 'R' &&
+            </div>
+            {lineageState.colorBy !== 'R' &&
               <div>
                 <DescriptiveHeading className='block font-medium mb-1'>
                   Scale
@@ -168,81 +188,161 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
                 </Select>
               </div>}
           </form>
-          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
-            <Chloropleth
-              className='flex-grow'
-              selected_area={areaState.loadingArea || areaState.currentArea}
-              tiles={tiles}
-              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
-              max_val={results ? results.max : 0}
-              min_val={results ? results.min : 0}
-              index={results ? results.index : null}
-              date={date}
-              handleOnClick={handleOnClick}
-              isMobile={isMobile}
-              percentage={lineageState.colorBy === 'p'}
-              lineColor={lineColor}
-            />
-            <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
-              <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-500 w-6 h-6' />
-              </div>
-            </FadeTransition>
-            <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
-          </div>
         </Card>
-        {/*  */}
-          <Card className="my-6 p-0">
-            <LocationFilter
-              className='relative h-12 flex justify-center items-center'
-              {...locationFilter}
-              loading={areaState.status === 'LOADING'}
-            />
-          <div className=" h-full ">
-            <LocalIncidence
-              chartDefinitions = {data.chartDefinitions}
-              colors={data.colors}
-              className={classNames(
-                'transition-opacity flex-grow', {
-                  hidden: mobileView === 'map',
-                  'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
-                }
-              )}
-              name={AreaLookupTable[areaState.currentArea]}
-              date={date}
-              setDate={persistDate}
-              selected_area={areaState.currentArea}
-              values={areaState.data}
-              isMobile={isMobile}
-              lineColor={lineColor}
-              activeLineages={lineageFilter.activeLineages}
-            />
-            <LineageFilter className='h-20' {...lineageFilter} />
-          </div>
-          <div className='box-content flex-shrink-0 xl:flex-shrink '>
-
-          </div>
-          </Card>
-        { mobileView === 'chart' &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
-            <LineageFilter {...lineageFilter} />
-            <div className='grid place-items-center h-18'>
-              <PillButton onClick={() => setMobileView('map')}>
-                View map on {formattedDate}
-              </PillButton>
-            </div>
-          </StickyMobileSection> }
-        <FadeTransition in={isInitialLoad}>
-          <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
-        </FadeTransition>
       </div>
-      { mobileView === 'map' &&
-        <DateFilter
-          className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
-          {...dateFilter}
-        /> }
+      <div className="absolute bottom-2 left-0 h-0 w-full flex items-end" style={{ maxWidth: 'calc(100% - 768px)' }}>
+        <Card className='mx-auto'>
+          <DateFilter {...dateFilter} className='w-96' />
+        </Card>
+      </div>
     </>
   )
+
+  // return (
+  //   <>
+  //     { mobileView === 'chart' &&
+  //       <LocationFilter
+  //         className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
+  //         {...locationFilter}
+  //         loading={isInitialLoad}
+  //       /> }
+
+  //     <div className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-4', { 'pb-0': mobileView === 'map' })}>
+  //       <Card className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
+  //         <DateFilter {...dateFilter} />
+  //         <div className='flex justify-between items-center space-x-3 overflow-hidden'>
+  //           { isMobile &&
+  //             <div className='flex items-center max-w-none min-w-0'>
+  //               <FadeTransition in={areaState.status === 'LOADING'}>
+  //                 <Spinner className='h-4 w-4 mr-2 text-gray-500' />
+  //               </FadeTransition>
+  //               <PillButton
+  //                 className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+  //                 onClick={() => setMobileView('chart')}
+  //               >
+  //                 <span className='truncate'>{locationFilter.heading}</span>
+  //                 <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
+  //               </PillButton>
+  //             </div> }
+  //         </div>
+  //         <form className={classNames(
+  //           'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
+  //           { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
+  //         )}>
+  //           <div>
+  //             <DescriptiveHeading className='block font-medium mb-1'>
+  //               Lineage
+  //             </DescriptiveHeading>
+  //             <Select
+  //               value={lineageState.loading.lineage || lineageState.lineage}
+  //               name='lineages'
+  //               onChange={e => lineageActions.setLineage(e.target.value)}
+  //             >
+  //               {unique_lineages.map((x) => <option key={x}>{x}</option>)}
+  //             </Select>
+  //           </div>
+  //           <div>
+  //             <DescriptiveHeading className='block font-medium mb-1'>
+  //               Color by
+  //             </DescriptiveHeading>
+  //             <Select
+  //               value={lineageState.loading.colorBy || lineageState.colorBy}
+  //               name='parameters'
+  //               onChange={e => lineageActions.colorBy(e.target.value)}
+  //             >
+  //               {parameter_options}
+  //             </Select>
+  //           </div> {lineageState.colorBy !== 'R' &&
+  //             <div>
+  //               <DescriptiveHeading className='block font-medium mb-1'>
+  //                 Scale
+  //             </DescriptiveHeading>
+
+  //               <Select
+  //                 value={lineageState.scale || ''}
+  //                 name='color_scale_type'
+  //                 onChange={e => lineageActions.setScale(e.target.value)}
+  //               >
+  //                 <option value='linear'>Linear</option>
+  //                 <option value='quadratic'>Quadratic</option>
+  //               </Select>
+  //             </div>}
+  //         </form>
+  //         <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
+  //           <Chloropleth
+  //             className='flex-grow'
+  //             selected_area={areaState.loadingArea || areaState.currentArea}
+  //             tiles={tiles}
+  //             color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
+  //             max_val={results ? results.max : 0}
+  //             min_val={results ? results.min : 0}
+  //             index={results ? results.index : null}
+  //             date={date}
+  //             handleOnClick={handleOnClick}
+  //             isMobile={isMobile}
+  //             percentage={lineageState.colorBy === 'p'}
+  //             lineColor={lineColor}
+  //           />
+  //           <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
+  //             <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>
+  //               <Spinner className='text-gray-500 w-6 h-6' />
+  //             </div>
+  //           </FadeTransition>
+  //           <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
+  //         </div>
+  //       </Card>
+  //       {/*  */}
+  //         <Card className="my-6 p-0">
+  //           <LocationFilter
+  //             className='relative h-12 flex justify-center items-center'
+  //             {...locationFilter}
+  //             loading={areaState.status === 'LOADING'}
+  //           />
+  //         <div className=" h-full ">
+  //           <LocalIncidence
+  //             chartDefinitions = {data.chartDefinitions}
+  //             colors={data.colors}
+  //             className={classNames(
+  //               'transition-opacity flex-grow', {
+  //                 hidden: mobileView === 'map',
+  //                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+  //               }
+  //             )}
+  //             name={AreaLookupTable[areaState.currentArea]}
+  //             date={date}
+  //             setDate={persistDate}
+  //             selected_area={areaState.currentArea}
+  //             values={areaState.data}
+  //             isMobile={isMobile}
+  //             lineColor={lineColor}
+  //             activeLineages={lineageFilter.activeLineages}
+  //           />
+  //           <LineageFilter className='h-20' {...lineageFilter} />
+  //         </div>
+  //         <div className='box-content flex-shrink-0 xl:flex-shrink '>
+
+  //         </div>
+  //         </Card>
+  //       { mobileView === 'chart' &&
+  //         <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
+  //           <LineageFilter {...lineageFilter} />
+  //           <div className='grid place-items-center h-18'>
+  //             <PillButton onClick={() => setMobileView('map')}>
+  //               View map on {formattedDate}
+  //             </PillButton>
+  //           </div>
+  //         </StickyMobileSection> }
+  //       <FadeTransition in={isInitialLoad}>
+  //         <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
+  //       </FadeTransition>
+  //     </div>
+  //     { mobileView === 'map' &&
+  //       <DateFilter
+  //         className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
+  //         {...dateFilter}
+  //       /> }
+  //   </>
+  // )
 }
 
 export default UI

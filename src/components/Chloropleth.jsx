@@ -54,7 +54,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
 
   const formatValue = useMemo(() =>
     percentage
-      ? v => `${v}%`
+      ? v => `${v - Math.round(v) === 0 ? v : v.toFixed(1)}%`
       : v => Math.round(v).toLocaleString()
   , [percentage])
 
@@ -331,7 +331,7 @@ const Chloropleth = (props) => {
               return 'grab'
             }}
           >
-            <NavigationControl className='right-2 top-2 z-10' />
+            <NavigationControl className='left-2 bottom-12 mb-1 z-10' />
             {popupFeature &&
               <Popup
                 closeButton={false}

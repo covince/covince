@@ -36,7 +36,7 @@ const NavBar = () => {
   return (
     <header className={classNames('transition-all duration-500 ease-in-out bg-gradient-to-r from-blue-900 to-blue-900', height)}>
       <div className='flex items-center h-header md:h-header-md'>
-        <div className="flex items-baseline container text-white px-4">
+        <div className="flex items-baseline w-full text-white px-4">
           <NavLink className="font-bold text-2xl flex-shrink-0" to="/">
             <span><IoMdGlobe size="1.3em" className="inline-block mr-1 mb-1 "/>CovGlobe</span>
           </NavLink>

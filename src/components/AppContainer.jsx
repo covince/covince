@@ -4,7 +4,7 @@ import React from 'react'
 const AppContainer = props => (
   <main
     {...props}
-    className={classNames('container md:py-4 flex flex-col', props.className)}
+    className={classNames('flex flex-col relative', props.className)}
   />
 )
 
