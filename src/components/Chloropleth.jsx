@@ -277,7 +277,7 @@ const Chloropleth = (props) => {
 
   const formatValue = useMemo(() =>
     percentage
-      ? v => `${v.toFixed(1)}%`
+      ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
       : v => v.toFixed(2)
   , [percentage])
 

@@ -122,7 +122,8 @@ const MultiLinePlot = props => {
         tickFormatter: value => {
           if (value === 0) return '0%'
           if (value >= 100) return '100%'
-          return `${parseFloat(value).toPrecision(2)}%`
+          if (!Number.isInteger(value)) return `${value.toFixed(1)}%`
+          return `${value}%`
         }
       }
     }
