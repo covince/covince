@@ -54,7 +54,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
 
   const formatValue = useMemo(() =>
     percentage
-      ? v => `${v}%`
+      ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
       : v => Math.round(v).toLocaleString()
   , [percentage])
 
