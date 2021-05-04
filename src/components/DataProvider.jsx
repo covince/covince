@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 import useQueryAsState from '../hooks/useQueryAsState'
@@ -17,21 +17,21 @@ const tolMutedQualitative = [
   '#DDDDDD' // grey
 ]
 
-const DataProvider = ({ children, default_data_url, default_tiles_url }) => {
+const DataProvider = ({ children, default_data_url, default_tiles_url, onLoad }) => {
   const [{ geojson, dataPath }, updateQuery] = useQueryAsState({
     geojson: default_tiles_url,
     dataPath: default_data_url
   })
 
   const getData = async () => {
-    const { data } = await axios.get(`${dataPath}/lists.json`)
+    const { data, headers } = await axios.get(`${dataPath}/lists.json`)
     if (data.colors === undefined) {
       data.colors = tolMutedQualitative
     }
     if (data.frameLength === undefined) {
       data.frameLength = 100
     }
-    return data
+    return [data, headers['last-modified']]
   }
   const getTiles = async () => {
     const { data } = await axios.get(geojson)
@@ -39,7 +39,13 @@ const DataProvider = ({ children, default_data_url, default_tiles_url }) => {
     return data
   }
 
-  const { data } = useQuery('data', getData, { suspense: true })
+  const { data: lists } = useQuery('data', getData, { suspense: true })
+  const [data, lastModified] = lists || []
+  useEffect(() => {
+    if (onLoad && lastModified) {
+      onLoad({ lastModified })
+    }
+  }, [onLoad, lastModified])
 
   const { data: tiles } = useQuery('tiles', getTiles, { suspense: true })
 

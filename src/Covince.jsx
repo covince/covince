@@ -10,6 +10,7 @@ const twentyFourHoursInMs = 1000 * 60 * 60 * 24
 const Covince = ({
   default_data_url = './data',
   default_tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
+  onLoad,
   ...props
 }) => {
   const queryClient = useRef(new QueryClient({
@@ -28,6 +29,7 @@ const Covince = ({
       <DataProvider
         default_data_url={default_data_url}
         default_tiles_url={default_tiles_url}
+        onLoad={onLoad}
       >
         <UI {...props} />
       </DataProvider>
