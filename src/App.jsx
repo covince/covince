@@ -24,7 +24,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar>
           { formattedVersion &&
-            <p className='text-sm text-right'>
+            <p className='text-sm text-right text-indigo-100'>
               Data updated <strong className='block'>{formattedVersion}</strong>
             </p> }
         </NavBar>
