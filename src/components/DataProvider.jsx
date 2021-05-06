@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 import useQueryAsState from '../hooks/useQueryAsState'
@@ -41,16 +41,11 @@ const DataProvider = ({ children, default_data_url, default_tiles_url, onLoad })
 
   const { data: lists } = useQuery('data', getData, { suspense: true })
   const [data, lastModified] = lists || []
-  useEffect(() => {
-    if (onLoad && lastModified) {
-      onLoad({ lastModified })
-    }
-  }, [onLoad, lastModified])
 
   const { data: tiles } = useQuery('tiles', getTiles, { suspense: true })
 
   return (
-    React.cloneElement(children, { data: data, tiles: tiles, dataPath: dataPath })
+    React.cloneElement(children, { data, tiles, dataPath, lastModified })
   )
 }
 export default DataProvider

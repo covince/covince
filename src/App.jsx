@@ -1,10 +1,9 @@
-import React, { Suspense, useState, useMemo } from 'react'
+import React, { Suspense } from 'react'
 
 import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
 import Covince from './Covince'
-import { format } from 'date-fns'
 
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
@@ -13,23 +12,12 @@ const Loading = () => (
 )
 
 function App () {
-  const [info, setInfo] = useState(null)
-  const formattedVersion = useMemo(() => {
-    if (info) return format(new Date(info.lastModified), 'dd MMMM yyy, HH:mm')
-    return null
-  }, [info])
-
   return (
     <>
       <Suspense fallback={<Loading />}>
-        <NavBar>
-          { formattedVersion &&
-            <p className='text-sm text-right text-indigo-100'>
-              Data updated <strong className='block'>{formattedVersion}</strong>
-            </p> }
-        </NavBar>
+        <NavBar />
         <AppContainer>
-          <Covince onLoad={setInfo} />
+          <Covince />
         </AppContainer>
       </Suspense>
     </>
