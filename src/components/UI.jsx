@@ -130,7 +130,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
         {!isMobile && lastModified &&
           <div className='absolute bottom-0 right-0 py-0 px-2 border-t border-l border-gray-200 rounded-tl-md'>
-            <p className='text-xs tracking-wide leading-6 text-heading _font-medium'>
+            <p className='text-xs tracking-wide leading-6 text-heading'>
               Data updated <span className='font-medium'>{formattedLastModified}</span>
             </p>
           </div> }
