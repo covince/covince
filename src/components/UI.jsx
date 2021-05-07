@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
-import { BsArrowRightShort } from 'react-icons/bs'
+import { BsArrowRightShort, BsMap } from 'react-icons/bs'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
@@ -25,7 +25,7 @@ import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
+const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
   const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
 
   const unique_lineages = data.lineages
@@ -98,8 +98,17 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
 
   const lineageFilter = useLineageFilter(unique_lineages, data.colors)
 
+  const formattedLastModified = useMemo(
+    () => lastModified ? format(new Date(lastModified), 'd MMMM y, HH:mm') : '',
+    [lastModified]
+  )
+
   return (
     <>
+      { isMobile && lastModified &&
+        <p className='text-xs tracking-wide leading-6 text-center text-heading'>
+          Data updated <span className='font-medium'>{formattedLastModified}</span>
+        </p> }
       { mobileView === 'chart' &&
         <LocationFilter
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
@@ -118,7 +127,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             <LineageFilter className='h-20' {...lineageFilter} />
           </Card>
         </FilterSection> }
-      <Card className={classNames('relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 md:px-6 md:py-6', { 'pb-0': mobileView === 'map' })}>
+      <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
         <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
@@ -167,8 +176,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
               <div>
                 <label className='block font-medium mb-1'>
                   Scale
-              </label>
-
+                </label>
                 <Select
                   value={lineageState.scale || ''}
                   name='color_scale_type'
@@ -177,7 +185,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
                   <option value='linear'>Linear</option>
                   <option value='quadratic'>Quadratic</option>
                 </Select>
-              </div>}
+              </div> }
           </form>
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
@@ -202,29 +210,38 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath }) => {
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <LocalIncidence
-          chartDefinitions = {data.chartDefinitions}
-          colors={data.colors}
-          className={classNames(
-            'transition-opacity flex-grow', {
-              hidden: mobileView === 'map',
-              'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
-            }
-          )}
-          name={AreaLookupTable[areaState.currentArea]}
-          date={date}
-          setDate={persistDate}
-          selected_area={areaState.currentArea}
-          values={areaState.data}
-          isMobile={isMobile}
-          lineColor={lineColor}
-          activeLineages={lineageFilter.activeLineages}
-        />
+        <div className='flex-grow flex flex-col'>
+          <LocalIncidence
+            chartDefinitions = {data.chartDefinitions}
+            colors={data.colors}
+            className={classNames(
+              'transition-opacity flex-grow', {
+                hidden: mobileView === 'map',
+                'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+              }
+            )}
+            name={AreaLookupTable[areaState.currentArea]}
+            date={date}
+            setDate={persistDate}
+            selected_area={areaState.currentArea}
+            values={areaState.data}
+            isMobile={isMobile}
+            lineColor={lineColor}
+            activeLineages={lineageFilter.activeLineages}
+          />
+          { !isMobile && lastModified &&
+            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>
+              <p className='text-xs tracking-wide leading-6 text-heading'>
+                Data updated <span className='font-medium'>{formattedLastModified}</span>
+              </p>
+            </div> }
+        </div>
         { mobileView === 'chart' &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 pt-3'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3'>
             <LineageFilter {...lineageFilter} />
-            <div className='grid place-items-center h-18'>
-              <PillButton onClick={() => setMobileView('map')}>
+            <div className='grid place-items-center h-12 box-content pt-1'>
+              <PillButton onClick={() => setMobileView('map')} className='flex items-center'>
+                <BsMap className='h-5 w-5 mr-3' />
                 View map on {formattedDate}
               </PillButton>
             </div>
