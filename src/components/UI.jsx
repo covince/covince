@@ -99,7 +99,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const lineageFilter = useLineageFilter(unique_lineages, data.colors)
 
   const formattedLastModified = useMemo(
-    () => lastModified ? format(new Date(lastModified), 'do MMMM y, HH:mm') : '',
+    () => lastModified ? format(new Date(lastModified), 'd MMMM y, HH:mm') : '',
     [lastModified]
   )
 
@@ -128,12 +128,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
-        {!isMobile && lastModified &&
-          <div className='absolute bottom-0 right-0 py-0 px-2 border-t border-l border-gray-200 rounded-tl-md'>
-            <p className='text-xs tracking-wide leading-6 text-heading'>
-              Data updated <span className='font-medium'>{formattedLastModified}</span>
-            </p>
-          </div> }
         <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
@@ -181,7 +175,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div> {lineageState.colorBy !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
-                    Scale
+                  Scale
                 </label>
                 <Select
                   value={lineageState.scale || ''}
@@ -216,24 +210,32 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <LocalIncidence
-          chartDefinitions = {data.chartDefinitions}
-          colors={data.colors}
-          className={classNames(
-            'transition-opacity flex-grow', {
-              hidden: mobileView === 'map',
-              'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
-            }
-          )}
-          name={AreaLookupTable[areaState.currentArea]}
-          date={date}
-          setDate={persistDate}
-          selected_area={areaState.currentArea}
-          values={areaState.data}
-          isMobile={isMobile}
-          lineColor={lineColor}
-          activeLineages={lineageFilter.activeLineages}
-        />
+        <div className='flex-grow flex flex-col'>
+          <LocalIncidence
+            chartDefinitions = {data.chartDefinitions}
+            colors={data.colors}
+            className={classNames(
+              'transition-opacity flex-grow', {
+                hidden: mobileView === 'map',
+                'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+              }
+            )}
+            name={AreaLookupTable[areaState.currentArea]}
+            date={date}
+            setDate={persistDate}
+            selected_area={areaState.currentArea}
+            values={areaState.data}
+            isMobile={isMobile}
+            lineColor={lineColor}
+            activeLineages={lineageFilter.activeLineages}
+          />
+          { !isMobile && lastModified &&
+            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>
+              <p className='text-xs tracking-wide leading-6 text-heading'>
+                Data updated <span className='font-medium'>{formattedLastModified}</span>
+              </p>
+            </div> }
+        </div>
         { mobileView === 'chart' &&
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3'>
             <LineageFilter {...lineageFilter} />
