@@ -18,3 +18,7 @@
 .heron-filter-section::-webkit-scrollbar-thumb {
   @apply rounded bg-gray-300;
 }
+
+.heron-filter-section::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
