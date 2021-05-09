@@ -128,7 +128,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
-        <div className={classNames('flex flex-col flex-grow', { hidden: mobileView === 'chart' })}>
+        <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'chart' })}>
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
             { isMobile &&
@@ -210,13 +210,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <div className='flex-grow flex flex-col'>
+        <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'map' })}>
           <LocalIncidence
             chartDefinitions = {data.chartDefinitions}
             colors={data.colors}
             className={classNames(
               'transition-opacity flex-grow', {
-                hidden: mobileView === 'map',
                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
               }
             )}
