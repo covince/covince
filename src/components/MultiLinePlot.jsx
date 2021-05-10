@@ -1,10 +1,12 @@
 import './MultiLinePlot.css'
 
-import React, { useMemo } from 'react'
-import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
+import React, { useCallback, useMemo } from 'react'
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
+
+import useQueryAsState from '../hooks/useQueryAsState'
 
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
@@ -13,7 +15,8 @@ const formatLargeNumber = number => {
 
 const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
-    payload.sort((a, b) => {
+    const _payload = payload.filter(_ => _.value > 0)
+    _payload.sort((a, b) => {
       if (a.value < b.value) return 1
       if (a.value > b.value) return -1
       return 0
@@ -23,7 +26,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
         <h4 className='text-center text-gray-700 font-bold mb-1'>
           {format(new Date(label), 'd MMMM yyyy')}
         </h4>
-        <table className='tabular-nums'>
+        <table className='tabular-nums w-full'>
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
@@ -32,7 +35,8 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
             </tr>
           </thead>
           <tbody>
-          {payload.map(item => {
+          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700'>No data</td></tr>}
+          {_payload.map(item => {
             if (item.name === '_range') {
               return null
             }
@@ -61,18 +65,29 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
 
 const MultiLinePlot = props => {
   const animationDuration = 500
+
   const {
     parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
     yAxis: yAxisConfig = {}, xAxis: xAxisConfig = {},
     date, setDate, area_data, activeLineages,
     type, width, height = 120, stroke = 'blueGray', className
   } = props
+
+  const [{ xMin, xMax }, updateQuery] = useQueryAsState()
+
+  const isWithinZoom = useCallback((date) => {
+    if (xMin && xMax) {
+      return (date >= xMin && date <= xMax) || (date >= xMax && date <= xMin)
+    }
+    return true
+  }, [xMin, xMax])
+
   const chart = useMemo(() => {
     const dataByDate = {}
     const presentLineages = new Set()
 
     for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total') {
+      if (d.parameter === parameter && d.lineage !== 'total' && isWithinZoom(d.date)) {
         dataByDate[d.date] = {
           ...dataByDate[d.date],
           date: d.date,
@@ -95,7 +110,7 @@ const MultiLinePlot = props => {
       lineages,
       data: Object.values(dataByDate)
     }
-  }, [area_data, activeLineages])
+  }, [area_data, activeLineages, isWithinZoom])
 
   const { lineages, data } = chart
 
@@ -148,6 +163,8 @@ const MultiLinePlot = props => {
     }
   }, [preset, type, yAxisConfig.domain, lineages])
 
+  const [zoomArea, setZoomArea] = React.useState({})
+
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
 
@@ -155,7 +172,7 @@ const MultiLinePlot = props => {
     <Tooltip
       content={CustomTooltip}
       percentage={preset === 'percentage'}
-      cursor={{ stroke: tailwindColors[stroke][type === 'area' ? '500' : '300'] }}
+      cursor={{ stroke: tailwindColors[stroke][400] }}
     />
   , [format, stroke])
 
@@ -251,7 +268,7 @@ const MultiLinePlot = props => {
   }, [xAxisConfig.referenceLine, stroke])
 
   return (
-    <div className={classNames('relative', className)}>
+    <div className={classNames('relative select-none', className)} onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}>
       <ComposedChart
         {...chartProps}
         onClick={item => {
@@ -259,6 +276,9 @@ const MultiLinePlot = props => {
             setDate(item.activeLabel)
           }
         }}
+        onMouseDown={(e) => setZoomArea({ start: e.activeLabel })}
+        onMouseMove={(e) => zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel })}
+        onMouseUp={() => { updateQuery({ xMin: zoomArea.start, xMax: zoomArea.end }); setZoomArea({}) }}
         cursor='pointer'
       >
         {grid}
@@ -268,6 +288,9 @@ const MultiLinePlot = props => {
         {tooltip}
         {xReference}
         {lines}
+        {zoomArea.start && zoomArea.end
+          ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
+          : null}
       </ComposedChart>
       <div className='absolute top-0 left-0 pointer-events-none'>
         <ComposedChart {...chartProps}>
