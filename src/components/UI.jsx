@@ -72,11 +72,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }, [areaState, isMobile, AreaLookupTable.overview])
 
-  const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
+  const { dateFormat = 'd MMMM y', label: timelineLabel } = data.timeline || {}
+  const formattedDate = useMemo(() => format(new Date(date), dateFormat), [date])
 
   const dateFilter = {
+    label: timelineLabel,
     dates: results ? results.dates : null,
-    label: formattedDate,
+    heading: formattedDate,
     value: date,
     onChange: (e) => {
       const { value } = e.target
