@@ -105,6 +105,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     [lastModified]
   )
 
+  const mapValues = useMemo(() => {
+    const values = {}
+    if (results === null) return values
+    for (const { area, lookup } of results.values) {
+      values[area] = lookup[date]
+    }
+    return values
+  }, [results, date])
+
   return (
     <>
       { isMobile && lastModified &&
@@ -165,7 +174,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div>
             <div>
               <label className='block font-medium mb-1'>
-                Color by
+                Colour by
               </label>
               <Select
                 value={lineageState.loading.colorBy || lineageState.colorBy}
@@ -193,12 +202,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <Chloropleth
               className='flex-grow'
               selected_area={areaState.loadingArea || areaState.currentArea}
-              tiles={tiles}
+              geojson={tiles}
+              config={tiles.config}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
-              index={results ? results.index : null}
-              date={date}
+              values={mapValues}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               percentage={lineageState.colorBy === 'p'}

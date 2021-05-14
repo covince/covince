@@ -1,4 +1,3 @@
-import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
 import React, { useState, useMemo, useEffect } from 'react'
@@ -61,7 +60,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
-      <div className='grid grid-cols-3 text-xs leading-6'>
+      <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
           {formatValue(dmin)}
         </span>
@@ -121,13 +120,13 @@ const doesNotMatch = (a, b) => (
 )
 
 const Chloropleth = (props) => {
-  const { tiles, date, index, selected_area } = props
+  const { geojson, values, selected_area, config = {} } = props
 
   const [query, updateQuery] = useQueryAsState(
     mapViewportToQuery({
-      latitude: tiles.config.default_lat,
-      longitude: tiles.config.default_lon,
-      zoom: props.isMobile ? tiles.config.default_zoom_mob : tiles.config.default_zoom,
+      latitude: config.default_lat,
+      longitude: config.default_lon,
+      zoom: props.isMobile ? config.default_zoom_mob : config.default_zoom,
       pitch: 0,
       bearing: 0
     })
@@ -136,11 +135,11 @@ const Chloropleth = (props) => {
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
-    ...mapQueryToViewport(query, tiles.config.bounds)
+    ...mapQueryToViewport(query, config.bounds)
   })
 
   useEffect(() => {
-    setViewport({ ...viewport, ...mapQueryToViewport(query, tiles.config.bounds) })
+    setViewport({ ...viewport, ...mapQueryToViewport(query, config.bounds) })
   }, getDependencyArray(query))
 
   useEffect(() => {
@@ -154,39 +153,44 @@ const Chloropleth = (props) => {
   }, getDependencyArray(viewport))
 
   const onViewportChange = newViewport => {
-    clampViewport(newViewport, tiles.config.bounds)
+    clampViewport(newViewport, config.bounds)
     setViewport(newViewport)
   }
 
-  const data = useMemo(() => {
-    if (tiles === null) {
-      return null
+  const features = useMemo(() => {
+    const features = {
+      selected: [],
+      active: [],
+      nulls: [],
+      others: []
     }
 
-    if (index === null) {
-      return tiles
+    if (values === null) {
+      return features
     }
 
-    const features = tiles.features.map(f => {
-      const { area_id } = f.properties
-
-      const values = index ? index[area_id] : null
-      const value = values ? values[date] : undefined
-      return {
-        ...f,
-        properties: {
-          ...f.properties,
-          value,
-          selected: area_id === selected_area
+    for (const feature of geojson.features) {
+      const { area_id } = feature.properties
+      const value = values[area_id]
+      if (value === null) {
+        features.nulls.push(feature)
+        if (area_id === selected_area) features.selected.push(feature)
+      } else if (value !== undefined) {
+        const _feature = {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            value
+          }
         }
+        features.active.push(_feature)
+        if (area_id === selected_area) features.selected.push(feature)
+      } else {
+        features.others.push(feature)
       }
-    })
-
-    return {
-      ...tiles,
-      features
     }
-  }, [tiles, date, index, selected_area])
+    return features
+  }, [geojson, values, selected_area])
 
   const { color_scale_type, min_val, max_val } = props
 
@@ -220,56 +224,105 @@ const Chloropleth = (props) => {
   const mapStyle = useMemo(() => ({
     version: 8,
     sources: {
-      areas: {
+      selectedAreas: {
         type: 'geojson',
-        data
+        data: {
+          ...geojson,
+          features: features.selected
+        }
+      },
+      activeAreas: {
+        type: 'geojson',
+        data: {
+          ...geojson,
+          features: features.active
+        }
+      },
+      nullAreas: {
+        type: 'geojson',
+        data: {
+          ...geojson,
+          features: features.nulls
+        }
+      },
+      otherAreas: {
+        type: 'geojson',
+        data: {
+          ...geojson,
+          features: features.others
+        }
       }
     },
     layers: [
       {
-        id: 'areas-fill',
+        id: 'other-areas-fill',
         type: 'fill',
-        source: 'areas',
+        source: 'otherAreas',
         paint: {
-          'fill-color': [
-            'case',
-            ['==', ['get', 'value'], null],
-            '#fff',
-            [
-              'interpolate',
-              ['linear'],
-              color_scale_type === 'quadratic'
-                ? ['sqrt', ['get', 'value']]
-                : ['get', 'value'],
-              ...colorScale
-            ]
-          ]
-          // 'fill-color-transition': { duration: 150 }
+          'fill-color': '#fff'
         }
       },
       {
-        id: 'areas-line',
+        id: 'other-areas-line',
         type: 'line',
-        source: 'areas',
+        source: 'otherAreas',
         paint: {
-          'line-color': ['case', ['==', ['get', 'value'], null],
-            tailwindColors[lineColor][300], [
-              'case',
-              ['get', 'selected'],
-              tailwindColors[lineColor][900],
-              tailwindColors[lineColor][600]
-            ]],
-          // 'line-color-transition': { duration: 300 },
-          'line-width': [
-            'case',
-            ['get', 'selected'],
-            2,
-            0.5
+          'line-color': tailwindColors[lineColor][300],
+          'line-width': 0.5
+        }
+      },
+      {
+        id: 'null-areas-fill',
+        type: 'fill',
+        source: 'nullAreas',
+        paint: {
+          'fill-color': '#fff'
+        }
+      },
+      {
+        id: 'null-areas-line',
+        type: 'line',
+        source: 'nullAreas',
+        paint: {
+          'line-color': tailwindColors[lineColor][300],
+          'line-width': 0.5
+        }
+      },
+      {
+        id: 'active-areas-fill',
+        type: 'fill',
+        source: 'activeAreas',
+        paint: {
+          'fill-color': [
+            'interpolate',
+            ['linear'],
+            color_scale_type === 'quadratic'
+              ? ['sqrt', ['get', 'value']]
+              : ['get', 'value'],
+            ...colorScale
           ]
+        }
+      },
+      {
+        id: 'active-areas-line',
+        type: 'line',
+        source: 'activeAreas',
+        paint: {
+          'line-color': tailwindColors[lineColor][600],
+          'line-width': 0.5
+        }
+      },
+      {
+        id: 'selected-areas-line',
+        type: 'line',
+        source: 'selectedAreas',
+        paint: {
+          'line-color': tailwindColors[lineColor][900],
+          'line-width': 2
         }
       }
     ]
-  }), [data, colorScale, color_scale_type])
+  }), [features, colorScale, color_scale_type])
 
   const [popupFeature, setPopupFeature] = useState(null)
 
@@ -278,7 +331,7 @@ const Chloropleth = (props) => {
   const formatValue = useMemo(() =>
     percentage
       ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
-      : v => v.toFixed(2)
+      : v => `${Number.isInteger(v) ? v : v.toFixed(2)}`
   , [percentage])
 
   return (
@@ -296,13 +349,13 @@ const Chloropleth = (props) => {
         <div ref={measureRef} className={classnames(props.className, 'relative z-0')}>
           <ReactMapGL
             {...viewport}
-            minZoom={tiles.config.min_zoom}
+            minZoom={config.min_zoom}
             disableTokenWarning
             onViewportChange={onViewportChange}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
             className='bg-gray-50'
-            interactiveLayerIds={['areas-fill']}
+            interactiveLayerIds={['null-areas-fill', 'active-areas-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (!feature) {
@@ -313,7 +366,7 @@ const Chloropleth = (props) => {
             }}
             onHover={e => {
               const [feature] = e.features
-              if (feature && 'value' in feature.properties && feature.properties.value !== 'null') {
+              if (feature && feature.properties.value !== 'null') {
                 if (feature.properties.lat === undefined) {
                   // Hack where if no central point is specified
                   // we use mouse position for popup
