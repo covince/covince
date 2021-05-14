@@ -5,11 +5,11 @@ import Slider from './Slider'
 import Button from './Button'
 import { Heading, DescriptiveHeading } from './Typography'
 
-const DateFilter = ({ className, dates = [], label, value, onChange, persistDate, playing, setPlaying }) => (
+const DateFilter = ({ className, dates = [], heading, description = 'Timeline', value, onChange, persistDate, playing, setPlaying }) => (
   <div className={className}>
     <div className='h-6 flex justify-between items-start'>
       <DescriptiveHeading>
-        Select date
+        {description}
       </DescriptiveHeading>
       <Button
         className='fill-current flex items-center pl-3 pr-1 h-9'
@@ -27,7 +27,7 @@ const DateFilter = ({ className, dates = [], label, value, onChange, persistDate
       </Button>
     </div>
     <div className='flex items-center justify-between h-6'>
-      <Heading>{label}</Heading>
+      <Heading>{heading}</Heading>
     </div>
     <div className='h-6 mt-2'>
       <Slider
