@@ -42,10 +42,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
     for (let i = 0; i < scale.length; i += 2) {
       const value = scale[i]
       const color = scale[i + 1]
-      const range =
-        type === 'quadratic'
-          ? Math.sqrt(dmax) - Math.sqrt(dmin)
-          : dmax - dmin
+      const range = dmax - dmin
       const percent = value / range * 100
       stops.push(`${color} ${percent}%`)
     }
