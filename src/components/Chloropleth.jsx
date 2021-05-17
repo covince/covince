@@ -238,9 +238,7 @@ const Chloropleth = (props) => {
             [
               'interpolate',
               ['linear'],
-              color_scale_type === 'quadratic'
-                ? ['sqrt', ['get', 'value']]
-                : ['get', 'value'],
+               ['get', 'value'],
               ...colorScale
             ]
           ]
