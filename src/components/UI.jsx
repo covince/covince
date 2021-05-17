@@ -74,6 +74,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { dateFormat = 'd MMMM y', label: timelineLabel } = data.timeline || {}
   const formattedDate = useMemo(() => format(new Date(date), dateFormat), [date])
+  const formattedDateMob = useMemo(() => format(new Date(date), "d MMMM y"), [date])
 
   const dateFilter = {
     label: timelineLabel,
@@ -243,7 +244,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='grid place-items-center h-12 box-content pt-1'>
               <PillButton onClick={() => setMobileView('map')} className='flex items-center'>
                 <BsMap className='h-5 w-5 mr-3' />
-                View map on {formattedDate}
+                View map on {formattedDateMob}
               </PillButton>
             </div>
           </StickyMobileSection> }
