@@ -37,7 +37,7 @@ const makeGradient = (transform) => {
   return `linear-gradient(to right, ${stops.join(',')})`
 }
 
-const linearGradient = makeGradient(v => 1 - v * 0.87)
+const linearGradient = makeGradient(v => 1.13 - v)
 const quadGradient = makeGradient(v => 1.13 - Math.sqrt(v))
 
 const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
