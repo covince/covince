@@ -49,7 +49,7 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
       const percent = value / range * 100
       stops.push(`${color} ${percent}%`)
     }
-    return  type === 'quadratic' ?`linear-gradient(to right)`  :`linear-gradient(to right, ${stops.join(',')})`
+    return  type === 'quadratic' ?`linear-gradient(to right, white 0%, white 100%)`  :`linear-gradient(to right, ${stops.join(',')})`
   }, [dmin, dmax, scale])
 
   const formatValue = useMemo(() =>
