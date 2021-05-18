@@ -68,7 +68,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
-      <div className='grid grid-cols-3 text-xs leading-6'>
+      <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
           {formatValue(dmin, 'floor')}
         </span>
