@@ -24,8 +24,10 @@ const colorStops = [
   { index: 1, rgb: 'rgb(252, 253, 191)' }
 ].map(x => {
   const index = (x.index - 0.13) / (1 - 0.13)
-  return { index, rgb: interpolateMagma(index + 0.13) }
-}).slice(1) // Cut off the first bit of magma with black
+  return { index, rgb: interpolateMagma(x.index) }
+}).slice(0) // Cut off the first bit of magma with black
+
+console.log(colorStops)
 
 const makeGradient = (transform) => {
   const stops = []
@@ -37,8 +39,8 @@ const makeGradient = (transform) => {
   return `linear-gradient(to right, ${stops.join(',')})`
 }
 
-const linearGradient = makeGradient(v => 1.13 - v)
-const quadGradient = makeGradient(v => 1.13 - Math.sqrt(v))
+const linearGradient = makeGradient(v => 1.13 - (v + 0.13) / 1.13)
+const quadGradient = makeGradient(v => 1.13 - (Math.sqrt(v) + 0.13) / 1.13)
 
 const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   let midpoint
