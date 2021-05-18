@@ -56,7 +56,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   const formatValue = useMemo(() =>
     percentage
       ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
-      : v => Math.round(v).toLocaleString()
+      : (v, method = 'round') => Math[method](v).toLocaleString()
   , [percentage])
 
   return (
@@ -64,13 +64,13 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
       <div className='grid grid-cols-3 text-xs leading-6'>
         <span>
-          {formatValue(dmin)}
+          {formatValue(dmin, 'floor')}
         </span>
         <span className='text-center'>
           {formatValue(midpoint)}
         </span>
         <span className='text-right'>
-          {formatValue(dmax)}
+          {formatValue(dmax, 'ceil')}
         </span>
       </div>
     </div>
