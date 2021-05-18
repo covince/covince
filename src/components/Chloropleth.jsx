@@ -288,7 +288,7 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'nullAreas',
         paint: {
-          'line-color': tailwindColors[lineColor][600],
+          'line-color': tailwindColors[lineColor][500],
           'line-width': 0.5
         }
       },
