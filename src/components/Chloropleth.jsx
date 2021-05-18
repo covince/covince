@@ -27,8 +27,6 @@ const colorStops = [
   return { index, rgb: interpolateMagma(x.index) }
 }).slice(0) // Cut off the first bit of magma with black
 
-console.log(colorStops)
-
 const makeGradient = (transform) => {
   const stops = []
   for (let i = 0; i <= 100; i += 1) {
