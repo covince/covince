@@ -12,7 +12,7 @@ import FadeTransition from './FadeTransition'
 import useQueryAsState from '../hooks/useQueryAsState'
 
 // original RGBs left in for reference
-const colorStops = [
+const colourStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
   { index: 0.13, rgb: 'rgb(28, 16, 68)' },
   { index: 0.25, rgb: 'rgb(79, 18, 123)' },
@@ -27,7 +27,7 @@ const colorStops = [
   return { index, rgb: interpolateMagma(x.index) }
 }).slice(0) // Cut off the first bit of magma with black
 
-const makeGradient = (transform) => {
+const makeMagmaGradient = (transform) => {
   const stops = []
   for (let i = 0; i <= 100; i += 1) {
     const value = transform(i / 100)
@@ -37,8 +37,17 @@ const makeGradient = (transform) => {
   return `linear-gradient(to right, ${stops.join(',')})`
 }
 
-const linearGradient = makeGradient(v => 1.13 - (v + 0.13) / 1.13)
-const quadGradient = makeGradient(v => 1.13 - (Math.sqrt(v) + 0.13) / 1.13)
+const RColourStops = [
+  { index: 0.125, rgb: 'rgb(255, 0, 0)' },
+  { index: 0.75, rgb: 'rgb(255, 255, 255)' },
+  { index: 1, rgb: 'rgb(0, 0, 255)' }
+]
+
+const gradients = {
+  linear: makeMagmaGradient(v => 1.13 - (v + 0.13) / 1.13),
+  quadratic: makeMagmaGradient(v => 1.13 - (Math.sqrt(v) + 0.13) / 1.13),
+  R_scale: `linear-gradient(to left, ${RColourStops.map(_ => `${_.rgb} ${_.index * 100}%`).join(',')})`
+}
 
 const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   let midpoint
@@ -48,10 +57,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
     midpoint = Math.round(10 * (dmin + dmax) * 0.5) / 10
   }
 
-  const gradient = useMemo(
-    () => type === 'quadratic' ? quadGradient : linearGradient,
-    [type]
-  )
+  const gradient = gradients[type]
 
   const formatValue = useMemo(() =>
     percentage
@@ -196,19 +202,18 @@ const Chloropleth = (props) => {
       return [0, '#fff']
     }
 
-    if (color_scale_type === 'R_scale') {
-      return [0, '#0000FF', 1, '#FFFFFF', 3.5, '#FF0000']
-    }
-    const scale = []
+    const stops = color_scale_type === 'R_scale' ? RColourStops : colourStops
 
+    const scale = []
     const range = color_scale_type === 'quadratic'
       ? Math.sqrt(max_val) - Math.sqrt(min_val)
       : max_val - min_val
 
-    for (const { index, rgb } of colorStops) {
+    for (const { index, rgb } of stops) {
       scale.unshift(rgb)
       scale.unshift(range * (1 - index))
     }
+
     return scale
   }, [max_val, min_val, color_scale_type])
 
