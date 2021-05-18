@@ -6,12 +6,13 @@ import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
 import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
 import Measure from 'react-measure'
+import { interpolateMagma } from 'd3-scale-chromatic'
 
 import FadeTransition from './FadeTransition'
 import useQueryAsState from '../hooks/useQueryAsState'
 
-// magma
-const colorStops = [
+// original RGBs left in for reference
+const colourStops = [
   { index: 0, rgb: 'rgb(0, 0, 4)' },
   { index: 0.13, rgb: 'rgb(28, 16, 68)' },
   { index: 0.25, rgb: 'rgb(79, 18, 123)' },
@@ -22,14 +23,33 @@ const colorStops = [
   { index: 0.88, rgb: 'rgb(254, 194, 135)' },
   { index: 1, rgb: 'rgb(252, 253, 191)' }
 ].map(x => {
-  x.index = (x.index - 0.13) / (1 - 0.13)
-  return x
-}).slice(1) // Cut off the first bit of magma with black
+  const index = (x.index - 0.13) / (1 - 0.13)
+  return { index, rgb: interpolateMagma(x.index) }
+}).slice(0) // Cut off the first bit of magma with black
 
-const quadColorStops =
-  colorStops.map(_ => ({ rgb: _.rgb, index: Math.sqrt(_.index) }))
+const makeMagmaGradient = (transform) => {
+  const stops = []
+  for (let i = 0; i <= 100; i += 1) {
+    const value = transform(i / 100)
+    const color = interpolateMagma(value)
+    stops.push(`${color} ${i}%`)
+  }
+  return `linear-gradient(to right, ${stops.join(',')})`
+}
 
-const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
+const RColourStops = [
+  { index: 0.125, rgb: 'rgb(255, 0, 0)' },
+  { index: 0.75, rgb: 'rgb(255, 255, 255)' },
+  { index: 1, rgb: 'rgb(0, 0, 255)' }
+]
+
+const gradients = {
+  linear: makeMagmaGradient(v => 1.13 - (v + 0.13) / 1.13),
+  quadratic: makeMagmaGradient(v => 1.13 - (Math.sqrt(v) + 0.13) / 1.13),
+  R_scale: `linear-gradient(to left, ${RColourStops.map(_ => `${_.rgb} ${_.index * 100}%`).join(',')})`
+}
+
+const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   let midpoint
   if (dmax > 2) {
     midpoint = Math.ceil((dmin + dmax) * 0.5)
@@ -37,39 +57,26 @@ const ColourBar = ({ dmin, dmax, scale, type, className, percentage }) => {
     midpoint = Math.round(10 * (dmin + dmax) * 0.5) / 10
   }
 
-  const gradient = useMemo(() => {
-    const stops = []
-    for (let i = 0; i < scale.length; i += 2) {
-      const value = scale[i]
-      const color = scale[i + 1]
-      const range =
-        type === 'quadratic'
-          ? Math.sqrt(dmax) - Math.sqrt(dmin)
-          : dmax - dmin
-      const percent = value / range * 100
-      stops.push(`${color} ${percent}%`)
-    }
-    return  type === 'quadratic' ?`linear-gradient(to right, rgba(255,0,0,0.0) 0%, rgba(255,0,0,0.0) 100%)`  :`linear-gradient(to right, ${stops.join(',')})`
-  }, [dmin, dmax, scale])
+  const gradient = gradients[type]
 
   const formatValue = useMemo(() =>
     percentage
       ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
-      : v => Math.round(v).toLocaleString()
+      : (v, method = 'round') => Math[method](v).toLocaleString()
   , [percentage])
 
   return (
     <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
-      <div className='grid grid-cols-3 text-xs leading-6'>
+      <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
-          {formatValue(dmin)}
+          {formatValue(dmin, 'floor')}
         </span>
         <span className='text-center'>
           {formatValue(midpoint)}
         </span>
         <span className='text-right'>
-          {formatValue(dmax)}
+          {formatValue(dmax, 'ceil')}
         </span>
       </div>
     </div>
@@ -195,23 +202,18 @@ const Chloropleth = (props) => {
       return [0, '#fff']
     }
 
-    if (color_scale_type === 'R_scale') {
-      return [0, '#0000FF', 1, '#FFFFFF', 3.5, '#FF0000']
-    }
-    const scale = []
+    const stops = color_scale_type === 'R_scale' ? RColourStops : colourStops
 
+    const scale = []
     const range = color_scale_type === 'quadratic'
       ? Math.sqrt(max_val) - Math.sqrt(min_val)
       : max_val - min_val
-
-    const stops = color_scale_type === 'quadratic'
-      ? quadColorStops
-      : colorStops
 
     for (const { index, rgb } of stops) {
       scale.unshift(rgb)
       scale.unshift(range * (1 - index))
     }
+
     return scale
   }, [max_val, min_val, color_scale_type])
 
@@ -356,7 +358,6 @@ const Chloropleth = (props) => {
               className='absolute left-0 bottom-0 w-60 z-10'
               dmin={min_val}
               dmax={max_val}
-              scale={colorScale}
               type={color_scale_type}
               percentage={percentage}
             />

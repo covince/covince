@@ -165,7 +165,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div>
             <div>
               <label className='block font-medium mb-1'>
-                Color by
+                Colour by
               </label>
               <Select
                 value={lineageState.loading.colorBy || lineageState.colorBy}
@@ -177,7 +177,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div> {lineageState.colorBy !== 'R' &&
               <div>
                 <label className='block font-medium mb-1'>
-                  Scale
+                  Colour Scale
                 </label>
                 <Select
                   value={lineageState.scale || ''}
