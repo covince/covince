@@ -73,8 +73,9 @@ const useLineages = (dataPath, options) => {
     const { dates, areas, values } = data
 
     let max = 0
-    for (const row of values) {
-      max = Math.max(max, ...row)
+    for (let i = 0; i < areas.length; i++) {
+      if (areas[i] === 'overview') continue
+      max = Math.max(max, ...values[i])
     }
     if (current.colorBy === 'p') max *= 100
     if (current.colorBy === 'R') max = 4
