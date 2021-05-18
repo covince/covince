@@ -280,7 +280,7 @@ const Chloropleth = (props) => {
         type: 'fill',
         source: 'nullAreas',
         paint: {
-          'fill-color': tailwindColors[lineColor][100]
+          'fill-color': '#fff'
         }
       },
       {

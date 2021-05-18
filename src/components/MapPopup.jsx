@@ -18,11 +18,8 @@ const MapPopup = ({ value, percentage, lat, long, onClick, label }) => {
       tipSize={8}
     >
       <div className='p-2' onClick={onClick}>
-        { value === null
-          ? <p className='text-sm leading-4 font-bold'>
-            No data
-          </p>
-          : <p className='font-bold text-gray-700'>
+        { value !== null &&
+          <p className='font-bold text-gray-700'>
             {formatValue(value)}
           </p> }
         <p className='text-sm'>
