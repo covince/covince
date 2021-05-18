@@ -3,11 +3,13 @@ import './Chloropleth.css'
 import React, { useState, useMemo, useEffect } from 'react'
 import classnames from 'classnames'
 import * as tailwindColors from 'tailwindcss/colors'
-import ReactMapGL, { NavigationControl, Popup } from 'react-map-gl'
+import ReactMapGL, { NavigationControl } from 'react-map-gl'
 import Measure from 'react-measure'
 import { interpolateMagma } from 'd3-scale-chromatic'
 
 import FadeTransition from './FadeTransition'
+import MapPopup from './MapPopup'
+
 import useQueryAsState from '../hooks/useQueryAsState'
 
 // original RGBs left in for reference
@@ -278,7 +280,7 @@ const Chloropleth = (props) => {
         type: 'fill',
         source: 'nullAreas',
         paint: {
-          'fill-color': '#fff'
+          'fill-color': tailwindColors[lineColor][100]
         }
       },
       {
@@ -286,7 +288,7 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'nullAreas',
         paint: {
-          'line-color': tailwindColors[lineColor][300],
+          'line-color': tailwindColors[lineColor][600],
           'line-width': 0.5
         }
       },
@@ -326,15 +328,18 @@ const Chloropleth = (props) => {
     ]
   }), [features, colorScale, color_scale_type])
 
-  const [popupFeature, setPopupFeature] = useState(null)
+  const [hoveredFeature, setHoveredFeature] = useState(null)
 
-  const { percentage } = props
+  const { percentage, handleOnClick } = props
 
-  const formatValue = useMemo(() =>
-    percentage
-      ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
-      : v => `${Number.isInteger(v) ? v : v.toFixed(2)}`
-  , [percentage])
+  const hoverPopup = useMemo(() => {
+    if (hoveredFeature === null) return null
+    const { area_id, area_name, lat, long } = hoveredFeature.properties
+    const value = values[area_id]
+    if (area_id in values) {
+      return { lat, long, value, label: area_name, onClick: () => handleOnClick(area_id) }
+    }
+  }, [hoveredFeature, values, handleOnClick])
 
   return (
     <Measure
@@ -361,9 +366,9 @@ const Chloropleth = (props) => {
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
               if (!feature) {
-                props.handleOnClick('overview')
-              } else if ('value' in feature.properties) {
-                props.handleOnClick(feature.properties.area_id)
+                handleOnClick('overview')
+              } else {
+                handleOnClick(feature.properties.area_id)
               }
             }}
             onHover={e => {
@@ -375,9 +380,9 @@ const Chloropleth = (props) => {
                   feature.properties.lat = e.lngLat[1]
                   feature.properties.long = e.lngLat[0]
                 }
-                setPopupFeature(feature.properties)
+                setHoveredFeature(feature)
               } else {
-                setPopupFeature(null)
+                setHoveredFeature(null)
               }
             }}
             getCursor={({ isHovering, isDragging }) => {
@@ -387,24 +392,7 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />
-            {popupFeature &&
-              <Popup
-                closeButton={false}
-                captureDrag={false}
-                latitude={popupFeature.lat}
-                longitude={popupFeature.long}
-                className='text-center text-current leading-none font-sans'
-                tipSize={8}
-              >
-                <div className='p-2' onClick={() => props.handleOnClick(popupFeature.area_id)}>
-                  <p className='font-bold text-gray-700'>
-                    {formatValue(popupFeature.value)}
-                  </p>
-                  <p className='text-sm'>
-                    {popupFeature.area_name}
-                  </p>
-                </div>
-              </Popup>}
+            { hoverPopup && <MapPopup {...hoverPopup} percentage={percentage} /> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
             <ColourBar

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap } from 'react-icons/bs'
@@ -26,7 +26,7 @@ import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
-  const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
+  const areaLookupTable = useAreaLookupTable(tiles, data.overview)
 
   const unique_lineages = data.lineages
 
@@ -37,9 +37,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     { setDate, setPlaying, persistDate }
   ] = useDates(results ? results.dates : [], data.initialDate, data.frameLength)
 
-  const handleOnClick = (area) => {
-    areaActions.load(area)
-  }
+  const handleOnClick = useCallback((area_id) => {
+    areaActions.load(area_id)
+  }, [areaActions.load])
 
   const parameter_options = data.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
@@ -64,13 +64,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
     return {
       category: data.overview.subnoun_singular,
-      heading: AreaLookupTable[areaState.currentArea],
+      heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
-      overviewButtonText: AreaLookupTable.overview,
+      overviewButtonText: areaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, AreaLookupTable.overview])
+  }, [areaState, isMobile, areaLookupTable.overview])
 
   const { dateFormat = 'd MMMM y', label: timelineLabel } = data.timeline || {}
   const formattedDate = useMemo(() => format(new Date(date), dateFormat), [date])
@@ -230,7 +230,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
               }
             )}
-            name={AreaLookupTable[areaState.currentArea]}
+            name={areaLookupTable[areaState.currentArea]}
             date={date}
             setDate={persistDate}
             selected_area={areaState.currentArea}
