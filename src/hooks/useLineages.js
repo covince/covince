@@ -81,7 +81,7 @@ const useLineages = (dataPath, options) => {
     if (current.colorBy === 'R') max = 4
     if (current.colorBy === 'lambda') max = Math.min(max, 1000)
 
-    const index = {}
+    const areaLookups = []
 
     for (let i = 0; i < areas.length; i++) {
       const area = areas[i]
@@ -90,10 +90,10 @@ const useLineages = (dataPath, options) => {
         const value = values[i][j]
         lookup[dates[j]] = current.colorBy === 'p' && value !== null ? value * 100 : value
       }
-      index[area] = lookup
+      areaLookups.push({ area, lookup })
     }
 
-    return { min: 0, max, index, dates }
+    return { min: 0, max, values: areaLookups, dates }
   }, [data])
 
   const state = useMemo(() => {

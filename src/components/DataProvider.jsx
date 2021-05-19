@@ -35,7 +35,6 @@ const DataProvider = ({ children, default_data_url, default_tiles_url, onLoad })
   }
   const getTiles = async () => {
     const { data } = await axios.get(geojson)
-    data.features.reverse()
     return data
   }
 
