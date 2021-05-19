@@ -1,3 +1,4 @@
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './Chloropleth.css'
 
 import React, { useState, useMemo, useEffect } from 'react'
