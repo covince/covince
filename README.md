@@ -4,6 +4,8 @@ CovInce is an an application built in React for visualising numbers and proporti
 
 If you would like to deploy your own version of covince and need assistance please raise an issue and we will try to help.
 
+Demo of the code in this repository (with old static data): covince.vercel.app
+
 
 # Development
 
