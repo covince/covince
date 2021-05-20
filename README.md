@@ -6,6 +6,53 @@ If you would like to deploy your own version of covince and need assistance plea
 
 Demo of the code in this repository (with old static data): http://covince.vercel.app
 
+# Configuration
+
+```json
+{
+  "chart_definitions": [
+    {
+      "parameter": "p",
+      "heading": "Proportion",
+      "type": "line",
+      "allow_stack": true,
+      "preset": "percentage"
+      "y_axis": {
+        "ticks": [], 
+        "domain": [],
+        "allow_data_overflow": true
+      },
+      "x_axis": {
+        "reference_line": 1
+      }
+    }
+  ],
+  "colors": {
+    "B.1.1.7": "#ffff00"
+  },
+  "overview": {
+    "category": "Overview",
+    "heading": "All areas",
+    "short_heading": "All",
+    "subnoun_singular": "Area",
+    "subnoun_plural": "areas"
+  },
+  "parameters": [
+    {
+      "id": "p",
+      "display": "Proportion"
+    }
+  ],
+  "timeline": {
+    "initial_date": "2021-01-01",
+    "date_format": { // https://date-fns.org/docs/format
+      "heading": "d MMMM y",
+      "mobile_nav": "d MMMM y",
+      "chart_tooltip": "d MMMM y"
+    }
+  }
+}
+```
 
 # Development
 

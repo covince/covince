@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 function useAreaLookupTable (tiles, overview) {
   return useMemo(() => {
     const lookupTable = {
-      overview: overview.short_text
+      overview: overview.short_heading
     }
     if (tiles !== null) {
       for (const feature of tiles.features) {

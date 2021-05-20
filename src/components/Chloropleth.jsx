@@ -86,15 +86,15 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
 }
 
 function clampViewport (viewport, bounds) {
-  if (viewport.longitude < bounds.minLongitude) {
-    viewport.longitude = bounds.minLongitude
-  } else if (viewport.longitude > bounds.maxLongitude) {
-    viewport.longitude = bounds.maxLongitude
+  if (viewport.longitude < bounds.min_longitude) {
+    viewport.longitude = bounds.min_longitude
+  } else if (viewport.longitude > bounds.max_longitude) {
+    viewport.longitude = bounds.max_longitude
   }
-  if (viewport.latitude < bounds.minLatitude) {
-    viewport.latitude = bounds.minLatitude
-  } else if (viewport.latitude > bounds.maxLatitude) {
-    viewport.latitude = bounds.maxLatitude
+  if (viewport.latitude < bounds.min_latitude) {
+    viewport.latitude = bounds.min_latitude
+  } else if (viewport.latitude > bounds.max_latitude) {
+    viewport.latitude = bounds.max_latitude
   }
 }
 

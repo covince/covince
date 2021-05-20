@@ -25,23 +25,25 @@ import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 
+import config from '../config'
+
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
-  const areaLookupTable = useAreaLookupTable(tiles, data.overview)
+  const areaLookupTable = useAreaLookupTable(tiles, config.overview)
 
   const unique_lineages = data.lineages
 
   const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath, data)
+  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
-  ] = useDates(results ? results.dates : [], data.initialDate, data.frameLength)
+  ] = useDates(results ? results.dates : [], config.timeline)
 
   const handleOnClick = useCallback((area_id) => {
     areaActions.load(area_id)
   }, [areaActions.load])
 
-  const parameter_options = data.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
+  const parameter_options = config.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
@@ -49,11 +51,11 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const locationFilter = useMemo(() => {
     if (areaState.currentArea === 'overview') {
       return {
-        category: data.overview.category,
-        heading: data.overview.heading,
+        category: config.overview.category,
+        heading: config.overview.heading,
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore {data.overview.subnoun_plural} {
+            Explore {config.overview.subnoun_plural} {
             isMobile
               ? <button onClick={() => setMobileView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
@@ -63,7 +65,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       }
     }
     return {
-      category: data.overview.subnoun_singular,
+      category: config.overview.subnoun_singular,
       heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
@@ -72,11 +74,18 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }, [areaState, isMobile, areaLookupTable.overview])
 
-  const { dateFormat = 'd MMMM y', label: timelineLabel } = data.timeline || {}
-  const formattedDate = useMemo(() => format(new Date(date), dateFormat), [date])
+  const { timeline } = config
+  const formattedDate = useMemo(
+    () => format(new Date(date), timeline.date_format.heading),
+    [date]
+  )
+  const mobileNavDate = useMemo(
+    () => format(new Date(date), timeline.date_format.mobile_nav),
+    [date]
+  )
 
   const dateFilter = {
-    label: timelineLabel,
+    label: config.timeline.label,
     dates: results ? results.dates : null,
     heading: formattedDate,
     value: date,
@@ -98,10 +107,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     lineageState.lineage === null || areaState.currentArea === null
   ), [lineageState.lineage, areaState.currentArea])
 
-  const lineageFilter = useLineageFilter(unique_lineages, data.colors)
+  const lineageFilter = useLineageFilter(unique_lineages, config.colors)
 
   const formattedLastModified = useMemo(
-    () => lastModified ? format(new Date(lastModified), 'd MMMM y, HH:mm') : '',
+    () => lastModified ? format(new Date(lastModified), config.datetimeFormat) : '',
     [lastModified]
   )
 
@@ -203,7 +212,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               className='flex-grow'
               selected_area={areaState.loadingArea || areaState.currentArea}
               geojson={tiles}
-              config={tiles.config}
+              config={config.map.viewport}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
@@ -223,8 +232,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         </div>
         <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'map' })}>
           <LocalIncidence
-            chartDefinitions = {data.chartDefinitions}
-            colors={data.colors}
+            chartDefinitions={config.charts}
             className={classNames(
               'transition-opacity flex-grow', {
                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
@@ -252,7 +260,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='grid place-items-center h-12 box-content pt-1'>
               <PillButton onClick={() => setMobileView('map')} className='flex items-center'>
                 <BsMap className='h-5 w-5 mr-3' />
-                View map on {formattedDate}
+                View map on {mobileNavDate}
               </PillButton>
             </div>
           </StickyMobileSection> }

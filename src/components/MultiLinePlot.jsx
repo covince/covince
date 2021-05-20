@@ -6,10 +6,14 @@ import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
 
+import config from '../config'
+
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
+
+const { timeline } = config
 
 const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
@@ -21,7 +25,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(label), 'd MMMM yyyy')}
+          {format(new Date(label), timeline.config.chart_tooltip)}
         </h4>
         <table className='tabular-nums'>
           <thead className='sr-only'>
@@ -173,7 +177,7 @@ const MultiLinePlot = props => {
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={yAxisConfig.allowDataOverflow || false}
+      allowDataOverflow={yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
@@ -237,10 +241,10 @@ const MultiLinePlot = props => {
   }, [lineages, stroke, type])
 
   const xReference = useMemo(() => {
-    if (xAxisConfig.referenceLine === undefined) return null
+    if (xAxisConfig.reference_line === undefined) return null
     return (
       <ReferenceLine
-        y={xAxisConfig.referenceLine}
+        y={xAxisConfig.reference_line}
         stroke={tailwindColors[stroke][600]}
         strokeDasharray={[8, 8]}
         label=''
@@ -248,7 +252,7 @@ const MultiLinePlot = props => {
         style={{ mixBlendMode: 'multiply' }}
       />
     )
-  }, [xAxisConfig.referenceLine, stroke])
+  }, [xAxisConfig.reference_line, stroke])
 
   return (
     <div className={classNames('relative', className)}>

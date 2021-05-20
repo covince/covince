@@ -1,0 +1,98 @@
+{
+  "datetime_format": "d MMMM y, HH:mm",
+  "colors": {
+    "B.1.177": "rgb(44,183,236)",
+    "B.1.1.7": "rgb(243,100,13)",
+    "other": "#777"
+  },
+  "parameters": [
+    {
+      "id": "lambda",
+      "display": "Incidence"
+    },
+    {
+      "id": "p",
+      "display": "Proportion"
+    },
+    {
+      "id": "R",
+      "display": "R"
+    }
+  ],
+  "overview": {
+    "category": "National Overview",
+    "heading": "England",
+    "short_heading": "National",
+    "subnoun_singular": "Local authority",
+    "subnoun_plural": "local authorities"
+  },
+  "timeline": {
+    "label": "timeline",
+    "initial_date": "2020-12-01",
+    "date_format": {
+      "heading": "d MMMM y",
+      "mobile_nav": "d MMMM y",
+      "chart_tooltip": "d MMMM y"
+    },
+    "frame_length": 100
+  },
+  "map": {
+    "settings": {
+      "default_lineage": "B.1.1.7",
+      "default_color_by": "p",
+      "default_color_scale": {
+        "p": "linear",
+        "lambda": "quadratic"
+      }
+    },
+    "viewport": {
+      "min_zoom": 4,
+      "default_lat": 52.561928,
+      "default_lon": -1.464854,
+      "default_zoom": 5,
+      "default_zoom_mob": 4.5,
+      "bounds": {
+        "min_longitude": -9,
+        "max_longitude": 5,
+        "min_latitude": 48,
+        "max_latitude": 60
+      }
+    }
+  },
+  "charts": [
+    {
+      "parameter": "lambda",
+      "heading": "Incidence",
+      "default_type": "line",
+      "allow_stack": true
+    },
+    {
+      "parameter": "p",
+      "heading": "Proportion",
+      "default_type": "area",
+      "allow_stack": true,
+      "preset": "percentage"
+    },
+    {
+      "parameter": "R",
+      "heading": "R",
+      "default_type": "line",
+      "y_axis": {
+        "ticks": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "domain": [
+          0,
+          3
+        ],
+        "allow_data_overflow": true
+      },
+      "x_axis": {
+        "reference_line": 1
+      }
+    }
+  ]
+}

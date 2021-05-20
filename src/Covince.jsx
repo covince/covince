@@ -3,14 +3,17 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import DataProvider from './components/DataProvider'
 
+import { setConfig } from './config'
+
 const UI = lazy(() => import('./components/UI'))
 
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24
 
-const Covince = ({
-  default_data_url = './data',
-  default_tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
+const CovInce = ({
+  data_url = './data',
+  tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
   onLoad,
+  config,
   ...props
 }) => {
   const queryClient = useRef(new QueryClient({
@@ -24,11 +27,13 @@ const Covince = ({
     }
   }))
 
+  setConfig(config)
+
   return (
     <QueryClientProvider client={queryClient.current}>
       <DataProvider
-        default_data_url={default_data_url}
-        default_tiles_url={default_tiles_url}
+        default_data_url={data_url}
+        default_tiles_url={tiles_url}
         onLoad={onLoad}
       >
         <UI {...props} />
@@ -37,4 +42,4 @@ const Covince = ({
   )
 }
 
-export default Covince
+export default CovInce
