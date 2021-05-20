@@ -3,12 +3,12 @@ import axios from 'axios'
 
 import useQueryAsState from './useQueryAsState'
 
-const getDefaultScale = (default_colour_scale, x) => {
-  if (typeof default_colour_scale === 'string') {
-    return default_colour_scale
+const getDefaultScale = (default_color_scale, x) => {
+  if (typeof default_color_scale === 'string') {
+    return default_color_scale
   }
-  if (typeof default_colour_scale === 'object') {
-    return default_colour_scale[x]
+  if (typeof default_color_scale === 'object') {
+    return default_color_scale[x]
   }
   return 'linear'
 }
@@ -105,7 +105,7 @@ const useLineages = (dataPath, options) => {
     return {
       status,
       ...current,
-      scale: scale || getDefaultScale(options.default_colour_scale, current.colorBy),
+      scale: scale || getDefaultScale(options.default_color_scale, current.colorBy),
       loading: {
         lineage,
         colorBy

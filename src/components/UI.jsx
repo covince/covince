@@ -110,7 +110,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const lineageFilter = useLineageFilter(unique_lineages, config.colors)
 
   const formattedLastModified = useMemo(
-    () => lastModified ? format(new Date(lastModified), config.datetimeFormat) : '',
+    () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
     [lastModified]
   )
 

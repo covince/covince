@@ -25,7 +25,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(label), timeline.config.chart_tooltip)}
+          {format(new Date(label), timeline.date_format.chart_tooltip)}
         </h4>
         <table className='tabular-nums'>
           <thead className='sr-only'>
