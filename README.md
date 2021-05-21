@@ -6,57 +6,43 @@ If you would like to deploy your own version of covince and need assistance plea
 
 Demo of the code in this repository (with old static data): http://covince.vercel.app
 
-# Configuration
+## Configuration
 
-```json
-{
-  "chart_definitions": [
-    {
-      "parameter": "p",
-      "heading": "Proportion",
-      "type": "line",
-      "allow_stack": true,
-      "preset": "percentage"
-      "y_axis": {
-        "ticks": [], 
-        "domain": [],
-        "allow_data_overflow": true
-      },
-      "x_axis": {
-        "reference_line": 1
-      }
-    }
-  ],
-  "colors": {
-    "B.1.1.7": "#ffff00"
-  },
-  "overview": {
-    "category": "Overview",
-    "heading": "All areas",
-    "short_heading": "All",
-    "subnoun_singular": "Area",
-    "subnoun_plural": "areas"
-  },
-  "parameters": [
-    {
-      "id": "p",
-      "display": "Proportion"
-    }
-  ],
-  "timeline": {
-    "initial_date": "2021-01-01",
-    "date_format": { // https://date-fns.org/docs/format
-      "heading": "d MMMM y",
-      "mobile_nav": "d MMMM y",
-      "chart_tooltip": "d MMMM y"
-    }
-  }
-}
-```
+### top-level sections
 
-# Development
+* `charts [array]` list of [chart](#chart) definitions
+* `colors [object]` lineages mapped to color definitions
+* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
+* `map [object]`
+  *  [`settings [object]`](#map-settings)
+  *  [`viewport [object]`](#map-viewport)
+* `overview [object]`
+* `parameters [array]` list of [parameter](#parameter) definitions
+* `timeline [object]`
+   
+### Chart
 
-## Install dependencies
+* `allow_stack [boolean]` (optional) enables stacking
+* `default_type ['line'|'area']`
+* `heading [string]` 
+* `parameter [string]` should match a parameter id
+* `preset ['percentage']` (optional) applies formatting rules
+* `y_axis [object]` (optional) 
+
+### Chart Y-Axis
+
+* `domain [number[]]` (optional) [reference](https://recharts.org/en-US/api/YAxis#domain)
+* `ticks [string[]]` (optional) [reference](https://recharts.org/en-US/api/YAxis#ticks) 
+* `reference_line [number]` (optional) display a dotted line at the specified value
+* `allow_data_overflow [boolean]` (optional) [reference](https://recharts.org/en-US/api/YAxis#allowDataOverflow)
+
+### Map settings
+### Map viewport
+### Parameter
+
+## Development
+
+### Install dependencies
 
 ```yarn install```
 
