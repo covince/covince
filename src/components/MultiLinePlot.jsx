@@ -67,7 +67,7 @@ const MultiLinePlot = props => {
   const animationDuration = 500
   const {
     parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
-    yAxis: yAxisConfig = {}, xAxis: xAxisConfig = {},
+    yAxis: yAxisConfig = {}, /* xAxis: xAxisConfig = {}, */
     date, setDate, area_data, activeLineages,
     type, width, height = 120, stroke = 'blueGray', className
   } = props
@@ -241,10 +241,10 @@ const MultiLinePlot = props => {
   }, [lineages, stroke, type])
 
   const xReference = useMemo(() => {
-    if (xAxisConfig.reference_line === undefined) return null
+    if (yAxisConfig.reference_line === undefined) return null
     return (
       <ReferenceLine
-        y={xAxisConfig.reference_line}
+        y={yAxisConfig.reference_line}
         stroke={tailwindColors[stroke][600]}
         strokeDasharray={[8, 8]}
         label=''
@@ -252,7 +252,7 @@ const MultiLinePlot = props => {
         style={{ mixBlendMode: 'multiply' }}
       />
     )
-  }, [xAxisConfig.reference_line, stroke])
+  }, [yAxisConfig.reference_line, stroke])
 
   return (
     <div className={classNames('relative', className)}>

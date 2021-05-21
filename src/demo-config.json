@@ -88,9 +88,7 @@
           0,
           3
         ],
-        "allow_data_overflow": true
-      },
-      "x_axis": {
+        "allow_data_overflow": true,
         "reference_line": 1
       }
     }
