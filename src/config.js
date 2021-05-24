@@ -29,7 +29,6 @@ const config = {
 let previousConfig
 
 export const setConfig = (userConfig) => {
-  console.log(userConfig, config, userConfig === previousConfig)
   // relying on immutability
   if (userConfig === previousConfig || userConfig === undefined) return
   previousConfig = userConfig

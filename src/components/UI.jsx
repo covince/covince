@@ -203,7 +203,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.colorBy !== 'R' &&
+            </div> {lineageState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
                   Colour Scale
