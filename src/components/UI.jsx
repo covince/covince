@@ -57,13 +57,14 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     const props = {
       loading: isInitialLoad || areaState.status === 'LOADING',
       areaList,
-      onChange: areaActions.load
+      onChange: areaActions.load,
+      value: areaState.currentArea,
+      overview: data.overview
     }
 
     if (areaState.currentArea === 'overview') {
       return {
         ...props,
-        value: '',
         category: data.overview.category,
         heading: data.overview.heading,
         subheading: (
@@ -79,12 +80,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
     return {
       ...props,
-      value: areaState.currentArea,
       category: data.overview.subnoun_singular,
       heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
-      overviewButtonText: areaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
   }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])

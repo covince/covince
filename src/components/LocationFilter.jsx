@@ -18,7 +18,6 @@ const Select = ({ label, children, value, onChange }) => {
   return (
     <div className='relative max-w-max covince-location-select'>
       <select className='appearance-none bg-white absolute left-0 top-0 w-full h-6 opacity-0 text-sm' value={value} onChange={_onChange} title={label}>
-        <option value=''>-- please select --</option>
         {children}
       </select>
       <Heading className='flex items-center justify-between space-x-2 relative z-0 pointer-events-none h-6'>
@@ -29,7 +28,7 @@ const Select = ({ label, children, value, onChange }) => {
   )
 }
 
-const LocationFilter = ({ className, loading, value, areaList, onChange, category, heading, subheading, showOverviewButton, loadOverview, overviewButtonText }) => (
+const LocationFilter = ({ className, loading, value, areaList, onChange, category, heading, subheading, showOverviewButton, loadOverview, overview }) => (
   <div className={className}>
     <div className='flex justify-between items-center h-6'>
       <DescriptiveHeading className='whitespace-nowrap'>
@@ -41,10 +40,12 @@ const LocationFilter = ({ className, loading, value, areaList, onChange, categor
         onClick={loadOverview}
       >
         <BsArrowUpShort className=' h-6 w-6 fill-current' />
-        {overviewButtonText}
+        {overview.short_text}
       </button> }
     </div>
     <Select value={value} onChange={onChange} label={heading}>
+      <option value='overview'>{overview.heading}</option>
+      <option value=''>-----</option>
       {areaList.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
     </Select>
     <p className='text-sm leading-6 h-6 mt-1 text-gray-600 font-medium'>
