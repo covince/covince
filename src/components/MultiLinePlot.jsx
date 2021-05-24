@@ -13,8 +13,6 @@ const formatLargeNumber = number => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
-const { timeline } = config
-
 const CustomTooltip = ({ active, payload, label, percentage }) => {
   if (active && payload) {
     payload.sort((a, b) => {
@@ -22,6 +20,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
       if (a.value > b.value) return -1
       return 0
     })
+    const { timeline } = config
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>

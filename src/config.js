@@ -26,7 +26,14 @@ const config = {
   }
 }
 
-export const setConfig = (userConfig = {}) => {
+let previousConfig
+
+export const setConfig = (userConfig) => {
+  console.log(userConfig, config, userConfig === previousConfig)
+  // relying on immutability
+  if (userConfig === previousConfig || userConfig === undefined) return
+  previousConfig = userConfig
+
   // normalise options
   const { timeline = {} } = userConfig
   if (typeof timeline.date_format === 'string') {

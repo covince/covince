@@ -5,8 +5,6 @@ import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
 import CovInce from './CovInce'
 
-import config from './demo-config.json'
-
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
     <Spinner className='w-6 h-6 text-gray-500' />
@@ -19,7 +17,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-          <CovInce config={config} />
+          <CovInce />
         </AppContainer>
       </Suspense>
     </>
