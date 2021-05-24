@@ -10,12 +10,15 @@ import FadeTransition from './FadeTransition'
 
 const Select = ({ label, children, value, onChange }) => {
   const _onChange = useCallback((e) => {
-    onChange(e.target.value)
+    if (e.target.value) {
+      onChange(e.target.value)
+    }
   }, [onChange])
 
   return (
     <div className='relative max-w-max covince-location-select'>
       <select className='appearance-none bg-white absolute left-0 top-0 w-full h-6 opacity-0 text-sm' value={value} onChange={_onChange} title={label}>
+        <option value=''>-- please select --</option>
         {children}
       </select>
       <Heading className='flex items-center justify-between space-x-2 relative z-0 pointer-events-none h-6'>
@@ -37,7 +40,7 @@ const LocationFilter = ({ className, loading, value, areaList, onChange, categor
         className='py-0 pr-1 text-xs uppercase tracking-wider rounded flex items-center font-bold text-primary focus:ring-2 focus:ring-primary focus:outline-none relative z-10'
         onClick={loadOverview}
       >
-        <BsArrowUpShort className=' h-6 w-6 mr-0.25 fill-current' />
+        <BsArrowUpShort className=' h-6 w-6 fill-current' />
         {overviewButtonText}
       </button> }
     </div>

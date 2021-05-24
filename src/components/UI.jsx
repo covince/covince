@@ -59,6 +59,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     if (areaState.currentArea === 'overview') {
       return {
         ...props,
+        value: '',
         category: data.overview.category,
         heading: data.overview.heading,
         subheading: (
