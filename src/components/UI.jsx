@@ -24,6 +24,7 @@ import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
+import useAreaList from '../hooks/useAreaList'
 
 import config from '../config'
 
@@ -48,9 +49,24 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
+  const areaList = useAreaList(results, areaLookupTable)
+
+  const isInitialLoad = useMemo(() => (
+    lineageState.lineage === null || areaState.currentArea === null
+  ), [lineageState.lineage, areaState.currentArea])
+
   const locationFilter = useMemo(() => {
+    const props = {
+      loading: isInitialLoad || areaState.status === 'LOADING',
+      areaList,
+      onChange: areaActions.load,
+      value: areaState.currentArea,
+      overview: data.overview
+    }
+
     if (areaState.currentArea === 'overview') {
       return {
+        ...props,
         category: config.overview.category,
         heading: config.overview.heading,
         subheading: (
@@ -65,14 +81,14 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       }
     }
     return {
+      ...props,
       category: config.overview.subnoun_singular,
       heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
-      overviewButtonText: areaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, areaLookupTable.overview])
+  }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -103,10 +119,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }
 
-  const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || areaState.currentArea === null
-  ), [lineageState.lineage, areaState.currentArea])
-
   const lineageFilter = useLineageFilter(unique_lineages, config.colors)
 
   const formattedLastModified = useMemo(
@@ -133,7 +145,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         <LocationFilter
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
-          loading={isInitialLoad}
         /> }
       { !isMobile &&
         <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
@@ -141,7 +152,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <DateFilter {...dateFilter} />
           </Card>
           <Card className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
+            <LocationFilter className='relative' {...locationFilter} />
           </Card>
           <Card className='box-content flex-shrink-0 xl:flex-shrink'>
             <LineageFilter className='h-20' {...lineageFilter} />

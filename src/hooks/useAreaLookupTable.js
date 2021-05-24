@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react'
 
 function useAreaLookupTable (tiles, overview) {

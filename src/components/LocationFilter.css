@@ -1,0 +1,3 @@
+.covince-location-select:focus-within .covince-location-select-focus {
+  @apply ring-2 ring-offset-2 ring-primary;
+}
