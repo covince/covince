@@ -49,9 +49,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const areaList = useAreaList(results, areaLookupTable)
 
+  const isInitialLoad = useMemo(() => (
+    lineageState.lineage === null || areaState.currentArea === null
+  ), [lineageState.lineage, areaState.currentArea])
+
   const locationFilter = useMemo(() => {
     const props = {
-      loading: areaState.status === 'LOADING',
+      loading: isInitialLoad || areaState.status === 'LOADING',
       areaList,
       onChange: areaActions.load
     }
@@ -83,7 +87,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       overviewButtonText: areaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, areaLookupTable.overview, areaList])
+  }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])
 
   const { dateFormat = 'd MMMM y', label: timelineLabel } = data.timeline || {}
   const formattedDate = useMemo(() => format(new Date(date), dateFormat), [date])
@@ -106,10 +110,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       persistDate(set_to)
     }
   }
-
-  const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || areaState.currentArea === null
-  ), [lineageState.lineage, areaState.currentArea])
 
   const lineageFilter = useLineageFilter(unique_lineages, data.colors)
 
