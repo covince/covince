@@ -4,11 +4,14 @@ import axios from 'axios'
 import useQueryAsState from '../hooks/useQueryAsState'
 import { setConfig } from '../config'
 
-const DataProvider = ({ children, default_data_url, default_tiles_url, onLoad }) => {
-  const [{ geojson, dataPath }] = useQueryAsState({
-    geojson: default_tiles_url,
-    dataPath: default_data_url
-  })
+const DataProvider = ({ children, default_data_url, default_tiles_url, disableQueryParams }) => {
+  const [{ geojson, dataPath }] =
+    disableQueryParams
+      ? [{ geojson: default_tiles_url, dataPath: default_data_url }]
+      : useQueryAsState({
+        geojson: default_tiles_url,
+        dataPath: default_data_url
+      })
 
   const getData = async () => {
     const { data, headers } = await axios.get(`${dataPath}/lists.json`)
