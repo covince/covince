@@ -36,8 +36,8 @@ export const setConfig = (userConfig = {}) => {
       chart_tooltip: timeline.date_format
     }
   }
-  if (typeof timeline.frameLength !== 'number') {
-    timeline.frameLength = 100
+  if (typeof timeline.frame_length !== 'number') {
+    timeline.frame_length = 100
   }
 
   Object.assign(config, userConfig)
