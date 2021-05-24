@@ -17,7 +17,7 @@ const Select = ({ label, children, value, onChange }) => {
 
   return (
     <div className='relative max-w-max covince-location-select'>
-      <select className='appearance-none bg-white absolute left-0 top-0 w-full h-6 opacity-0 text-sm' value={value} onChange={_onChange} title={label}>
+      <select className='appearance-none bg-white absolute left-0 top-0 w-full h-6 opacity-0 md:text-sm' value={value} onChange={_onChange} title={label}>
         {children}
       </select>
       <Heading className='flex items-center justify-between space-x-2 relative z-0 pointer-events-none h-6'>
