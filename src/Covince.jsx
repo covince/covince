@@ -10,7 +10,6 @@ const twentyFourHoursInMs = 1000 * 60 * 60 * 24
 const CovInce = ({
   data_url = './data',
   tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
-  onLoad,
   disableQueryParamURLs = false,
   ...props
 }) => {
@@ -31,7 +30,6 @@ const CovInce = ({
         default_data_url={data_url}
         default_tiles_url={tiles_url}
         disableQueryParams={disableQueryParamURLs}
-        onLoad={onLoad}
       >
         <UI {...props} />
       </DataProvider>
