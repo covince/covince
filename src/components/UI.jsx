@@ -29,7 +29,7 @@ import useAreaList from '../hooks/useAreaList'
 import config from '../config'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
-  const areaLookupTable = useAreaLookupTable(tiles, config.overview)
+  const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages
 
@@ -64,14 +64,16 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       overview: data.overview
     }
 
+    const { ontology } = config
+
     if (areaState.currentArea === 'overview') {
       return {
         ...props,
-        category: config.overview.category,
-        heading: config.overview.heading,
+        category: ontology.overview.category,
+        heading: ontology.overview.heading,
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore {config.overview.subnoun_plural} {
+            Explore {ontology.area.noun_plural} {
             isMobile
               ? <button onClick={() => setMobileView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
@@ -82,7 +84,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
     return {
       ...props,
-      category: config.overview.subnoun_singular,
+      category: ontology.area.category,
       heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',

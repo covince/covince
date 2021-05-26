@@ -19,12 +19,16 @@
       "display": "R"
     }
   ],
-  "overview": {
-    "category": "National Overview",
-    "heading": "England",
-    "short_heading": "National",
-    "subnoun_singular": "Local authority",
-    "subnoun_plural": "local authorities"
+  "ontology": {
+    "overview": {
+      "category": "National Overview",
+      "heading": "England",
+      "short_heading": "National"
+    },
+    "area": {
+      "category": "Local authority",
+      "noun_plural": "local authorities"
+    }
   },
   "timeline": {
     "label": "timeline",

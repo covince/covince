@@ -16,7 +16,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `map [object]`
   *  [`settings [object]`](#map-settings)
   *  [`viewport [object]`](#map-viewport)
-* [`overview [object]`](#overview)
+* [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions
 * [`timeline [object]`](#timeline)
    
@@ -39,8 +39,8 @@ Demo of the code in this repository (with old static data): http://covince.verce
 ### Map settings
 
 * `default_lineage [string]` should match a lineage in lists
-* `default_color_by [string]` should match a color in config
-* `default_color_scale [string|object]` can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
+* `default_color_by [string]` should match a [parameter](#parameter) id
+* `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
 
 ### Map viewport
 
@@ -55,13 +55,15 @@ Demo of the code in this repository (with old static data): http://covince.verce
   * `min_latitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `max_latitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
 
-### Overview
+### Ontology
 
-* `category [string]` e.g. "National Overview"
-* `heading [string]` e.g. "England"
-* `short_heading [string]` e.g. "National"
-* `subnoun_singular [string]` e.g. "Local authority"
-* `subnoun_plural [string]` e.g. "local authorities"
+* `overview [object]`
+  * `category [string]` e.g. "National Overview"
+  * `heading [string]` e.g. "England"
+  * `short_heading [string]` e.g. "National"
+* `area [object]`
+  * `category [string]` e.g. "Local authority"
+  * `noun_plural [string]` e.g. "local authorities"
 
 ### Parameter
 
