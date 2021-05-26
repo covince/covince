@@ -3,7 +3,7 @@ import React, { Suspense } from 'react'
 import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
-import CovInce from './CovInce'
+import CovInce from './Covince'
 
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
