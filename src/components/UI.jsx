@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap } from 'react-icons/bs'
@@ -24,36 +24,56 @@ import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
+import useAreaList from '../hooks/useAreaList'
+
+import config from '../config'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
-  const AreaLookupTable = useAreaLookupTable(tiles, data.overview)
+  const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages
 
   const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath, data)
+  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
-  ] = useDates(results ? results.dates : [], data.initialDate, data.frameLength)
+  ] = useDates(results ? results.dates : [], config.timeline)
 
-  const handleOnClick = (area) => {
-    areaActions.load(area)
-  }
+  const handleOnClick = useCallback((area_id) => {
+    areaActions.load(area_id)
+  }, [areaActions.load])
 
-  const parameter_options = data.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
+  const parameter_options = config.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
+  const areaList = useAreaList(results, areaLookupTable)
+
+  const isInitialLoad = useMemo(() => (
+    lineageState.lineage === null || areaState.currentArea === null
+  ), [lineageState.lineage, areaState.currentArea])
+
   const locationFilter = useMemo(() => {
+    const props = {
+      loading: isInitialLoad || areaState.status === 'LOADING',
+      areaList,
+      onChange: areaActions.load,
+      value: areaState.currentArea,
+      overview: data.overview
+    }
+
+    const { ontology } = config
+
     if (areaState.currentArea === 'overview') {
       return {
-        category: data.overview.category,
-        heading: data.overview.heading,
+        ...props,
+        category: ontology.overview.category,
+        heading: ontology.overview.heading,
         subheading: (
           <span className='flex items-center text-subheading'>
-            Explore {data.overview.subnoun_plural} {
+            Explore {ontology.area.noun_plural} {
             isMobile
               ? <button onClick={() => setMobileView('map')} className='px-1 underline text-primary font-medium'>on the map</button>
               : 'on the map'
@@ -63,20 +83,29 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       }
     }
     return {
-      category: data.overview.subnoun_singular,
-      heading: AreaLookupTable[areaState.currentArea],
+      ...props,
+      category: ontology.area.category,
+      heading: areaLookupTable[areaState.currentArea],
       subheading: areaState.currentArea,
       showOverviewButton: areaState.loadingArea !== 'overview',
-      overviewButtonText: AreaLookupTable.overview,
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, AreaLookupTable.overview])
+  }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])
 
-  const formattedDate = useMemo(() => format(new Date(date), 'd MMMM y'), [date])
+  const { timeline } = config
+  const formattedDate = useMemo(
+    () => format(new Date(date), timeline.date_format.heading),
+    [date]
+  )
+  const mobileNavDate = useMemo(
+    () => format(new Date(date), timeline.date_format.mobile_nav),
+    [date]
+  )
 
   const dateFilter = {
+    label: config.timeline.label,
     dates: results ? results.dates : null,
-    label: formattedDate,
+    heading: formattedDate,
     value: date,
     onChange: (e) => {
       const { value } = e.target
@@ -92,16 +121,21 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }
 
-  const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || areaState.currentArea === null
-  ), [lineageState.lineage, areaState.currentArea])
-
-  const lineageFilter = useLineageFilter(unique_lineages, data.colors)
+  const lineageFilter = useLineageFilter(unique_lineages, config.colors)
 
   const formattedLastModified = useMemo(
-    () => lastModified ? format(new Date(lastModified), 'd MMMM y, HH:mm') : '',
+    () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
     [lastModified]
   )
+
+  const mapValues = useMemo(() => {
+    const values = {}
+    if (results === null) return values
+    for (const { area, lookup } of results.values) {
+      values[area] = lookup[date]
+    }
+    return values
+  }, [results, date])
 
   return (
     <>
@@ -113,7 +147,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         <LocationFilter
           className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
           {...locationFilter}
-          loading={isInitialLoad}
         /> }
       { !isMobile &&
         <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
@@ -121,7 +154,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <DateFilter {...dateFilter} />
           </Card>
           <Card className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative' {...locationFilter} loading={areaState.status === 'LOADING'} />
+            <LocationFilter className='relative' {...locationFilter} />
           </Card>
           <Card className='box-content flex-shrink-0 xl:flex-shrink'>
             <LineageFilter className='h-20' {...lineageFilter} />
@@ -163,7 +196,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div>
             <div>
               <label className='block font-medium mb-1'>
-                Color by
+                Colour by
               </label>
               <Select
                 value={lineageState.loading.colorBy || lineageState.colorBy}
@@ -172,10 +205,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.colorBy !== 'R' &&
+            </div> {lineageState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
-                  Scale
+                  Colour Scale
                 </label>
                 <Select
                   value={lineageState.scale || ''}
@@ -191,12 +224,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <Chloropleth
               className='flex-grow'
               selected_area={areaState.loadingArea || areaState.currentArea}
-              tiles={tiles}
+              geojson={tiles}
+              config={config.map.viewport}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
-              index={results ? results.index : null}
-              date={date}
+              values={mapValues}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               percentage={lineageState.colorBy === 'p'}
@@ -212,14 +245,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         </div>
         <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'map' })}>
           <LocalIncidence
-            chartDefinitions = {data.chartDefinitions}
-            colors={data.colors}
+            chartDefinitions={config.charts}
             className={classNames(
               'transition-opacity flex-grow', {
                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
               }
             )}
-            name={AreaLookupTable[areaState.currentArea]}
+            name={areaLookupTable[areaState.currentArea]}
             date={date}
             setDate={persistDate}
             selected_area={areaState.currentArea}
@@ -241,7 +273,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='grid place-items-center h-12 box-content pt-1'>
               <PillButton onClick={() => setMobileView('map')} className='flex items-center'>
                 <BsMap className='h-5 w-5 mr-3' />
-                View map on {formattedDate}
+                View map on {mobileNavDate}
               </PillButton>
             </div>
           </StickyMobileSection> }

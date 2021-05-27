@@ -7,6 +7,7 @@ import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
 
 import useQueryAsState from '../hooks/useQueryAsState'
+import config from '../config'
 
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
@@ -21,10 +22,11 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
       if (a.value > b.value) return -1
       return 0
     })
+    const { timeline } = config
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(label), 'd MMMM yyyy')}
+          {format(new Date(label), timeline.date_format.chart_tooltip)}
         </h4>
         <table className='tabular-nums w-full'>
           <thead className='sr-only'>
@@ -68,7 +70,7 @@ const MultiLinePlot = props => {
 
   const {
     parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
-    yAxis: yAxisConfig = {}, xAxis: xAxisConfig = {},
+    yAxis: yAxisConfig = {}, /* xAxis: xAxisConfig = {}, */
     date, setDate, area_data, activeLineages,
     type, width, height = 120, stroke = 'blueGray', className
   } = props
@@ -190,7 +192,7 @@ const MultiLinePlot = props => {
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={yAxisConfig.allowDataOverflow || false}
+      allowDataOverflow={yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
@@ -254,10 +256,10 @@ const MultiLinePlot = props => {
   }, [lineages, stroke, type])
 
   const xReference = useMemo(() => {
-    if (xAxisConfig.referenceLine === undefined) return null
+    if (yAxisConfig.reference_line === undefined) return null
     return (
       <ReferenceLine
-        y={xAxisConfig.referenceLine}
+        y={yAxisConfig.reference_line}
         stroke={tailwindColors[stroke][600]}
         strokeDasharray={[8, 8]}
         label=''
@@ -265,7 +267,7 @@ const MultiLinePlot = props => {
         style={{ mixBlendMode: 'multiply' }}
       />
     )
-  }, [xAxisConfig.referenceLine, stroke])
+  }, [yAxisConfig.reference_line, stroke])
 
   return (
     <div className={classNames('relative select-none', className)} onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}>
