@@ -1,10 +1,11 @@
 import './MultiLinePlot.css'
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
+import { orderBy } from 'lodash'
 
 import useQueryAsState from '../hooks/useQueryAsState'
 import config from '../config'
@@ -77,19 +78,12 @@ const MultiLinePlot = props => {
 
   const [{ xMin, xMax }, updateQuery] = useQueryAsState()
 
-  const isWithinZoom = useCallback((date) => {
-    if (xMin && xMax) {
-      return (date >= xMin && date <= xMax) || (date >= xMax && date <= xMin)
-    }
-    return true
-  }, [xMin, xMax])
-
   const chart = useMemo(() => {
     const dataByDate = {}
     const presentLineages = new Set()
 
     for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total' && isWithinZoom(d.date)) {
+      if (d.parameter === parameter && d.lineage !== 'total') {
         dataByDate[d.date] = {
           ...dataByDate[d.date],
           date: d.date,
@@ -108,13 +102,20 @@ const MultiLinePlot = props => {
       }
     }
 
+    const data =
+      orderBy(Object.values(dataByDate), 'date', 'asc')
+        .map((d, index) => ({ ...d, index }))
+
+    const dates = data.map(_ => _.date)
+
     return {
       lineages,
-      data: Object.values(dataByDate)
+      data,
+      dates
     }
-  }, [area_data, activeLineages, isWithinZoom])
+  }, [area_data, activeLineages])
 
-  const { lineages, data } = chart
+  const { lineages, data, dates } = chart
 
   const chartProps = useMemo(() => ({
     data,
@@ -165,6 +166,15 @@ const MultiLinePlot = props => {
     }
   }, [preset, type, yAxisConfig.domain, lineages])
 
+  const xAxisDomain = useMemo(() => {
+    if (xMin && xMax) {
+      const _xMin = Math.max(dates.indexOf(xMin), 0)
+      const _xMax = Math.min(dates.indexOf(xMax), data.length - 1)
+      return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
+    }
+    return ['dataMin', 'dataMax']
+  }, [xMax])
+
   const [zoomArea, setZoomArea] = React.useState({})
 
   const grid =
@@ -180,14 +190,17 @@ const MultiLinePlot = props => {
 
   const xAxis = useMemo(() =>
     <XAxis
-      dataKey='date'
+      dataKey='index'
+      type="number"
+      allowDataOverflow
+      domain={xAxisDomain}
       fontSize='12'
       tick={data.length}
-      tickFormatter={d => format(new Date(d), 'd MMM')}
+      tickFormatter={i => i in data ? format(new Date(data[i].date), 'd MMM') : ''}
       tickMargin='4'
       stroke='currentcolor'
     />
-  , [data])
+  , [data, xAxisDomain])
 
   const yAxis =
     <YAxis
@@ -275,12 +288,16 @@ const MultiLinePlot = props => {
         {...chartProps}
         onClick={item => {
           if (item) {
-            setDate(item.activeLabel)
+            setDate(data[item.activeLabel].date)
           }
         }}
-        onMouseDown={(e) => setZoomArea({ start: e.activeLabel })}
+        onMouseDown={(e) => setZoomArea({ start: e.activeLabel, end: zoomArea.end })}
         onMouseMove={(e) => zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel })}
-        onMouseUp={() => { updateQuery({ xMin: zoomArea.start, xMax: zoomArea.end }); setZoomArea({}) }}
+        onMouseUp={() => {
+          const xMin = data[zoomArea.start].date
+          const xMax = data[zoomArea.end].date
+          updateQuery({ xMin, xMax }); setZoomArea({})
+        }}
         cursor='pointer'
       >
         {grid}
@@ -297,7 +314,8 @@ const MultiLinePlot = props => {
       <div className='absolute top-0 left-0 pointer-events-none'>
         <ComposedChart {...chartProps}>
           <XAxis
-            dataKey='date'
+            dataKey='index'
+            domain={xAxisDomain}
             tick={false}
             stroke='none'
           />
@@ -309,7 +327,7 @@ const MultiLinePlot = props => {
             stroke='none'
           />
           <ReferenceLine
-            x={date}
+            x={dates.indexOf(date)}
             stroke={tailwindColors[stroke][400]}
             label=''
             strokeWidth={2}
