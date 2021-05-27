@@ -117,12 +117,12 @@ const MultiLinePlot = props => {
 
   const { lineages, data, dates } = chart
 
-  const chartProps = useMemo(() => ({
-    data,
+  const chartProps = {
+    data: [...data], // new array required for animations
     width,
     height,
     margin: { top: 12, left: 0, right: 24 }
-  }), [data, width, height])
+  }
 
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
@@ -196,6 +196,7 @@ const MultiLinePlot = props => {
       domain={xAxisDomain}
       fontSize='12'
       tick={data.length}
+      ticks={Object.keys(dates)}
       tickFormatter={i => i in data ? format(new Date(data[i].date), 'd MMM') : ''}
       tickMargin='4'
       stroke='currentcolor'
@@ -315,6 +316,7 @@ const MultiLinePlot = props => {
         <ComposedChart {...chartProps}>
           <XAxis
             dataKey='index'
+            allowDataOverflow
             domain={xAxisDomain}
             tick={false}
             stroke='none'
