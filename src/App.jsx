@@ -3,7 +3,7 @@ import React, { Suspense } from 'react'
 import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
-import Covince from './Covince'
+import CovInce from './Covince'
 
 const Loading = () => (
   <div className='fixed inset-0 grid place-content-center'>
@@ -17,7 +17,7 @@ function App () {
       <Suspense fallback={<Loading />}>
         <NavBar />
         <AppContainer>
-          <Covince />
+          <CovInce />
         </AppContainer>
       </Suspense>
     </>

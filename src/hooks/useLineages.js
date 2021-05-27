@@ -3,14 +3,18 @@ import axios from 'axios'
 
 import useQueryAsState from './useQueryAsState'
 
-const getDefaultScale = (x) => {
-  if (x === 'p') return 'linear'
-  if (x === 'lambda') return 'quadratic'
-  if (x === 'R') return undefined
+const getDefaultScale = (default_color_scale, x) => {
+  if (typeof default_color_scale === 'string') {
+    return default_color_scale
+  }
+  if (typeof default_color_scale === 'object') {
+    return default_color_scale[x]
+  }
+  return 'linear'
 }
 
 const useLineages = (dataPath, options) => {
-  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.defaultLineage, colorBy: options.defaultColorBy })
+  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage, colorBy: options.default_color_by })
   const [{ current, status, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':
@@ -77,6 +81,7 @@ const useLineages = (dataPath, options) => {
       if (areas[i] === 'overview') continue
       max = Math.max(max, ...values[i])
     }
+    // TODO: generalise/remove this
     if (current.colorBy === 'p') max *= 100
     if (current.colorBy === 'R') max = 4
     if (current.colorBy === 'lambda') max = Math.min(max, 1000)
@@ -100,7 +105,7 @@ const useLineages = (dataPath, options) => {
     return {
       status,
       ...current,
-      scale: scale || getDefaultScale(current.colorBy),
+      scale: scale || getDefaultScale(options.default_color_scale, current.colorBy),
       loading: {
         lineage,
         colorBy

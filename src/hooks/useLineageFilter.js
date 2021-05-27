@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
-export default (uniqueLineages, colours) => {
+export default (uniqueLineages, colors) => {
   const [{ show }, updateQuery] = useQueryAsState()
 
   const queryLineages = useMemo(() =>
@@ -12,7 +12,7 @@ export default (uniqueLineages, colours) => {
   const activeLineages = useMemo(() =>
     uniqueLineages.reduce((memo, lineage, index) => {
       memo[lineage] = {
-        colour: colours[index],
+        colour: colors[Array.isArray(colors) ? index : lineage],
         active: queryLineages.has(lineage)
       }
       return memo

@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
-function useAreaLookupTable (tiles, overview) {
+function useAreaLookupTable (tiles, ontology) {
   return useMemo(() => {
     const lookupTable = {
-      overview: overview.short_text
+      overview: ontology.overview.short_heading
     }
     if (tiles !== null) {
       for (const feature of tiles.features) {
@@ -11,7 +11,7 @@ function useAreaLookupTable (tiles, overview) {
       }
     }
     return lookupTable
-  }, [tiles, overview])
+  }, [tiles, ontology.overview])
 }
 
 export default useAreaLookupTable
