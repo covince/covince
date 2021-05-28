@@ -15,7 +15,7 @@ const formatLargeNumber = number => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
-const CustomTooltip = ({ active, payload, label, percentage }) => {
+const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
     _payload.sort((a, b) => {
@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(label), timeline.date_format.chart_tooltip)}
+          {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
         </h4>
         <table className='tabular-nums w-full'>
           <thead className='sr-only'>
@@ -167,13 +167,25 @@ const MultiLinePlot = props => {
   }, [preset, type, yAxisConfig.domain, lineages])
 
   const xAxisDomain = useMemo(() => {
-    if (xMin && xMax) {
+    if (xMin && xMax && dates.length) {
       const _xMin = Math.max(dates.indexOf(xMin), 0)
       const _xMax = Math.min(dates.indexOf(xMax), data.length - 1)
       return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
     }
     return ['dataMin', 'dataMax']
-  }, [xMax])
+  }, [xMax, dates])
+
+  const xAxisProps = useMemo(() => {
+    const indices = Object.keys(dates)
+    const ticks = xMin && xMax ? indices.slice(...xAxisDomain) : indices
+    return {
+      allowDataOverflow: true,
+      dataKey: 'index',
+      domain: xAxisDomain,
+      ticks,
+      type: 'number'
+    }
+  }, [xAxisDomain, dates])
 
   const [zoomArea, setZoomArea] = React.useState({})
 
@@ -184,24 +196,21 @@ const MultiLinePlot = props => {
     <Tooltip
       content={CustomTooltip}
       percentage={preset === 'percentage'}
+      dates={dates}
       cursor={{ stroke: tailwindColors[stroke][400] }}
     />
-  , [format, stroke])
+  , [format, stroke, dates])
 
   const xAxis = useMemo(() =>
     <XAxis
-      dataKey='index'
-      type="number"
-      allowDataOverflow
-      domain={xAxisDomain}
+      {...xAxisProps}
       fontSize='12'
       tick={data.length}
-      ticks={Object.keys(dates)}
       tickFormatter={i => i in data ? format(new Date(data[i].date), 'd MMM') : ''}
       tickMargin='4'
       stroke='currentcolor'
     />
-  , [data, xAxisDomain])
+  , [data, xAxisProps])
 
   const yAxis =
     <YAxis
@@ -269,7 +278,7 @@ const MultiLinePlot = props => {
     )
   }, [lineages, stroke, type])
 
-  const xReference = useMemo(() => {
+  const yReference = useMemo(() => {
     if (yAxisConfig.reference_line === undefined) return null
     return (
       <ReferenceLine
@@ -284,20 +293,30 @@ const MultiLinePlot = props => {
   }, [yAxisConfig.reference_line, stroke])
 
   return (
-    <div className={classNames('relative select-none', className)} onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}>
+    <div
+      className={classNames('relative select-none', className)}
+      onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}
+    >
       <ComposedChart
         {...chartProps}
         onClick={item => {
-          if (item) {
+          if (item && !zoomArea.dragging) {
             setDate(data[item.activeLabel].date)
           }
         }}
-        onMouseDown={(e) => setZoomArea({ start: e.activeLabel, end: zoomArea.end })}
-        onMouseMove={(e) => zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel })}
+        onMouseDown={e => {
+          setZoomArea({ start: e.activeLabel, dragging: false })
+        }}
+        onMouseMove={e => {
+          zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel, dragging: true })
+        }}
         onMouseUp={() => {
-          const xMin = data[zoomArea.start].date
-          const xMax = data[zoomArea.end].date
-          updateQuery({ xMin, xMax }); setZoomArea({})
+          if (zoomArea.end && zoomArea.end !== zoomArea.start) {
+            const xMin = data[zoomArea.start].date
+            const xMax = data[zoomArea.end].date
+            updateQuery({ xMin, xMax })
+          }
+          setZoomArea({ dragging: zoomArea.dragging })
         }}
         cursor='pointer'
       >
@@ -306,7 +325,7 @@ const MultiLinePlot = props => {
         {xAxis}
         {yAxis}
         {tooltip}
-        {xReference}
+        {yReference}
         {lines}
         {zoomArea.start && zoomArea.end
           ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
@@ -315,9 +334,7 @@ const MultiLinePlot = props => {
       <div className='absolute top-0 left-0 pointer-events-none'>
         <ComposedChart {...chartProps}>
           <XAxis
-            dataKey='index'
-            allowDataOverflow
-            domain={xAxisDomain}
+            {...xAxisProps}
             tick={false}
             stroke='none'
           />
