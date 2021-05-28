@@ -66,63 +66,27 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
   return null
 }
 
-const MultiLinePlot = props => {
-  const animationDuration = 500
+const animationDuration = 500
 
+const MainChart = React.memo((props) => {
   const {
-    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
-    yAxis: yAxisConfig = {}, /* xAxis: xAxisConfig = {}, */
-    date, setDate, area_data, activeLineages,
-    type, width, height = 120, stroke = 'blueGray', className
+    activeLineages, chart,
+    chartProps, stroke, preset, type,
+    xAxisProps, yAxisConfig = {},
+    setDate, updateQuery
   } = props
-
-  const [{ xMin, xMax }, updateQuery] = useQueryAsState()
-
-  const chart = useMemo(() => {
-    const dataByDate = {}
-    const presentLineages = new Set()
-
-    for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total') {
-        dataByDate[d.date] = {
-          ...dataByDate[d.date],
-          date: d.date,
-          [d.lineage]: d.mean,
-          [`${d.lineage}_range`]: d.range
-        }
-        presentLineages.add(d.lineage)
-      }
-    }
-
-    const lineages = []
-    for (const lineage of Array.from(presentLineages)) {
-      const { active, colour } = activeLineages[lineage]
-      if (active) {
-        lineages.push({ lineage, colour })
-      }
-    }
-
-    const data =
-      orderBy(Object.values(dataByDate), 'date', 'asc')
-        .map((d, index) => ({ ...d, index }))
-
-    const dates = data.map(_ => _.date)
-
-    return {
-      lineages,
-      data,
-      dates
-    }
-  }, [area_data, activeLineages])
 
   const { lineages, data, dates } = chart
 
-  const chartProps = {
-    data: [...data], // new array required for animations
-    width,
-    height,
-    margin: { top: 12, left: 0, right: 24 }
-  }
+  const yAxisDomain = useMemo(() => {
+    if (preset === 'percentage' && type === 'area' && lineages.length) {
+      return [0, 1]
+    } else if (yAxisConfig && yAxisConfig.domain) {
+      return yAxisConfig.domain
+    } else {
+      return [0, 'auto']
+    }
+  }, [preset, type, yAxisConfig, lineages])
 
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
@@ -155,37 +119,6 @@ const MultiLinePlot = props => {
       ticks: yAxisConfig.ticks
     }
   }, [preset, lineages, activeLineages, yAxisConfig])
-
-  const yAxisDomain = useMemo(() => {
-    if (preset === 'percentage' && type === 'area' && lineages.length) {
-      return [0, 1]
-    } else if (yAxisConfig.domain) {
-      return yAxisConfig.domain
-    } else {
-      return [0, 'auto']
-    }
-  }, [preset, type, yAxisConfig.domain, lineages])
-
-  const xAxisDomain = useMemo(() => {
-    if (xMin && xMax && dates.length) {
-      const _xMin = Math.max(dates.indexOf(xMin), 0)
-      const _xMax = Math.min(dates.indexOf(xMax), data.length - 1)
-      return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
-    }
-    return ['dataMin', 'dataMax']
-  }, [xMax, dates])
-
-  const xAxisProps = useMemo(() => {
-    const indices = Object.keys(dates)
-    const ticks = xMin && xMax ? indices.slice(...xAxisDomain) : indices
-    return {
-      allowDataOverflow: true,
-      dataKey: 'index',
-      domain: xAxisDomain,
-      ticks,
-      type: 'number'
-    }
-  }, [xAxisDomain, dates])
 
   const [zoomArea, setZoomArea] = React.useState({})
 
@@ -293,54 +226,148 @@ const MultiLinePlot = props => {
   }, [yAxisConfig.reference_line, stroke])
 
   return (
+    <ComposedChart
+      {...chartProps}
+      data={[...data] /* new array required for animations */}
+      onClick={item => {
+        if (item && !zoomArea.dragging) {
+          setDate(data[item.activeLabel].date)
+        }
+      }}
+      onMouseDown={e => {
+        setZoomArea({ start: e.activeLabel, dragging: false })
+      }}
+      onMouseMove={e => {
+        zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel, dragging: true })
+      }}
+      onMouseUp={() => {
+        if (zoomArea.end && zoomArea.end !== zoomArea.start) {
+          const xMin = data[zoomArea.start].date
+          const xMax = data[zoomArea.end].date
+          updateQuery({ xMin, xMax })
+        }
+        setZoomArea({ dragging: zoomArea.dragging })
+      }}
+      cursor='pointer'
+    >
+      {grid}
+      {areas}
+      {xAxis}
+      {yAxis}
+      {tooltip}
+      {yReference}
+      {lines}
+      {zoomArea.start && zoomArea.end
+        ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
+        : null}
+    </ComposedChart>
+  )
+})
+MainChart.displayName = 'MainChart'
+
+const MultiLinePlot = props => {
+  const {
+    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
+    yAxis: yAxisConfig, /* xAxis: xAxisConfig = {}, */
+    date, setDate, area_data, activeLineages,
+    type, width, height = 120, stroke = 'blueGray', className
+  } = props
+
+  const [{ xMin, xMax }, updateQuery] = useQueryAsState()
+
+  const chart = useMemo(() => {
+    const dataByDate = {}
+    const presentLineages = new Set()
+
+    for (const d of area_data) {
+      if (d.parameter === parameter && d.lineage !== 'total') {
+        dataByDate[d.date] = {
+          ...dataByDate[d.date],
+          date: d.date,
+          [d.lineage]: d.mean,
+          [`${d.lineage}_range`]: d.range
+        }
+        presentLineages.add(d.lineage)
+      }
+    }
+
+    const lineages = []
+    for (const lineage of Array.from(presentLineages)) {
+      const { active, colour } = activeLineages[lineage]
+      if (active) {
+        lineages.push({ lineage, colour })
+      }
+    }
+
+    const data =
+      orderBy(Object.values(dataByDate), 'date', 'asc')
+        .map((d, index) => ({ ...d, index }))
+
+    const dates = data.map(_ => _.date)
+
+    return {
+      lineages,
+      data,
+      dates
+    }
+  }, [area_data, activeLineages])
+
+  const { data, dates } = chart
+
+  const chartProps = useMemo(() => ({
+    width,
+    height,
+    margin: { top: 12, left: 0, right: 24 }
+  }), [width, height])
+
+  const xAxisDomain = useMemo(() => {
+    if (xMin && xMax && dates.length) {
+      const _xMin = Math.max(dates.indexOf(xMin), 0)
+      const _xMax = Math.min(dates.indexOf(xMax), data.length - 1)
+      return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
+    }
+    return ['dataMin', 'dataMax']
+  }, [xMax, dates])
+
+  const xAxisProps = useMemo(() => {
+    const indices = Object.keys(dates)
+    const ticks = xMin && xMax ? indices.slice(...xAxisDomain) : indices
+    return {
+      allowDataOverflow: true,
+      dataKey: 'index',
+      domain: xAxisDomain,
+      ticks,
+      type: 'number'
+    }
+  }, [xAxisDomain, dates])
+
+  return (
     <div
       className={classNames('relative select-none', className)}
       onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}
     >
-      <ComposedChart
-        {...chartProps}
-        onClick={item => {
-          if (item && !zoomArea.dragging) {
-            setDate(data[item.activeLabel].date)
-          }
+      <MainChart
+        {...{
+          chart,
+          activeLineages,
+          chartProps,
+          stroke,
+          type,
+          preset,
+          yAxisConfig,
+          xAxisProps,
+          setDate,
+          updateQuery
         }}
-        onMouseDown={e => {
-          setZoomArea({ start: e.activeLabel, dragging: false })
-        }}
-        onMouseMove={e => {
-          zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel, dragging: true })
-        }}
-        onMouseUp={() => {
-          if (zoomArea.end && zoomArea.end !== zoomArea.start) {
-            const xMin = data[zoomArea.start].date
-            const xMax = data[zoomArea.end].date
-            updateQuery({ xMin, xMax })
-          }
-          setZoomArea({ dragging: zoomArea.dragging })
-        }}
-        cursor='pointer'
-      >
-        {grid}
-        {areas}
-        {xAxis}
-        {yAxis}
-        {tooltip}
-        {yReference}
-        {lines}
-        {zoomArea.start && zoomArea.end
-          ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
-          : null}
-      </ComposedChart>
+      />
       <div className='absolute top-0 left-0 pointer-events-none'>
-        <ComposedChart {...chartProps}>
+        <ComposedChart {...chartProps} data={data}>
           <XAxis
             {...xAxisProps}
             tick={false}
             stroke='none'
           />
           <YAxis
-            type='number'
-            domain={yAxisDomain}
             width={48}
             tick={false}
             stroke='none'
