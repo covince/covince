@@ -8,7 +8,7 @@ import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
 import { Heading } from './Typography'
-import { PillButton } from './Button'
+import { PillButton, Button } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
@@ -25,6 +25,7 @@ import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 import useAreaList from '../hooks/useAreaList'
+import useChartZoom from '../hooks/useChartZoom'
 
 import config from '../config'
 
@@ -137,6 +138,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     return values
   }, [results, date])
 
+  const { chartZoomApplied, clearChartZoom } = useChartZoom()
+
   return (
     <>
       { isMobile && lastModified &&
@@ -170,7 +173,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
-                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+                  className='flex items-center bg-primary text-white space-x-1 min-w-0 h-8 pr-2'
                   onClick={() => setMobileView('chart')}
                 >
                   <span className='truncate'>{locationFilter.heading}</span>
@@ -270,11 +273,21 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         { mobileView === 'chart' &&
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3'>
             <LineageFilter {...lineageFilter} />
-            <div className='grid place-items-center h-12 box-content pt-1'>
-              <PillButton onClick={() => setMobileView('map')} className='flex items-center'>
-                <BsMap className='h-5 w-5 mr-3' />
-                View map on {mobileNavDate}
+            <div
+              className={classNames(
+                'grid items-center gap-3 grid-flow-col h-12 box-content pt-1 _gap-3',
+                chartZoomApplied ? 'auto-cols-fr' : 'justify-center'
+              )}
+            >
+              <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
+                <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
+                View map
+                {!chartZoomApplied && <span>&nbsp;on {mobileNavDate}</span>}
               </PillButton>
+              { chartZoomApplied &&
+                <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
+                  <span className='whitespace-nowrap truncate'>Reset chart zoom</span>
+                </PillButton> }
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>

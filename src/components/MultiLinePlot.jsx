@@ -1,13 +1,13 @@
 import './MultiLinePlot.css'
 
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
-import useQueryAsState from '../hooks/useQueryAsState'
+import useChartZoom from '../hooks/useChartZoom'
 import config from '../config'
 
 const formatLargeNumber = number => {
@@ -71,9 +71,9 @@ const animationDuration = 500
 const MainChart = React.memo((props) => {
   const {
     activeLineages, chart,
-    chartProps, stroke, preset, type,
+    stroke, preset, type,
     xAxisProps, yAxisConfig = {},
-    setDate, updateQuery
+    children, ...chartProps
   } = props
 
   const { lineages, data, dates } = chart
@@ -119,8 +119,6 @@ const MainChart = React.memo((props) => {
       ticks: yAxisConfig.ticks
     }
   }, [preset, lineages, activeLineages, yAxisConfig])
-
-  const [zoomArea, setZoomArea] = React.useState({})
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
@@ -229,25 +227,6 @@ const MainChart = React.memo((props) => {
     <ComposedChart
       {...chartProps}
       data={[...data] /* new array required for animations */}
-      onClick={item => {
-        if (item && !zoomArea.dragging) {
-          setDate(data[item.activeLabel].date)
-        }
-      }}
-      onMouseDown={e => {
-        setZoomArea({ start: e.activeLabel, dragging: false })
-      }}
-      onMouseMove={e => {
-        zoomArea.start && setZoomArea({ start: zoomArea.start, end: e.activeLabel, dragging: true })
-      }}
-      onMouseUp={() => {
-        if (zoomArea.end && zoomArea.end !== zoomArea.start) {
-          const xMin = data[zoomArea.start].date
-          const xMax = data[zoomArea.end].date
-          updateQuery({ xMin, xMax })
-        }
-        setZoomArea({ dragging: zoomArea.dragging })
-      }}
       cursor='pointer'
     >
       {grid}
@@ -257,9 +236,7 @@ const MainChart = React.memo((props) => {
       {tooltip}
       {yReference}
       {lines}
-      {zoomArea.start && zoomArea.end
-        ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
-        : null}
+      {children}
     </ComposedChart>
   )
 })
@@ -273,7 +250,7 @@ const MultiLinePlot = props => {
     type, width, height = 120, stroke = 'blueGray', className
   } = props
 
-  const [{ xMin, xMax }, updateQuery] = useQueryAsState()
+  const { xMin, xMax, setChartZoom, clearChartZoom } = useChartZoom()
 
   const chart = useMemo(() => {
     const dataByDate = {}
@@ -321,12 +298,15 @@ const MultiLinePlot = props => {
   }), [width, height])
 
   const xAxisDomain = useMemo(() => {
+    const min = 0
+    const max = data.length - 1
     if (xMin && xMax && dates.length) {
-      const _xMin = Math.max(dates.indexOf(xMin), 0)
-      const _xMax = Math.min(dates.indexOf(xMax), data.length - 1)
+      const _xMin = Math.max(dates.indexOf(xMin), min)
+      let _xMax = dates.indexOf(xMax)
+      if (_xMax === -1) _xMax = max
       return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
     }
-    return ['dataMin', 'dataMax']
+    return [min, max]
   }, [xMax, dates])
 
   const xAxisProps = useMemo(() => {
@@ -341,27 +321,81 @@ const MultiLinePlot = props => {
     }
   }, [xAxisDomain, dates])
 
+  const [zoomArea, setZoomArea] = React.useState({})
+
+  const eventHandlers = useMemo(() => {
+    return {
+      onClick: item => {
+        if (item && !zoomArea.dragged) {
+          setDate(data[item.activeLabel].date)
+        }
+        setZoomArea({ dragged: zoomArea.dragged })
+      },
+      onMouseDown: e => {
+        setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
+      },
+      onMouseMove: e => {
+        if (!zoomArea.start) return
+        let end = e.activeLabel
+        if (e.activeLabel === undefined) { // outside of x axis
+          end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
+        }
+        console.log(e, zoomArea, end)
+        setZoomArea({ start: zoomArea.start, end, dragged: true })
+      },
+      onMouseUp: () => {
+        if (zoomArea.end !== zoomArea.start) {
+          const xMin = data[zoomArea.start].date
+          const xMax = data[zoomArea.end].date
+          setChartZoom(xMin, xMax)
+        }
+        setZoomArea({ dragged: zoomArea.dragged })
+      },
+      onMouseEnter: () => {
+        setZoomArea({ ...zoomArea, window: false })
+      },
+      onMouseLeave: () => {
+        setZoomArea({ ...zoomArea, window: true })
+      }
+    }
+  }, [zoomArea])
+
+  useEffect(() => {
+    if (zoomArea.window) {
+      window.addEventListener('mouseup', eventHandlers.onMouseUp, true)
+      window.addEventListener('touchend', eventHandlers.onMouseUp, true)
+    }
+    return () => {
+      window.removeEventListener('mouseup', eventHandlers.onMouseUp, true)
+      window.removeEventListener('touchend', eventHandlers.onMouseUp, true)
+    }
+  }, [zoomArea])
+
   return (
     <div
       className={classNames('relative select-none', className)}
-      onDoubleClick={() => updateQuery({ xMin: undefined, xMax: undefined })}
+      onDoubleClick={clearChartZoom}
     >
       <MainChart
         {...{
-          chart,
+          ...chartProps,
+          ...eventHandlers,
           activeLineages,
+          chart,
           chartProps,
+          preset,
           stroke,
           type,
-          preset,
-          yAxisConfig,
           xAxisProps,
-          setDate,
-          updateQuery
+          yAxisConfig
         }}
-      />
+      >
+        {zoomArea.start
+          ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
+          : null}
+      </MainChart>
       <div className='absolute top-0 left-0 pointer-events-none'>
-        <ComposedChart {...chartProps} data={data}>
+        <ComposedChart {...chartProps} data={data} className='test'>
           <XAxis
             {...xAxisProps}
             tick={false}

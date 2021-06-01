@@ -25,7 +25,7 @@ export const PillButton = (props) => (
   <button
     {...props}
     className={classnames(props.className, [
-      'px-4 p-2 text-sm rounded-full bg-primary font-bold text-white'
+      'px-4 p-2 text-sm rounded-full font-bold'
     ])}
   />
 )

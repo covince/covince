@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import Measure from 'react-measure'
-import { BsArrowsFullscreen } from 'react-icons/bs'
 
 import MultiLinePlot from './MultiLinePlot'
 import { Heading } from './Typography'
@@ -24,16 +23,10 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
 
   const [height, setHeight] = useState(0)
 
-  const isZooming = query.xMin && query.xMax
-
   const chart = (
     <>
       <ChartHeading className='pl-12 pr-6 flex items-baseline'isMobile={isMobile}>
         {heading}
-        { isZooming &&
-          <button onClick={() => updateQuery({ xMin: undefined, xMax: undefined })} className='ml-3'>
-            <BsArrowsFullscreen className='h-4 w-4 text-heading' />
-          </button> }
         { allowStack &&
           <Checkbox
             id={line_type_accessor}
