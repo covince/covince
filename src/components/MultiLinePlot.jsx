@@ -73,7 +73,7 @@ const MainChart = React.memo((props) => {
     activeLineages, chart,
     stroke, preset, type,
     xAxisProps, yAxisConfig = {},
-    children, ...chartProps
+    zoomArea, ...chartProps
   } = props
 
   const { lineages, data, dates } = chart
@@ -223,11 +223,16 @@ const MainChart = React.memo((props) => {
     )
   }, [yAxisConfig.reference_line, stroke])
 
+  const cursor = useMemo(() => {
+    if (zoomArea.start) return 'ew-resize'
+    return 'crosshair'
+  }, [zoomArea])
+
   return (
     <ComposedChart
       {...chartProps}
       data={[...data] /* new array required for animations */}
-      cursor='pointer'
+      cursor={cursor}
     >
       {grid}
       {areas}
@@ -236,7 +241,9 @@ const MainChart = React.memo((props) => {
       {tooltip}
       {yReference}
       {lines}
-      {children}
+      {zoomArea.start
+        ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
+        : null}
     </ComposedChart>
   )
 })
@@ -337,10 +344,9 @@ const MultiLinePlot = props => {
       onMouseMove: e => {
         if (!zoomArea.start) return
         let end = e.activeLabel
-        if (e.activeLabel === undefined) { // outside of x axis
+        if (e.activeLabel === undefined) { // outside of axes
           end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
         }
-        console.log(e, zoomArea, end)
         setZoomArea({ start: zoomArea.start, end, dragged: true })
       },
       onMouseUp: () => {
@@ -350,24 +356,7 @@ const MultiLinePlot = props => {
           setChartZoom(xMin, xMax)
         }
         setZoomArea({ dragged: zoomArea.dragged })
-      },
-      onMouseEnter: () => {
-        setZoomArea({ ...zoomArea, window: false })
-      },
-      onMouseLeave: () => {
-        setZoomArea({ ...zoomArea, window: true })
       }
-    }
-  }, [zoomArea])
-
-  useEffect(() => {
-    if (zoomArea.window) {
-      window.addEventListener('mouseup', eventHandlers.onMouseUp, true)
-      window.addEventListener('touchend', eventHandlers.onMouseUp, true)
-    }
-    return () => {
-      window.removeEventListener('mouseup', eventHandlers.onMouseUp, true)
-      window.removeEventListener('touchend', eventHandlers.onMouseUp, true)
     }
   }, [zoomArea])
 
@@ -382,18 +371,14 @@ const MultiLinePlot = props => {
           ...eventHandlers,
           activeLineages,
           chart,
-          chartProps,
           preset,
           stroke,
           type,
           xAxisProps,
-          yAxisConfig
+          yAxisConfig,
+          zoomArea
         }}
-      >
-        {zoomArea.start
-          ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
-          : null}
-      </MainChart>
+      />
       <div className='absolute top-0 left-0 pointer-events-none'>
         <ComposedChart {...chartProps} data={data} className='test'>
           <XAxis

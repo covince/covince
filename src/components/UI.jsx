@@ -2,13 +2,14 @@ import React, { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap } from 'react-icons/bs'
+import { HiOutlineZoomOut } from 'react-icons/hi'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
 import { Heading } from './Typography'
-import { PillButton, Button } from './Button'
+import { PillButton, InlineButton } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
@@ -246,7 +247,18 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'map' })}>
+        <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' })}>
+          <FadeTransition in={chartZoomApplied}>
+            <div className='absolute left-0 right-0 -top-6 h-0 flex'>
+              <InlineButton
+                onClick={clearChartZoom}
+                className='mt-1.5 mx-auto h-6 px-1 flex items-center'
+              >
+                <HiOutlineZoomOut className='h-5 w-5 mr-1' />
+                zoom out
+              </InlineButton>
+            </div>
+          </FadeTransition>
           <LocalIncidence
             chartDefinitions={config.charts}
             className={classNames(
