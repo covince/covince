@@ -79,19 +79,17 @@ const MainChart = React.memo((props) => {
   const { lineages, data, dates } = chart
 
   const yAxisDomain = useMemo(() => {
-    if (chartZoomApplied && type !== 'area' && data.length) {
+    if (yAxisConfig && yAxisConfig.domain) {
+      return yAxisConfig.domain
+    } else if (chartZoomApplied && type !== 'area' && data.length) {
       const range = data.slice(...xAxisProps.domain)
-      let { minY: min, maxY: max } = range[0]
-      for (const { minY, maxY } of range.slice(1)) {
-        min = Math.min(minY, min)
+      let { maxY: max } = range[0]
+      for (const { maxY } of range.slice(1)) {
         max = Math.max(maxY, max)
       }
-      return [Math.round(min), Math.round(max)]
-    }
-    if (preset === 'percentage' && type === 'area' && lineages.length) {
-      return [0, 1]
-    } else if (yAxisConfig && yAxisConfig.domain) {
-      return yAxisConfig.domain
+      return [0, Math.ceil(max)]
+    } else if (preset === 'percentage' && type === 'area' && lineages.length) {
+      return [0, 100]
     } else {
       return [0, 'auto']
     }
@@ -106,7 +104,7 @@ const MainChart = React.memo((props) => {
       if (fullScale) {
         return {
           tickFormatter: value => `${Math.min(parseFloat(value), 100)}%`,
-          ticks: [0, 25, 50, 75, 100]
+          ticks: chartZoomApplied ? undefined : [0, 25, 50, 75, 100]
         }
       }
       return {
@@ -275,15 +273,12 @@ const MultiLinePlot = props => {
 
     for (const d of area_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
-        const maxY = d.date in dataByDate ? dataByDate[d.date].maxY : 0
-        const minY = d.date in dataByDate ? dataByDate[d.date].minY : Number.MAX_VALUE
         dataByDate[d.date] = {
           ...dataByDate[d.date],
           date: d.date,
           [d.lineage]: d.mean,
           [`${d.lineage}_range`]: d.range,
-          maxY: Math.max(maxY, d.range[1]),
-          minY: Math.min(minY, d.range[0])
+          maxY: Math.max(d.date in dataByDate ? dataByDate[d.date].maxY : 0, d.range[1])
         }
         presentLineages.add(d.lineage)
       }
