@@ -1,6 +1,6 @@
 import './MultiLinePlot.css'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'

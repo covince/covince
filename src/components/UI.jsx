@@ -1,15 +1,14 @@
 import React, { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
-import { BsArrowRightShort, BsMap } from 'react-icons/bs'
-import { HiOutlineZoomOut } from 'react-icons/hi'
+import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/bs'
 
 import Chloropleth from './Chloropleth'
 import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
 import { Heading } from './Typography'
-import { PillButton, InlineButton } from './Button'
+import { PillButton, Button } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
@@ -248,17 +247,18 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           </div>
         </div>
         <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' })}>
-          <FadeTransition in={chartZoomApplied}>
-            <div className='absolute left-0 right-0 -top-6 h-0 flex'>
-              <InlineButton
-                onClick={clearChartZoom}
-                className='mt-1.5 mx-auto h-6 px-1 flex items-center'
-              >
-                <HiOutlineZoomOut className='h-5 w-5 mr-1' />
-                zoom out
-              </InlineButton>
-            </div>
-          </FadeTransition>
+          { !isMobile &&
+            <FadeTransition in={chartZoomApplied}>
+              <div className='absolute left-0 right-0 -top-6 h-0 flex'>
+                <Button
+                  onClick={clearChartZoom}
+                  className='ml-auto mr-4 -mt-1.5 h-6 pl-1.5 pr-1.5 flex items-center text-primary'
+                >
+                  <BsArrowCounterclockwise className='h-4 w-4 mr-1' />
+                  <span className='text-xs tracking-wide font-medium'>Reset date range</span>
+                </Button>
+              </div>
+            </FadeTransition> }
           <LocalIncidence
             chartDefinitions={config.charts}
             className={classNames(
@@ -298,7 +298,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               </PillButton>
               { chartZoomApplied &&
                 <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
-                  <span className='whitespace-nowrap truncate'>Reset chart zoom</span>
+                  <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
                 </PillButton> }
             </div>
           </StickyMobileSection> }
