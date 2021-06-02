@@ -81,20 +81,33 @@ const MainChart = React.memo((props) => {
   const yAxisDomain = useMemo(() => {
     if (yAxisConfig && yAxisConfig.domain) {
       return yAxisConfig.domain
-    } else if (chartZoomApplied && type !== 'area' && data.length) {
-      const range = data.slice(...xAxisProps.domain)
-      let { maxY: max } = range[0]
-      for (const { maxY } of range.slice(1)) {
-        max = Math.max(maxY, max)
-      }
-      return [0, Math.ceil(max)]
-    } else if (preset === 'percentage' && type === 'area' && lineages.length) {
-      return [0, 100]
-    } else {
-      return [0, 'auto']
     }
+    if (preset === 'percentage' && type === 'area' && lineages.length === Object.keys(activeLineages).length) {
+      return [0, 100]
+    }
+    if (chartZoomApplied && data.length) {
+      if (type === 'area') {
+        const range = data.slice(...xAxisProps.domain)
+        let { sumY: max } = range[0]
+        for (const { sumY } of range.slice(1)) {
+          max = Math.max(sumY, max)
+        }
+        return [0, Math.ceil(max)]
+      } else {
+        const range = data.slice(...xAxisProps.domain)
+        let { maxY: max } = range[0]
+        for (const { maxY } of range.slice(1)) {
+          max = Math.max(maxY, max)
+        }
+        return [0, Math.ceil(max)]
+      }
+    }
+    if (preset === 'percentage' && type === 'area' && lineages.length) {
+      return [0, 1]
+    }
+    return [0, 'auto']
   }, [preset, type, yAxisConfig, lineages, chartZoomApplied, data])
-
+  console.log(yAxisDomain)
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
       if (lineages.length === 0) {
@@ -273,13 +286,17 @@ const MultiLinePlot = props => {
 
     for (const d of area_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
-        dataByDate[d.date] = {
+        const next = {
           ...dataByDate[d.date],
           date: d.date,
           [d.lineage]: d.mean,
-          [`${d.lineage}_range`]: d.range,
-          maxY: Math.max(d.date in dataByDate ? dataByDate[d.date].maxY : 0, d.range[1])
+          [`${d.lineage}_range`]: d.range
         }
+        if (d.lineage in activeLineages && activeLineages[d.lineage].active) {
+          next.maxY = Math.max(next.maxY || 0, d.range[1])
+          next.sumY = (next.sumY || 0) + d.mean
+        }
+        dataByDate[d.date] = next
         presentLineages.add(d.lineage)
       }
     }
