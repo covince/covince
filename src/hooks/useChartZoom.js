@@ -6,7 +6,7 @@ export default () => {
   return {
     xMin,
     xMax,
-    chartZoomApplied: xMin && xMax,
+    chartZoomApplied: !!(xMin && xMax),
     setChartZoom: (xMin, xMax) => updateQuery({ xMin, xMax }),
     clearChartZoom: () => updateQuery({ xMin: undefined, xMax: undefined })
   }

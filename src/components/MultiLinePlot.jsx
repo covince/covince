@@ -70,7 +70,7 @@ const animationDuration = 500
 
 const MainChart = React.memo((props) => {
   const {
-    activeLineages, chart,
+    activeLineages, chart, chartZoomApplied,
     stroke, preset, type,
     xAxisProps, yAxisConfig = {},
     zoomArea, ...chartProps
@@ -79,6 +79,16 @@ const MainChart = React.memo((props) => {
   const { lineages, data, dates } = chart
 
   const yAxisDomain = useMemo(() => {
+    if (chartZoomApplied && type !== 'area' && data.length) {
+      const range = data.slice(...xAxisProps.domain)
+      let { minY: min, maxY: max } = range[0]
+      for (const { minY, maxY } of range.slice(1)) {
+        min = Math.min(minY, min)
+        max = Math.max(maxY, max)
+      }
+      console.log([min, max])
+      return [min, max]
+    }
     if (preset === 'percentage' && type === 'area' && lineages.length) {
       return [0, 1]
     } else if (yAxisConfig && yAxisConfig.domain) {
@@ -86,7 +96,7 @@ const MainChart = React.memo((props) => {
     } else {
       return [0, 'auto']
     }
-  }, [preset, type, yAxisConfig, lineages])
+  }, [preset, type, yAxisConfig, lineages, chartZoomApplied, data])
 
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
@@ -116,9 +126,9 @@ const MainChart = React.memo((props) => {
         }
         return value.toLocaleString()
       },
-      ticks: yAxisConfig.ticks
+      ticks: chartZoomApplied ? undefined : yAxisConfig.ticks
     }
-  }, [preset, lineages, activeLineages, yAxisConfig])
+  }, [preset, lineages, activeLineages, yAxisConfig, chartZoomApplied])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
@@ -153,6 +163,7 @@ const MainChart = React.memo((props) => {
       stroke='currentcolor'
       tickMargin='4'
       tick={data.length}
+      allowDecimals={false}
       {...yAxisTicks}
     />
 
@@ -257,7 +268,7 @@ const MultiLinePlot = props => {
     type, width, height = 120, stroke = 'blueGray', className
   } = props
 
-  const { xMin, xMax, setChartZoom, clearChartZoom } = useChartZoom()
+  const { xMin, xMax, setChartZoom, clearChartZoom, chartZoomApplied } = useChartZoom()
 
   const chart = useMemo(() => {
     const dataByDate = {}
@@ -265,11 +276,15 @@ const MultiLinePlot = props => {
 
     for (const d of area_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
+        const maxY = d.date in dataByDate ? dataByDate[d.date].maxY : 0
+        const minY = d.date in dataByDate ? dataByDate[d.date].minY : Number.MAX_VALUE
         dataByDate[d.date] = {
           ...dataByDate[d.date],
           date: d.date,
           [d.lineage]: d.mean,
-          [`${d.lineage}_range`]: d.range
+          [`${d.lineage}_range`]: d.range,
+          maxY: Math.max(maxY, d.range[1]),
+          minY: Math.min(minY, d.range[0])
         }
         presentLineages.add(d.lineage)
       }
@@ -371,6 +386,7 @@ const MultiLinePlot = props => {
           ...eventHandlers,
           activeLineages,
           chart,
+          chartZoomApplied,
           preset,
           stroke,
           type,
