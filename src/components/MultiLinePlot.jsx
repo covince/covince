@@ -86,7 +86,7 @@ const MainChart = React.memo((props) => {
         min = Math.min(minY, min)
         max = Math.max(maxY, max)
       }
-      return [min, max]
+      return [Math.round(min), Math.round(max)]
     }
     if (preset === 'percentage' && type === 'area' && lineages.length) {
       return [0, 1]
