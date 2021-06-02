@@ -86,7 +86,6 @@ const MainChart = React.memo((props) => {
         min = Math.min(minY, min)
         max = Math.max(maxY, max)
       }
-      console.log([min, max])
       return [min, max]
     }
     if (preset === 'percentage' && type === 'area' && lineages.length) {
@@ -156,7 +155,7 @@ const MainChart = React.memo((props) => {
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={yAxisConfig.allow_data_overflow || false}
+      allowDataOverflow={chartZoomApplied || yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
