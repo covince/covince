@@ -107,7 +107,7 @@ const MainChart = React.memo((props) => {
     }
     return [0, 'auto']
   }, [preset, type, yAxisConfig, lineages, chartZoomApplied, data])
-  console.log(yAxisDomain)
+
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
       if (lineages.length === 0) {
@@ -244,16 +244,10 @@ const MainChart = React.memo((props) => {
     )
   }, [yAxisConfig.reference_line, stroke])
 
-  const cursor = useMemo(() => {
-    if (zoomArea.start) return 'ew-resize'
-    return 'crosshair'
-  }, [zoomArea])
-
   return (
     <ComposedChart
       {...chartProps}
       data={[...data] /* new array required for animations */}
-      cursor={cursor}
     >
       {grid}
       {areas}
@@ -355,6 +349,7 @@ const MultiLinePlot = props => {
   }, [xAxisDomain, dates])
 
   const [zoomArea, setZoomArea] = React.useState({})
+  const [isHovering, setIsHovering] = React.useState(false)
 
   const eventHandlers = useMemo(() => {
     return {
@@ -368,12 +363,16 @@ const MultiLinePlot = props => {
         setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
       },
       onMouseMove: e => {
+        setIsHovering(e.activeLabel !== undefined)
         if (!zoomArea.start) return
         let end = e.activeLabel
         if (e.activeLabel === undefined) { // outside of axes
           end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
         }
         setZoomArea({ start: zoomArea.start, end, dragged: true })
+      },
+      onMouseLeave: e => {
+        setIsHovering(false)
       },
       onMouseUp: () => {
         if (zoomArea.end !== zoomArea.start) {
@@ -384,7 +383,13 @@ const MultiLinePlot = props => {
         setZoomArea({ dragged: zoomArea.dragged })
       }
     }
-  }, [zoomArea])
+  }, [zoomArea, isHovering])
+
+  const cursor = useMemo(() => {
+    if (zoomArea.start) return 'ew-resize'
+    if (isHovering) return 'crosshair'
+    return undefined
+  }, [zoomArea, isHovering])
 
   return (
     <div
@@ -398,6 +403,7 @@ const MultiLinePlot = props => {
           activeLineages,
           chart,
           chartZoomApplied,
+          cursor,
           preset,
           stroke,
           type,
