@@ -27,9 +27,10 @@ import useLineageFilter from '../hooks/useLineageFilter'
 import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
 
-import config from '../config'
+import getConfig from '../config'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
+  const config = getConfig()
   const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages

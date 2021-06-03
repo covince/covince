@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
 import useChartZoom from '../hooks/useChartZoom'
-import config from '../config'
+import getConfig from '../config'
 
 const formatLargeNumber = number => {
   const fixed = number.toFixed(2)
@@ -16,6 +16,7 @@ const formatLargeNumber = number => {
 }
 
 const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
+  const config = getConfig()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
     _payload.sort((a, b) => {
@@ -87,14 +88,16 @@ const MainChart = React.memo((props) => {
     }
     if (chartZoom && data.length) {
       if (type === 'area') {
-        const range = data.slice(...xAxisProps.domain)
+        const [minIndex, maxIndex] = xAxisProps.domain
+        const range = data.slice(minIndex, maxIndex + 1)
         let { sumY: max } = range[0]
         for (const { sumY } of range.slice(1)) {
           max = Math.max(sumY, max)
         }
         return [0, Math.ceil(max)]
       } else {
-        const range = data.slice(...xAxisProps.domain)
+        const [minIndex, maxIndex] = xAxisProps.domain
+        const range = data.slice(minIndex, maxIndex + 1)
         let { maxY: max } = range[0]
         for (const { maxY } of range.slice(1)) {
           max = Math.max(maxY, max)
@@ -339,7 +342,11 @@ const MultiLinePlot = props => {
 
   const xAxisProps = useMemo(() => {
     const indices = Object.keys(dates)
-    const ticks = chartZoom ? indices.slice(...xAxisDomain) : indices
+    let ticks = indices
+    if (chartZoom) {
+      const [minIndex, maxIndex] = xAxisDomain
+      ticks = indices.slice(minIndex, maxIndex + 1)
+    }
     return {
       allowDataOverflow: true,
       dataKey: 'index',

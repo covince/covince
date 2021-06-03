@@ -14,7 +14,7 @@ const tolMutedQualitative = [
   '#DDDDDD' // grey
 ]
 
-const config = {
+const defaults = {
   datetime_format: 'd MMMM y, HH:mm',
   map: { settings: {} },
   timeline: {
@@ -26,6 +26,7 @@ const config = {
   }
 }
 
+let config
 let previousConfig
 
 export const setConfig = (userConfig) => {
@@ -33,7 +34,8 @@ export const setConfig = (userConfig) => {
   if (userConfig === previousConfig || userConfig === undefined) return
   previousConfig = userConfig
 
-  merge(config, userConfig)
+  config = {}
+  merge(config, defaults, userConfig)
 
   // normalise options
   const { map, timeline, colors } = config
@@ -55,4 +57,4 @@ export const setConfig = (userConfig) => {
   }
 }
 
-export default config
+export default () => config
