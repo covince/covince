@@ -7,6 +7,7 @@ import { HiChevronDown } from 'react-icons/hi'
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
+import { InlineButton } from './Button'
 
 const Select = ({ label, children, value, onChange }) => {
   const _onChange = useCallback((e) => {
@@ -34,14 +35,14 @@ const LocationFilter = ({ className, loading, value, areaList, onChange, categor
       <DescriptiveHeading className='whitespace-nowrap'>
         {category}
       </DescriptiveHeading>
-      {showOverviewButton && <button
+      {showOverviewButton && <InlineButton
         title='Return to overview'
-        className='py-0 pr-1 text-xs uppercase tracking-wider rounded flex items-center font-bold text-primary focus:ring-2 focus:ring-primary focus:outline-none relative z-10'
+        className='pr-1 relative z-10'
         onClick={loadOverview}
       >
         <BsArrowUpShort className=' h-6 w-6 fill-current' />
         {overview.short_text}
-      </button> }
+      </InlineButton> }
     </div>
     <Select value={value} onChange={onChange} label={heading}>
       <option value='overview'>{overview.heading}</option>

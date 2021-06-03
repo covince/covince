@@ -1,11 +1,13 @@
 import './MultiLinePlot.css'
 
 import React, { useMemo } from 'react'
-import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area } from 'recharts'
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
+import { orderBy } from 'lodash'
 
+import useChartZoom from '../hooks/useChartZoom'
 import config from '../config'
 
 const formatLargeNumber = number => {
@@ -13,9 +15,10 @@ const formatLargeNumber = number => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
-const CustomTooltip = ({ active, payload, label, percentage }) => {
+const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
   if (active && payload) {
-    payload.sort((a, b) => {
+    const _payload = payload.filter(_ => _.value > 0)
+    _payload.sort((a, b) => {
       if (a.value < b.value) return 1
       if (a.value > b.value) return -1
       return 0
@@ -24,9 +27,9 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(label), timeline.date_format.chart_tooltip)}
+          {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
         </h4>
-        <table className='tabular-nums'>
+        <table className='tabular-nums w-full'>
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
@@ -35,7 +38,8 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
             </tr>
           </thead>
           <tbody>
-          {payload.map(item => {
+          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700'>No data</td></tr>}
+          {_payload.map(item => {
             if (item.name === '_range') {
               return null
             }
@@ -62,52 +66,47 @@ const CustomTooltip = ({ active, payload, label, percentage }) => {
   return null
 }
 
-const MultiLinePlot = props => {
-  const animationDuration = 500
+const animationDuration = 500
+
+const MainChart = React.memo((props) => {
   const {
-    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
-    yAxis: yAxisConfig = {}, /* xAxis: xAxisConfig = {}, */
-    date, setDate, area_data, activeLineages,
-    type, width, height = 120, stroke = 'blueGray', className
+    activeLineages, chart, chartZoomApplied,
+    stroke, preset, type,
+    xAxisProps, yAxisConfig = {},
+    zoomArea, ...chartProps
   } = props
-  const chart = useMemo(() => {
-    const dataByDate = {}
-    const presentLineages = new Set()
 
-    for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total') {
-        dataByDate[d.date] = {
-          ...dataByDate[d.date],
-          date: d.date,
-          [d.lineage]: d.mean,
-          [`${d.lineage}_range`]: d.range
+  const { lineages, data, dates } = chart
+
+  const yAxisDomain = useMemo(() => {
+    if (yAxisConfig && yAxisConfig.domain) {
+      return yAxisConfig.domain
+    }
+    if (preset === 'percentage' && type === 'area' && lineages.length === Object.keys(activeLineages).length) {
+      return [0, 100]
+    }
+    if (chartZoomApplied && data.length) {
+      if (type === 'area') {
+        const range = data.slice(...xAxisProps.domain)
+        let { sumY: max } = range[0]
+        for (const { sumY } of range.slice(1)) {
+          max = Math.max(sumY, max)
         }
-        presentLineages.add(d.lineage)
+        return [0, Math.ceil(max)]
+      } else {
+        const range = data.slice(...xAxisProps.domain)
+        let { maxY: max } = range[0]
+        for (const { maxY } of range.slice(1)) {
+          max = Math.max(maxY, max)
+        }
+        return [0, Math.ceil(max)]
       }
     }
-
-    const lineages = []
-    for (const lineage of Array.from(presentLineages)) {
-      const { active, colour } = activeLineages[lineage]
-      if (active) {
-        lineages.push({ lineage, colour })
-      }
+    if (preset === 'percentage' && type === 'area' && lineages.length) {
+      return [0, 1]
     }
-
-    return {
-      lineages,
-      data: Object.values(dataByDate)
-    }
-  }, [area_data, activeLineages])
-
-  const { lineages, data } = chart
-
-  const chartProps = useMemo(() => ({
-    data,
-    width,
-    height,
-    margin: { top: 12, left: 0, right: 24 }
-  }), [data, width, height])
+    return [0, 'auto']
+  }, [preset, type, yAxisConfig, lineages, chartZoomApplied, data])
 
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
@@ -118,7 +117,7 @@ const MultiLinePlot = props => {
       if (fullScale) {
         return {
           tickFormatter: value => `${Math.min(parseFloat(value), 100)}%`,
-          ticks: [0, 25, 50, 75, 100]
+          ticks: chartZoomApplied ? undefined : [0, 25, 50, 75, 100]
         }
       }
       return {
@@ -137,19 +136,9 @@ const MultiLinePlot = props => {
         }
         return value.toLocaleString()
       },
-      ticks: yAxisConfig.ticks
+      ticks: chartZoomApplied ? undefined : yAxisConfig.ticks
     }
-  }, [preset, lineages, activeLineages, yAxisConfig])
-
-  const yAxisDomain = useMemo(() => {
-    if (preset === 'percentage' && type === 'area' && lineages.length) {
-      return [0, 1]
-    } else if (yAxisConfig.domain) {
-      return yAxisConfig.domain
-    } else {
-      return [0, 'auto']
-    }
-  }, [preset, type, yAxisConfig.domain, lineages])
+  }, [preset, lineages, activeLineages, yAxisConfig, chartZoomApplied])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
@@ -158,31 +147,33 @@ const MultiLinePlot = props => {
     <Tooltip
       content={CustomTooltip}
       percentage={preset === 'percentage'}
-      cursor={{ stroke: tailwindColors[stroke][type === 'area' ? '500' : '300'] }}
+      dates={dates}
+      cursor={{ stroke: tailwindColors[stroke][400] }}
     />
-  , [format, stroke])
+  , [format, stroke, dates])
 
   const xAxis = useMemo(() =>
     <XAxis
-      dataKey='date'
+      {...xAxisProps}
       fontSize='12'
       tick={data.length}
-      tickFormatter={d => format(new Date(d), 'd MMM')}
+      tickFormatter={i => i in data ? format(new Date(data[i].date), 'd MMM') : ''}
       tickMargin='4'
       stroke='currentcolor'
     />
-  , [data])
+  , [data, xAxisProps])
 
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={yAxisConfig.allow_data_overflow || false}
+      allowDataOverflow={chartZoomApplied || yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
       stroke='currentcolor'
       tickMargin='4'
       tick={data.length}
+      allowDecimals={false}
       {...yAxisTicks}
     />
 
@@ -239,7 +230,7 @@ const MultiLinePlot = props => {
     )
   }, [lineages, stroke, type])
 
-  const xReference = useMemo(() => {
+  const yReference = useMemo(() => {
     if (yAxisConfig.reference_line === undefined) return null
     return (
       <ReferenceLine
@@ -254,40 +245,187 @@ const MultiLinePlot = props => {
   }, [yAxisConfig.reference_line, stroke])
 
   return (
-    <div className={classNames('relative', className)}>
-      <ComposedChart
-        {...chartProps}
-        onClick={item => {
-          if (item) {
-            setDate(item.activeLabel)
-          }
+    <ComposedChart
+      {...chartProps}
+      data={[...data] /* new array required for animations */}
+    >
+      {grid}
+      {areas}
+      {xAxis}
+      {yAxis}
+      {tooltip}
+      {yReference}
+      {lines}
+      {zoomArea.start
+        ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
+        : null}
+    </ComposedChart>
+  )
+})
+MainChart.displayName = 'MainChart'
+
+const MultiLinePlot = props => {
+  const {
+    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
+    yAxis: yAxisConfig, /* xAxis: xAxisConfig = {}, */
+    date, setDate, area_data, activeLineages,
+    type, width, height = 120, stroke = 'blueGray', className
+  } = props
+
+  const { xMin, xMax, setChartZoom, clearChartZoom, chartZoomApplied } = useChartZoom()
+
+  const chart = useMemo(() => {
+    const dataByDate = {}
+    const presentLineages = new Set()
+
+    for (const d of area_data) {
+      if (d.parameter === parameter && d.lineage !== 'total') {
+        const next = {
+          ...dataByDate[d.date],
+          date: d.date,
+          [d.lineage]: d.mean,
+          [`${d.lineage}_range`]: d.range
+        }
+        if (d.lineage in activeLineages && activeLineages[d.lineage].active) {
+          next.maxY = Math.max(next.maxY || 0, d.range[1])
+          next.sumY = (next.sumY || 0) + d.mean
+        }
+        dataByDate[d.date] = next
+        presentLineages.add(d.lineage)
+      }
+    }
+
+    const lineages = []
+    for (const lineage of Array.from(presentLineages)) {
+      const { active, colour } = activeLineages[lineage]
+      if (active) {
+        lineages.push({ lineage, colour })
+      }
+    }
+
+    const data =
+      orderBy(Object.values(dataByDate), 'date', 'asc')
+        .map((d, index) => ({ ...d, index }))
+
+    const dates = data.map(_ => _.date)
+
+    return {
+      lineages,
+      data,
+      dates
+    }
+  }, [area_data, activeLineages])
+
+  const { data, dates } = chart
+
+  const chartProps = useMemo(() => ({
+    width,
+    height,
+    margin: { top: 12, left: 0, right: 24 }
+  }), [width, height])
+
+  const xAxisDomain = useMemo(() => {
+    const min = 0
+    const max = data.length - 1
+    if (xMin && xMax && dates.length) {
+      const _xMin = Math.max(dates.indexOf(xMin), min)
+      let _xMax = dates.indexOf(xMax)
+      if (_xMax === -1) _xMax = max
+      return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
+    }
+    return [min, max]
+  }, [xMax, dates])
+
+  const xAxisProps = useMemo(() => {
+    const indices = Object.keys(dates)
+    const ticks = xMin && xMax ? indices.slice(...xAxisDomain) : indices
+    return {
+      allowDataOverflow: true,
+      dataKey: 'index',
+      domain: xAxisDomain,
+      ticks,
+      type: 'number'
+    }
+  }, [xAxisDomain, dates])
+
+  const [zoomArea, setZoomArea] = React.useState({})
+  const [isHovering, setIsHovering] = React.useState(false)
+
+  const eventHandlers = useMemo(() => {
+    return {
+      onClick: item => {
+        if (item && !zoomArea.dragged) {
+          setDate(data[item.activeLabel].date)
+        }
+        setZoomArea({ dragged: zoomArea.dragged })
+      },
+      onMouseDown: e => {
+        setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
+      },
+      onMouseMove: e => {
+        setIsHovering(e.activeLabel !== undefined)
+        if (!zoomArea.start) return
+        let end = e.activeLabel
+        if (e.activeLabel === undefined) { // outside of axes
+          end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
+        }
+        setZoomArea({ start: zoomArea.start, end, dragged: true })
+      },
+      onMouseLeave: e => {
+        setIsHovering(false)
+      },
+      onMouseUp: () => {
+        if (zoomArea.end !== zoomArea.start) {
+          const xMin = data[zoomArea.start].date
+          const xMax = data[zoomArea.end].date
+          setChartZoom(xMin, xMax)
+        }
+        setZoomArea({ dragged: zoomArea.dragged })
+      }
+    }
+  }, [zoomArea, isHovering])
+
+  const cursor = useMemo(() => {
+    if (zoomArea.start) return 'ew-resize'
+    if (isHovering) return 'crosshair'
+    return undefined
+  }, [zoomArea, isHovering])
+
+  return (
+    <div
+      className={classNames('relative select-none', className)}
+      onDoubleClick={clearChartZoom}
+    >
+      <MainChart
+        {...{
+          ...chartProps,
+          ...eventHandlers,
+          activeLineages,
+          chart,
+          chartZoomApplied,
+          cursor,
+          preset,
+          stroke,
+          type,
+          xAxisProps,
+          yAxisConfig,
+          zoomArea
         }}
-        cursor='pointer'
-      >
-        {grid}
-        {areas}
-        {xAxis}
-        {yAxis}
-        {tooltip}
-        {xReference}
-        {lines}
-      </ComposedChart>
+      />
       <div className='absolute top-0 left-0 pointer-events-none'>
-        <ComposedChart {...chartProps}>
+        <ComposedChart {...chartProps} data={data} className='test'>
           <XAxis
-            dataKey='date'
+            {...xAxisProps}
             tick={false}
             stroke='none'
           />
           <YAxis
-            type='number'
-            domain={yAxisDomain}
             width={48}
             tick={false}
             stroke='none'
           />
           <ReferenceLine
-            x={date}
+            x={dates.indexOf(date)}
             stroke={tailwindColors[stroke][400]}
             label=''
             strokeWidth={2}

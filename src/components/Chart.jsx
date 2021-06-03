@@ -1,10 +1,11 @@
-
 import React, { useState, useCallback } from 'react'
 import Measure from 'react-measure'
+
 import MultiLinePlot from './MultiLinePlot'
 import { Heading } from './Typography'
 import classNames from 'classnames'
 import Checkbox from './Checkbox'
+
 import useQueryAsState from '../hooks/useQueryAsState'
 
 const ChartHeading = ({ isMobile, ...props }) =>
@@ -24,12 +25,12 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
 
   const chart = (
     <>
-      <ChartHeading className='pl-12 pr-6 flex items-baseline justify-between'isMobile={isMobile}>
+      <ChartHeading className='pl-12 pr-6 flex items-baseline'isMobile={isMobile}>
         {heading}
         { allowStack &&
           <Checkbox
             id={line_type_accessor}
-            className='text-primary'
+            className='text-primary ml-auto'
             checked={query[line_type_accessor] === 'area'}
             label='Stack'
             onChange={handleGraphTypeChange}
