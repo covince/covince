@@ -4,9 +4,7 @@ export default () => {
   const [{ xMin, xMax }, updateQuery] = useQueryAsState()
 
   return {
-    xMin,
-    xMax,
-    chartZoomApplied: !!(xMin && xMax),
+    chartZoom: (xMin && xMax) ? [xMin, xMax] : null,
     setChartZoom: (xMin, xMax) => updateQuery({ xMin, xMax }),
     clearChartZoom: () => updateQuery({ xMin: undefined, xMax: undefined })
   }

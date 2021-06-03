@@ -138,7 +138,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     return values
   }, [results, date])
 
-  const { chartZoomApplied, clearChartZoom } = useChartZoom()
+  const { chartZoom, clearChartZoom } = useChartZoom()
 
   return (
     <>
@@ -248,7 +248,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         </div>
         <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' })}>
           { !isMobile &&
-            <FadeTransition in={chartZoomApplied}>
+            <FadeTransition in={!!chartZoom}>
               <div className='absolute left-0 right-0 -top-6 h-0 flex'>
                 <Button
                   onClick={clearChartZoom}
@@ -288,15 +288,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div
               className={classNames(
                 'grid items-center gap-3 grid-flow-col h-12 box-content pt-1 _gap-3',
-                chartZoomApplied ? 'auto-cols-fr' : 'justify-center'
+                chartZoom ? 'auto-cols-fr' : 'justify-center'
               )}
             >
               <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
-                {!chartZoomApplied && <span>&nbsp;on {mobileNavDate}</span>}
+                {!chartZoom && <span>&nbsp;on {mobileNavDate}</span>}
               </PillButton>
-              { chartZoomApplied &&
+              { chartZoom &&
                 <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
                   <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
                 </PillButton> }
