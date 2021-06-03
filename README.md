@@ -11,14 +11,14 @@ Demo of the code in this repository (with old static data): http://covince.verce
 ### Top-level sections
 
 * `charts [array]` list of [chart](#chart) definitions
-* `colors [object]` lineages mapped to color definitions
+* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
 * `map [object]`
-  *  [`settings [object]`](#map-settings)
+  *  [`settings [object]`](#map-settings) (optional)
   *  [`viewport [object]`](#map-viewport)
 * [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions
-* [`timeline [object]`](#timeline)
+* [`timeline [object]`](#timeline) (optional)
    
 ### Chart
 
@@ -38,9 +38,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 ### Map settings
 
-* `default_lineage [string]` should match a lineage in lists
-* `default_color_by [string]` should match a [parameter](#parameter) id
-* `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
+* `default_lineage [string]` (optional) should match a lineage in lists, defaults to first lineage
+* `default_color_by [string]` (optional) should match a [parameter](#parameter) id, defaults to first parameter
+* `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` (optional) can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
 
 ### Map viewport
 
@@ -71,13 +71,13 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `display [string]`
 
 ### Timeline
-* `label [string]` e.g. "timeline",
-* `initial_date [string]` should be in ISO format e.g. "2021-01-01"
-* `date_format [string|object]` can be a string for all dates or an object with the following required keys:
+* `label [string]` (optional) e.g. "timeline",
+* `initial_date [string]` (optional) should be in ISO format e.g. "2021-01-01", defaults to latest date
+* `date_format [string|object]` (optional) can be a string for all dates or an object with the following required keys:
   * `heading [string]` [reference](https://date-fns.org/docs/format)
   * `mobile_nav [string]` [reference](https://date-fns.org/docs/format)
   * `chart_tooltip [string]` [reference](https://date-fns.org/docs/format)
-* `frame_length [number]` time in milliseconds per date when playing the timeline. Defaults to 100.
+* `frame_length [number]` (optional) time in milliseconds per date when playing the timeline. Defaults to 100.
 
 ## Development
 
