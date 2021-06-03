@@ -327,18 +327,18 @@ const MultiLinePlot = props => {
   const xAxisDomain = useMemo(() => {
     const min = 0
     const max = data.length - 1
-    if (xMin && xMax && dates.length) {
+    if (chartZoomApplied && dates.length) {
       const _xMin = Math.max(dates.indexOf(xMin), min)
       let _xMax = dates.indexOf(xMax)
       if (_xMax === -1) _xMax = max
       return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
     }
     return [min, max]
-  }, [xMax, dates])
+  }, [chartZoomApplied, dates])
 
   const xAxisProps = useMemo(() => {
     const indices = Object.keys(dates)
-    const ticks = xMin && xMax ? indices.slice(...xAxisDomain) : indices
+    const ticks = chartZoomApplied ? indices.slice(...xAxisDomain) : indices
     return {
       allowDataOverflow: true,
       dataKey: 'index',
