@@ -70,7 +70,7 @@ const animationDuration = 500
 
 const MainChart = React.memo((props) => {
   const {
-    activeLineages, chart, chartZoomApplied,
+    activeLineages, chart, chartZoom,
     stroke, preset, type,
     xAxisProps, yAxisConfig = {},
     zoomArea, ...chartProps
@@ -85,7 +85,7 @@ const MainChart = React.memo((props) => {
     if (preset === 'percentage' && type === 'area' && lineages.length === Object.keys(activeLineages).length) {
       return [0, 100]
     }
-    if (chartZoomApplied && data.length) {
+    if (chartZoom && data.length) {
       if (type === 'area') {
         const range = data.slice(...xAxisProps.domain)
         let { sumY: max } = range[0]
@@ -106,7 +106,7 @@ const MainChart = React.memo((props) => {
       return [0, 1]
     }
     return [0, 'auto']
-  }, [preset, type, yAxisConfig, lineages, chartZoomApplied, data])
+  }, [preset, type, yAxisConfig, lineages, xAxisProps.domain, data])
 
   const yAxisTicks = useMemo(() => {
     if (preset === 'percentage') {
@@ -117,7 +117,7 @@ const MainChart = React.memo((props) => {
       if (fullScale) {
         return {
           tickFormatter: value => `${Math.min(parseFloat(value), 100)}%`,
-          ticks: chartZoomApplied ? undefined : [0, 25, 50, 75, 100]
+          ticks: chartZoom ? undefined : [0, 25, 50, 75, 100]
         }
       }
       return {
@@ -136,9 +136,9 @@ const MainChart = React.memo((props) => {
         }
         return value.toLocaleString()
       },
-      ticks: chartZoomApplied ? undefined : yAxisConfig.ticks
+      ticks: chartZoom ? undefined : yAxisConfig.ticks
     }
-  }, [preset, lineages, activeLineages, yAxisConfig, chartZoomApplied])
+  }, [preset, lineages, activeLineages, yAxisConfig, chartZoom])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
@@ -166,7 +166,7 @@ const MainChart = React.memo((props) => {
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={chartZoomApplied || yAxisConfig.allow_data_overflow || false}
+      allowDataOverflow={chartZoom || yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       fontSize='12'
       width={48}
@@ -272,7 +272,7 @@ const MultiLinePlot = props => {
     type, width, height = 120, stroke = 'blueGray', className
   } = props
 
-  const { xMin, xMax, setChartZoom, clearChartZoom, chartZoomApplied } = useChartZoom()
+  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
 
   const chart = useMemo(() => {
     const dataByDate = {}
@@ -325,20 +325,21 @@ const MultiLinePlot = props => {
   }), [width, height])
 
   const xAxisDomain = useMemo(() => {
-    const min = 0
-    const max = data.length - 1
-    if (chartZoomApplied && dates.length) {
-      const _xMin = Math.max(dates.indexOf(xMin), min)
-      let _xMax = dates.indexOf(xMax)
-      if (_xMax === -1) _xMax = max
-      return _xMin < _xMax ? [_xMin, _xMax] : [_xMax, _xMin]
+    const minIndex = 0
+    const maxIndex = data.length - 1
+    if (chartZoom && dates.length) {
+      const [minDate, maxDate] = chartZoom
+      const min = Math.max(dates.indexOf(minDate), minIndex)
+      let max = dates.indexOf(maxDate)
+      if (max === -1) max = maxIndex
+      return min < max ? [min, max] : [max, min]
     }
-    return [min, max]
-  }, [chartZoomApplied, dates])
+    return [minIndex, maxIndex]
+  }, [chartZoom, dates])
 
   const xAxisProps = useMemo(() => {
     const indices = Object.keys(dates)
-    const ticks = chartZoomApplied ? indices.slice(...xAxisDomain) : indices
+    const ticks = chartZoom ? indices.slice(...xAxisDomain) : indices
     return {
       allowDataOverflow: true,
       dataKey: 'index',
@@ -404,7 +405,7 @@ const MultiLinePlot = props => {
           ...eventHandlers,
           activeLineages,
           chart,
-          chartZoomApplied,
+          chartZoom,
           cursor,
           preset,
           stroke,
