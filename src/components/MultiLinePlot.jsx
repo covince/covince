@@ -256,7 +256,7 @@ const MainChart = React.memo((props) => {
       {tooltip}
       {yReference}
       {lines}
-      {zoomArea.start
+      {zoomArea.start !== undefined
         ? <ReferenceArea x1={zoomArea.start} x2={zoomArea.end} strokeOpacity={0.3} />
         : null}
     </ComposedChart>
@@ -360,11 +360,13 @@ const MultiLinePlot = props => {
         setZoomArea({ dragged: zoomArea.dragged })
       },
       onMouseDown: e => {
-        setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
+        if (e) {
+          setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
+        }
       },
       onMouseMove: e => {
         setIsHovering(e.activeLabel !== undefined)
-        if (!zoomArea.start) return
+        if (zoomArea.start === undefined) return
         let end = e.activeLabel
         if (e.activeLabel === undefined) { // outside of axes
           end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
