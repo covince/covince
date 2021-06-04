@@ -41,7 +41,7 @@ const LocationFilter = ({ className, loading, value, areaList, onChange, categor
         onClick={loadOverview}
       >
         <BsArrowUpShort className=' h-6 w-6 fill-current' />
-        {overview.short_text}
+        {overview.short_heading}
       </InlineButton> }
     </div>
     <Select value={value} onChange={onChange} label={heading}>
