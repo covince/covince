@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
 
-const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, toggleAll }) => {
+const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, toggleAll, nomenclature, schemes, setScheme }) => {
   const formStyle = useMemo(() => {
     const numLineages = Object.keys(activeLineages).length
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), 5))
@@ -13,7 +13,11 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
   return (
     <div className={className}>
       <header className='flex justify-between space-x-6'>
-        <DescriptiveHeading>Lineages</DescriptiveHeading>
+        <DescriptiveHeading>
+          Lineages - <select className='uppercase font-medium border border-gray-300 rounded shadow-sm p-0.5' value={nomenclature} onChange={e => setScheme(e.target.value)}>
+            {schemes.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+          </select>
+        </DescriptiveHeading>
         <div className='flex items-center'>
           <label
             htmlFor='lineage_toggle_all'
@@ -35,14 +39,14 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
       >
         {Object.keys(activeLineages)
           .map(lineage => {
-            const { active, colour } = activeLineages[lineage]
+            const { active, colour, label } = activeLineages[lineage]
             return (
               <Checkbox
                 key={lineage}
                 className='mx-4 md:mx-2 h-8 md:h-7'
                 style={{ color: colour }}
                 id={`lineage_filter_${lineage}`}
-                label={lineage}
+                label={label}
                 checked={active}
                 onChange={() => toggleLineage(lineage)}
               />
