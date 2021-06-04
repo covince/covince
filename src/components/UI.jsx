@@ -27,15 +27,16 @@ import useLineageFilter from '../hooks/useLineageFilter'
 import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
 
-import config from '../config'
+import getConfig from '../config'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
+  const config = getConfig()
   const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages
 
   const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings)
+  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings, unique_lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
@@ -57,15 +58,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   ), [lineageState.lineage, areaState.currentArea])
 
   const locationFilter = useMemo(() => {
+    const { ontology } = config
+
     const props = {
       loading: isInitialLoad || areaState.status === 'LOADING',
       areaList,
       onChange: areaActions.load,
       value: areaState.currentArea,
-      overview: data.overview
+      overview: ontology.overview
     }
-
-    const { ontology } = config
 
     if (areaState.currentArea === 'overview') {
       return {
@@ -95,11 +96,11 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { timeline } = config
   const formattedDate = useMemo(
-    () => format(new Date(date), timeline.date_format.heading),
+    () => date ? format(new Date(date), timeline.date_format.heading) : '',
     [date]
   )
   const mobileNavDate = useMemo(
-    () => format(new Date(date), timeline.date_format.mobile_nav),
+    () => date ? format(new Date(date), timeline.date_format.mobile_nav) : '',
     [date]
   )
 

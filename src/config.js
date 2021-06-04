@@ -1,3 +1,4 @@
+import { merge } from 'lodash'
 
 // https://personal.sron.nl/~pault/
 const tolMutedQualitative = [
@@ -13,12 +14,11 @@ const tolMutedQualitative = [
   '#DDDDDD' // grey
 ]
 
-const config = {
+const defaults = {
   datetime_format: 'd MMMM y, HH:mm',
-  colors: tolMutedQualitative,
   map: { settings: {} },
   timeline: {
-    dateFormat: {
+    date_format: {
       heading: 'd MMMM y',
       mobile_nav: 'd MMMM y',
       chart_tooltip: 'd MMMM y'
@@ -26,6 +26,7 @@ const config = {
   }
 }
 
+let config
 let previousConfig
 
 export const setConfig = (userConfig) => {
@@ -33,8 +34,11 @@ export const setConfig = (userConfig) => {
   if (userConfig === previousConfig || userConfig === undefined) return
   previousConfig = userConfig
 
+  config = {}
+  merge(config, defaults, userConfig)
+
   // normalise options
-  const { timeline = {} } = userConfig
+  const { map, timeline, colors } = config
   if (typeof timeline.date_format === 'string') {
     timeline.date_format = {
       heading: timeline.date_format,
@@ -45,8 +49,12 @@ export const setConfig = (userConfig) => {
   if (typeof timeline.frame_length !== 'number') {
     timeline.frame_length = 100
   }
-
-  Object.assign(config, userConfig)
+  if (typeof map.settings.default_color_by !== 'string') {
+    map.settings.default_color_by = userConfig.parameters[0].id
+  }
+  if (typeof colors === 'undefined') {
+    config.colors = tolMutedQualitative
+  }
 }
 
-export default config
+export default () => config

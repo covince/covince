@@ -13,8 +13,8 @@ const getDefaultScale = (default_color_scale, x) => {
   return 'linear'
 }
 
-const useLineages = (dataPath, options) => {
-  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage, colorBy: options.default_color_by })
+const useLineages = (dataPath, options, lineages) => {
+  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage || lineages[0], colorBy: options.default_color_by })
   const [{ current, status, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':

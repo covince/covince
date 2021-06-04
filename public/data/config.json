@@ -1,10 +1,4 @@
 {
-  "datetime_format": "d MMMM y, HH:mm",
-  "colors": {
-    "B.1.177": "rgb(44,183,236)",
-    "B.1.1.7": "rgb(243,100,13)",
-    "other": "#777"
-  },
   "parameters": [
     {
       "id": "lambda",
@@ -30,20 +24,8 @@
       "noun_plural": "local authorities"
     }
   },
-  "timeline": {
-    "label": "timeline",
-    "initial_date": "2020-12-01",
-    "date_format": {
-      "heading": "d MMMM y",
-      "mobile_nav": "d MMMM y",
-      "chart_tooltip": "d MMMM y"
-    },
-    "frame_length": 100
-  },
   "map": {
     "settings": {
-      "default_lineage": "B.1.1.7",
-      "default_color_by": "p",
       "default_color_scale": {
         "p": "linear",
         "lambda": "quadratic"
