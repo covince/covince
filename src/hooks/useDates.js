@@ -28,7 +28,7 @@ export default (datesList, { initial_date = datesList[datesList.length - 1], fra
       }, frame_length)
       return () => clearTimeout(timeout)
     }
-  }, [playing, date])
+  }, [playing, date, datesList])
 
   const state = useMemo(() => ({
     date,
@@ -40,7 +40,7 @@ export default (datesList, { initial_date = datesList[datesList.length - 1], fra
       persistDate(datesList[0], 'replace')
     }
     setPlaying(isPlaying)
-  }, [setPlaying, date])
+  }, [setPlaying, date, datesList])
 
   const actions = {
     setPlaying: _setPlaying,
