@@ -160,8 +160,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           <Card className='w-80 box-content flex-shrink-0'>
             <LocationFilter className='relative' {...locationFilter} />
           </Card>
-          <Card className='box-content flex-shrink-0 xl:flex-shrink'>
-            <LineageFilter className='h-20' {...lineageFilter} />
+          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-2'>
+            <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
