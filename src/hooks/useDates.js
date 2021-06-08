@@ -13,29 +13,37 @@ export default (datesList, { initial_date = datesList[datesList.length - 1], fra
     }
   }, [query.date])
 
+  const persistDate = useCallback((date, method) => updateQuery({ date }, method), [updateQuery])
+
   useEffect(() => {
     if (playing) {
       const timeout = setTimeout(() => {
-        let cur_index = datesList.indexOf(date)
-        if (datesList[cur_index + 1] === undefined) {
-          cur_index = -1
+        const cur_index = datesList.indexOf(date)
+        if (cur_index === datesList.length - 1) {
+          setPlaying(false)
+          return
         }
         const set_to = datesList[cur_index + 1]
-        setDate(set_to)
+        persistDate(set_to, 'replace')
       }, frame_length)
       return () => clearTimeout(timeout)
     }
-  }, [playing, date])
+  }, [playing, date, datesList])
 
   const state = useMemo(() => ({
     date,
     playing
   }))
 
-  const persistDate = useCallback((date) => updateQuery({ date }), [updateQuery])
+  const _setPlaying = useCallback((isPlaying) => {
+    if (isPlaying && datesList.indexOf(date) === datesList.length - 1) {
+      persistDate(datesList[0], 'replace')
+    }
+    setPlaying(isPlaying)
+  }, [setPlaying, date, datesList])
 
   const actions = {
-    setPlaying,
+    setPlaying: _setPlaying,
     setDate,
     persistDate
   }
