@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/bs'
@@ -142,6 +142,14 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { chartZoom, clearChartZoom } = useChartZoom()
 
+  const { activeLineages } = lineageFilter
+  const selectedLineage = lineageState.loading.lineage || lineageState.lineage
+  useEffect(() => {
+    if (!(selectedLineage in activeLineages)) {
+      lineageActions.setLineage(Object.keys(activeLineages)[0])
+    }
+  }, [selectedLineage, activeLineages])
+
   return (
     <>
       { isMobile && lastModified &&
@@ -192,7 +200,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 Lineage
               </label>
               <Select
-                value={lineageState.loading.lineage || lineageState.lineage}
+                value={selectedLineage}
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
@@ -281,7 +289,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             values={areaState.data}
             isMobile={isMobile}
             lineColor={lineColor}
-            activeLineages={lineageFilter.activeLineages}
+            activeLineages={activeLineages}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>

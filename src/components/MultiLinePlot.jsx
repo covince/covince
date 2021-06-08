@@ -188,14 +188,14 @@ const MainChart = React.memo((props) => {
 
   const areas = useMemo(() => {
     if (type === 'area') {
-      return lineages.map(({ lineage, colour }) => (
+      return lineages.map(({ lineage, colour, label }) => (
         <Area
           key={lineage}
           activeDot={{ stroke: tailwindColors[stroke][400] }}
           dataKey={lineage}
           dot={false}
           fill={colour}
-          name={lineage}
+          name={label}
           stackId='1'
           stroke={colour}
           type='monotone'
@@ -224,13 +224,13 @@ const MainChart = React.memo((props) => {
 
   const lines = useMemo(() => {
     if (type === 'area') return null
-    return lineages.map(({ lineage, colour }) =>
+    return lineages.map(({ lineage, colour, label }) =>
       <Line
         key={lineage}
         activeDot={{ stroke: tailwindColors[stroke][400] }}
         dataKey={lineage}
         dot={false}
-        name={lineage}
+        name={label}
         stroke={colour}
         type='monotone'
         animationDuration={animationDuration}
@@ -306,9 +306,11 @@ const MultiLinePlot = props => {
 
     const lineages = []
     for (const lineage of Array.from(presentLineages)) {
-      const { active, colour } = activeLineages[lineage]
-      if (active) {
-        lineages.push({ lineage, colour })
+      if (lineage in activeLineages) {
+        const { active, colour, label } = activeLineages[lineage]
+        if (active) {
+          lineages.push({ lineage, colour, label })
+        }
       }
     }
 

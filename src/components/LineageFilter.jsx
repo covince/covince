@@ -19,7 +19,13 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
   return (
     <div className={className}>
       <header className='flex justify-between space-x-6'>
-        <DescriptiveHeading>Lineages</DescriptiveHeading>
+        <DescriptiveHeading>
+          Lineages - <select className='uppercase font-medium border border-gray-300 rounded shadow-sm p-0.5'
+          // value={nomenclature} onChange={e => setScheme(e.target.value)}
+        >
+            {/* {schemes.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)} */}
+          </select>
+        </DescriptiveHeading>
         <div className='flex items-center'>
           <label
             htmlFor='lineage_toggle_all'
