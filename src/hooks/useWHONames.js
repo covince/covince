@@ -1,4 +1,4 @@
-const scheme = {
+export const pangoToWHO = {
   'B.1.1.7': {
     name: 'Alpha',
     character: 'α',
@@ -28,5 +28,5 @@ const scheme = {
 }
 
 export default () => {
-  return (pango) => scheme[pango]
+  return (pango) => pangoToWHO[pango]
 }

@@ -26,6 +26,7 @@ import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
+import { pangoToWHO } from '../hooks/useWHONames'
 
 import getConfig from '../config'
 
@@ -195,7 +196,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
-                {unique_lineages.map((x) => <option key={x}>{x}</option>)}
+                {unique_lineages.map((x) =>
+                  <option key={x} value={x}>
+                    {x}
+                    {(x in pangoToWHO) && ` (${pangoToWHO[x].name})`}
+                  </option>
+                )}
               </Select>
             </div>
             <div>
@@ -209,7 +215,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.scale !== undefined &&
+            </div>
+            { lineageState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
                   Colour Scale

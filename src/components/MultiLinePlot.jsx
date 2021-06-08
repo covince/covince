@@ -8,6 +8,7 @@ import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
 import useChartZoom from '../hooks/useChartZoom'
+import { pangoToWHO } from '../hooks/useWHONames'
 import getConfig from '../config'
 
 const formatLargeNumber = number => {
@@ -34,6 +35,7 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
+              <th>WHO Name</th>
               <th>Lineage</th>
               <th>Value</th>
             </tr>
@@ -44,12 +46,16 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
             if (item.name === '_range') {
               return null
             }
+            const who = pangoToWHO[item.name]
             return (
               <tr key={item.name} className='tooltip_entry'>
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
-                <td className='px-3'>
+                <td className='text-gray-600 text-center px-2'>
+                  {who && who.character}
+                </td>
+                <td className='pr-3 text-inherit'>
                   {item.name}
                 </td>
                 <td className='text-right'>
