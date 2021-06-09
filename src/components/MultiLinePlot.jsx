@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
 import useChartZoom from '../hooks/useChartZoom'
-import { pangoToWHO } from '../hooks/useWHONames'
+import { pangoToWHO, useRoulette } from '../hooks/useWHONames'
 import getConfig from '../config'
 
 const formatLargeNumber = number => {
@@ -16,8 +16,19 @@ const formatLargeNumber = number => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
+const RouletteName = ({ lineage, roulette }) => {
+  if (roulette === 'who-pango') {
+    return lineage in pangoToWHO ? pangoToWHO[lineage].name : lineage
+  }
+  if (roulette === 'who (pango)') {
+    return lineage in pangoToWHO ? pangoToWHO[lineage].name : `(${lineage})`
+  }
+  return lineage
+}
+
 const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
   const config = getConfig()
+  const { roulette } = useRoulette()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
     _payload.sort((a, b) => {
@@ -46,17 +57,13 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
             if (item.name === '_range') {
               return null
             }
-            const who = pangoToWHO[item.name]
             return (
               <tr key={item.name} className='tooltip_entry'>
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
-                <td className='text-gray-600 text-center px-2'>
-                  {who && who.character}
-                </td>
-                <td className='pr-3 text-inherit'>
-                  {item.name}
+                <td className='px-3 text-inherit'>
+                  <RouletteName lineage={item.name} roulette={roulette} />
                 </td>
                 <td className='text-right'>
                   {percentage ? `${item.value.toFixed(1)}%` : formatLargeNumber(item.value)}

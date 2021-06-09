@@ -1,36 +1,32 @@
 import { useCallback, useMemo } from 'react'
-import useNomenclature from './useNomenclature'
 import { sortBy } from 'lodash'
 
 import useQueryAsState from './useQueryAsState'
+import { useRoulette, pangoToWHO } from './useWHONames'
 
 export default (uniqueLineages, colors) => {
   const [{ show }, updateQuery] = useQueryAsState()
-  const { hasLineage, getName, nomenclature, schemes, setScheme } = useNomenclature(uniqueLineages)
 
   const queryLineages = useMemo(() =>
     new Set(show === undefined ? uniqueLineages : show.split(',').filter(_ => _.length))
   , [show])
 
   const activeLineages = useMemo(() => {
-    const lineages = sortBy(
-      uniqueLineages
-        .map((lineage, index) => ({
-          lineage,
-          colour: colors[Array.isArray(colors) ? index : lineage],
-          active: queryLineages.has(lineage),
-          label: getName(lineage)
-        }))
-        .filter(_ => hasLineage(_.lineage)),
-      'label'
-    )
-
-    return lineages.reduce((memo, { lineage, ...rest }) => {
-      memo[lineage] = rest
+    return uniqueLineages.reduce((memo, lineage, index) => {
+      memo[lineage] = {
+        lineage,
+        colour: colors[Array.isArray(colors) ? index : lineage],
+        active: queryLineages.has(lineage),
+        who: pangoToWHO[lineage]
+      }
       return memo
     }, {})
   }
-  , [queryLineages, nomenclature])
+  , [queryLineages])
+
+  const sortedLineages = useMemo(() => {
+    return sortBy(Object.values(activeLineages), ['who.sort', 'lineage'])
+  }, [activeLineages])
 
   const allSelected = useMemo(
     () => queryLineages.size === uniqueLineages.length,
@@ -47,14 +43,13 @@ export default (uniqueLineages, colors) => {
 
   return {
     activeLineages,
+    sortedLineages,
     toggleLineage: lineage => {
       queryLineages[queryLineages.has(lineage) ? 'delete' : 'add'](lineage)
       updateQuery({ show: Array.from(queryLineages).join(',') })
     },
     allSelected,
     toggleAll,
-    nomenclature,
-    schemes,
-    setScheme
+    ...useRoulette()
   }
 }

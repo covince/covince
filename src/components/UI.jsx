@@ -26,9 +26,37 @@ import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
-import { pangoToWHO } from '../hooks/useWHONames'
 
 import getConfig from '../config'
+
+const RouletteOptions = ({ roulette, lineages }) => {
+  return lineages.map(({ lineage, who }) => {
+    if (roulette === 'pango-who') {
+      return (
+        <option key={lineage} value={lineage}>
+          {lineage}
+          {who && ` (${who.name})`}
+        </option>
+      )
+    }
+    if (roulette === 'who-pango') {
+      return (
+        <option key={lineage} value={lineage}>
+          {who && who.name}
+          {who ? ` (${lineage})` : lineage}
+        </option>
+      )
+    }
+    if (roulette === 'who (pango)') {
+      return (
+        <option key={lineage} value={lineage}>
+          {who ? who.name : `(${lineage})`}
+        </option>
+      )
+    }
+    return null
+  })
+}
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
   const config = getConfig()
@@ -204,12 +232,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
-                {unique_lineages.map((x) =>
-                  <option key={x} value={x}>
-                    {x}
-                    {(x in pangoToWHO) && ` (${pangoToWHO[x].name})`}
-                  </option>
-                )}
+                <RouletteOptions
+                  lineages={lineageFilter.sortedLineages}
+                  roulette={lineageFilter.roulette}
+                />
               </Select>
             </div>
             <div>

@@ -1,3 +1,5 @@
+import useQueryAsState from './useQueryAsState'
+
 export const pangoToWHO = {
   'B.1.1.7': {
     name: 'Alpha',
@@ -24,6 +26,14 @@ export const pangoToWHO = {
     name: 'Eta',
     character: 'η',
     sort: 5
+  }
+}
+
+export const useRoulette = () => {
+  const [{ roulette }, updateQuery] = useQueryAsState({ roulette: 'pango-who' })
+  return {
+    roulette,
+    setRoulette: roulette => updateQuery({ roulette })
   }
 }
 
