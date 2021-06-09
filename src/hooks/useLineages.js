@@ -75,11 +75,11 @@ const useLineages = (dataPath, options, lineages) => {
     }
 
     const { dates, areas, values } = data
-
+    const mean = Array.isArray(values) ? values : values.mean
     let max = 0
     for (let i = 0; i < areas.length; i++) {
       if (areas[i] === 'overview') continue
-      max = Math.max(max, ...values[i])
+      max = Math.max(max, ...mean[i])
     }
     // TODO: generalise/remove this
     if (current.colorBy === 'p') max *= 100
@@ -92,9 +92,14 @@ const useLineages = (dataPath, options, lineages) => {
       const area = areas[i]
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
-        const value = values[i][j]
-        lookup[dates[j]] = current.colorBy === 'p' && value !== null ? value * 100 : value
+        const value = mean[i][j]
+        lookup[dates[j]] = {
+          mean: current.colorBy === 'p' && value !== null ? value * 100 : value,
+          upper: values.upper ? values.upper[i][j] : null,
+          lower: values.lower ? values.lower[i][j] : null
+        }
       }
+      console.log(lookup)
       areaLookups.push({ area, lookup })
     }
 
