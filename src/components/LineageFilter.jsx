@@ -1,11 +1,8 @@
 import React, { useMemo } from 'react'
 import classNames from 'classnames'
-import { orderBy } from 'lodash'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
-
-import useWHONames from '../hooks/useWHONames'
 
 const RouletteLabel = ({ roulette, lineage, who }) => {
   if (roulette === 'pango-who') {
