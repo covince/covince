@@ -130,7 +130,7 @@ const doesNotMatch = (a, b) => (
 )
 
 const Chloropleth = (props) => {
-  const { geojson, values, alpha, selected_area, config = {} } = props
+  const { geojson, values, selected_area, config = {} } = props
 
   const [query, updateQuery] = useQueryAsState(
     mapViewportToQuery({
@@ -181,17 +181,18 @@ const Chloropleth = (props) => {
 
     for (const feature of geojson.features) {
       const { area_id } = feature.properties
-      const value = values[area_id]
-      if (value === null) {
+      if (!(area_id in values)) continue
+      const { mean, upper = 1, lower = 1 } = values[area_id]
+      if (mean === null) {
         features.nulls.push(feature)
         if (area_id === selected_area) features.selected.push(feature)
-      } else if (value !== undefined) {
+      } else if (mean !== undefined) {
         const _feature = {
           ...feature,
           properties: {
             ...feature.properties,
-            value,
-            alpha: alpha[area_id]
+            value: mean,
+            alpha: lower !== null && upper !== null ? lower / upper : 1
           }
         }
         features.active.push(_feature)
@@ -201,7 +202,7 @@ const Chloropleth = (props) => {
       }
     }
     return features
-  }, [geojson, values, alpha, selected_area])
+  }, [geojson, values, selected_area])
 
   const { color_scale_type, min_val, max_val } = props
 

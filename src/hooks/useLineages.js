@@ -93,13 +93,14 @@ const useLineages = (dataPath, options, lineages) => {
       const lookup = {}
       for (let j = 0; j < dates.length; j++) {
         const value = mean[i][j]
+        const upper = values.upper ? values.upper[i][j] : null
+        const lower = values.lower ? values.lower[i][j] : null
         lookup[dates[j]] = {
           mean: current.colorBy === 'p' && value !== null ? value * 100 : value,
-          upper: values.upper ? values.upper[i][j] : null,
-          lower: values.lower ? values.lower[i][j] : null
+          upper: current.colorBy === 'p' && upper !== null ? upper * 100 : upper,
+          lower: current.colorBy === 'p' && lower !== null ? lower * 100 : lower
         }
       }
-      console.log(lookup)
       areaLookups.push({ area, lookup })
     }
 

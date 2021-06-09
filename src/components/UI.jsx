@@ -134,17 +134,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     const values = {}
     if (results === null) return values
     for (const { area, lookup } of results.values) {
-      values[area] = lookup[date].mean
-    }
-    return values
-  }, [results, date])
-
-  const mapAlpha = useMemo(() => {
-    const values = {}
-    if (results === null) return values
-    for (const { area, lookup } of results.values) {
-      const { upper, lower } = lookup[date]
-      values[area] = upper && lower ? upper - lower : 1
+      values[area] = lookup[date]
     }
     return values
   }, [results, date])
@@ -244,7 +234,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               values={mapValues}
-              alpha={mapAlpha}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               percentage={lineageState.colorBy === 'p'}
