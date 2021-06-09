@@ -8,16 +8,16 @@ const RouletteLabel = ({ roulette, lineage, who }) => {
   if (roulette === 'pango-who') {
     return (
       <>
-        <span className={classNames('font-bold', { block: who })}>{lineage}</span>
-        {who ? <span className='text-xs tracking-wide leading-none text-gray-600 '>{who.name}</span> : null}
+        <span className={classNames('text-gray-700', { block: who })}>{lineage}</span>
+        {who ? <span className='text-xs tracking-wide leading-none text-gray-500 '>{who.name}</span> : null}
       </>
     )
   }
   if (roulette === 'who-pango') {
     return (
       <>
-        {who ? <span className={classNames('block font-bold')}>{who.name}</span> : null}
-        <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-600': who })}>{lineage}</span>
+        {who ? <span className={classNames('block text-gray-700')}>{who.name}</span> : null}
+        <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500': who })}>{lineage}</span>
       </>
     )
   }
@@ -25,7 +25,7 @@ const RouletteLabel = ({ roulette, lineage, who }) => {
     return (
       who
         ? who.name
-        : <span className='text-gray-600'>({lineage})</span>
+        : <span className='text-gray-500'>({lineage})</span>
     )
   }
 
@@ -41,9 +41,10 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
 
   return (
     <div className={className}>
-      <header className='flex justify-between space-x-6'>
+      <header className='flex justify-between space-x-6 md:-mb-0.5'>
         <DescriptiveHeading>
-          Lineages &mdash; <select className='uppercase font-medium border border-gray-300 rounded shadow-sm p-0.5'
+          Lineages
+          &mdash; <select className='uppercase font-medium border border-gray-300 rounded shadow-sm p-0.5'
           value={roulette} onChange={e => setRoulette(e.target.value)}
         >
             <option value='pango-who'>1. PANGO-WHO</option>
@@ -67,7 +68,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
         </div>
       </header>
       <form
-        className='flex-grow flex flex-wrap md:grid grid-flow-row overflow-y-auto -mx-4 md:-mx-2 md:mt-1'
+        className='flex-grow flex flex-wrap md:grid grid-flow-row md:content-center md:gap-0.5 overflow-y-auto md:-mx-2'
         style={formStyle}
       >
         {sortedLineages
@@ -75,7 +76,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
             return (
               <Checkbox
                 key={lineage}
-                className='mx-3 md:mx-1.5 my-1 md:my-0 md:h-7'
+                className='w-1/3 my-1 md:my-0 md:mx-2' // add md:h-7 here to cancel auto alignment
                 style={{ color: colour }}
                 id={`lineage_filter_${lineage}`}
                 checked={active}

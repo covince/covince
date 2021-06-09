@@ -18,6 +18,7 @@ export default (uniqueLineages, colors) => {
         colour: colors[Array.isArray(colors) ? index : lineage],
         active: queryLineages.has(lineage),
         who: pangoToWHO[lineage]
+        // who: pangoToWHO[lineage] || (lineage === 'other' ? null : { name: 'Omicron' })
       }
       return memo
     }, {})

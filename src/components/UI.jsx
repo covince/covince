@@ -197,7 +197,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           <Card className='w-80 box-content flex-shrink-0'>
             <LocationFilter className='relative' {...locationFilter} />
           </Card>
-          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-2'>
+          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-1.5'>
             <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
           </Card>
         </FilterSection> }
