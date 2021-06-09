@@ -181,7 +181,7 @@ const Chloropleth = (props) => {
 
     for (const feature of geojson.features) {
       const { area_id } = feature.properties
-      if (!(area_id in values)) continue
+      if (!(values[area_id])) continue
       const { mean, upper = 1, lower = 1 } = values[area_id]
       if (mean === null) {
         features.nulls.push(feature)
