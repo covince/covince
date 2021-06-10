@@ -26,9 +26,6 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_type ['line'|'area']`
 * `heading [string]` 
 * `parameter [string]` should match a parameter id
-* `precision [number|object]` (optional) decimal places for tooltip, can be an object with the following keys:
-  * `mean [number]`
-  * `range [number]`
 * `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
 * `y_axis [object]` (optional) 
 
@@ -73,6 +70,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `id [string]`
 * `display [string]`
 * `format ['percentage']` (optional) values should be 0-1 and are formatted as percentages
+* `precision [number|object]` (optional) decimal places for values, can a number for all values or an object with the following required keys:
+  * `mean [number]`
+  * `range [number]`
 
 ### Timeline
 * `label [string]` (optional) e.g. "timeline",

@@ -353,8 +353,8 @@ const Chloropleth = (props) => {
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 
-  const { format, handleOnClick } = props
-  const percentage = format === 'percentage'
+  const { parameterConfig, handleOnClick } = props
+  const percentage = parameterConfig && parameterConfig.format === 'percentage'
 
   const hoverPopup = useMemo(() => {
     if (hoveredFeature === null) return null
@@ -428,7 +428,7 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />
-            { hoverPopup && <MapPopup {...hoverPopup} percentage={percentage} /> }
+            { hoverPopup && <MapPopup {...hoverPopup} {...parameterConfig} /> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0}>
             <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white bg-opacity-80'>

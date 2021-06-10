@@ -141,11 +141,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { chartZoom, clearChartZoom } = useChartZoom()
 
-  const mapFormat = useMemo(() => {
+  const mapParameterConfig = useMemo(() => {
     const param = config.parameters.find(_ => _.id === lineageState.colorBy)
-    return param
-      ? (param.format || lineageState.colorBy === 'p' ? 'percentage' : undefined) // back compat
-      : undefined
+    if (param) {
+      return {
+        format: param.format || lineageState.colorBy === 'p' ? 'percentage' : undefined,
+        precision: param.precision
+      }
+    }
+    return undefined
   }, [lineageState.colorBy])
 
   return (
@@ -243,8 +247,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               values={mapValues}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
-              format={mapFormat}
               lineColor={lineColor}
+              parameterConfig={mapParameterConfig}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>

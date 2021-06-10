@@ -31,7 +31,6 @@ function LocalIncidence ({ chartDefinitions, values, date, setDate, className, i
               date={date}
               setDate={setDate}
               parameter={chart.parameter}
-              precision={chart.precision}
               defaultType={chart.default_type}
               stroke={lineColor}
               allowStack={chart.allow_stack}
