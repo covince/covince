@@ -12,6 +12,7 @@ import FadeTransition from './FadeTransition'
 import MapPopup from './MapPopup'
 
 import useQueryAsState from '../hooks/useQueryAsState'
+import Checkbox from './Checkbox'
 
 // original RGBs left in for reference
 const colourStops = [
@@ -68,7 +69,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
   , [percentage])
 
   return (
-    <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
+    <>
       <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
       <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
@@ -81,7 +82,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
           {formatValue(dmax, 'ceil')}
         </span>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -226,6 +227,8 @@ const Chloropleth = (props) => {
     return scale
   }, [max_val, min_val, color_scale_type])
 
+  const [showConfidence, setShowConfidence] = useState(true)
+
   const { lineColor = 'blueGray' } = props
 
   const mapStyle = useMemo(() => ({
@@ -308,7 +311,7 @@ const Chloropleth = (props) => {
               : ['get', 'value'],
             ...colorScale
           ],
-          'fill-opacity': ['get', 'alpha']
+          'fill-opacity': showConfidence ? ['get', 'alpha'] : 1
         }
       },
       {
@@ -330,7 +333,7 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [features, colorScale, color_scale_type])
+  }), [features, colorScale, color_scale_type, showConfidence])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 
@@ -399,13 +402,24 @@ const Chloropleth = (props) => {
             { hoverPopup && <MapPopup {...hoverPopup} percentage={percentage} /> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0} mountOnEnter>
-            <ColourBar
-              className='absolute left-0 bottom-0 w-60 z-10'
-              dmin={min_val}
-              dmax={max_val}
-              type={color_scale_type}
-              percentage={percentage}
-            />
+            <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white bg-opacity-80'>
+              <form className='mb-1.5 ml-2'>
+                <Checkbox
+                  id='map_confidence_intervals'
+                  className='text-primary'
+                  checked={showConfidence}
+                  onChange={e => console.log(e.target.value) || setShowConfidence(e.target.checked)}
+                >
+                  <span className='text-xs tracking-wide select-none'>Confidence intervals</span>
+                </Checkbox>
+              </form>
+              <ColourBar
+                dmin={min_val}
+                dmax={max_val}
+                type={color_scale_type}
+                percentage={percentage}
+              />
+            </div>
           </FadeTransition>
         </div>
       )}
