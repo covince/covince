@@ -307,13 +307,26 @@ MainChart.displayName = 'MainChart'
 
 const MultiLinePlot = props => {
   const {
-    parameter, precision, preset = parameter === 'p' ? 'percentage' : null, // back compat
+    parameter, precision, preset: deprecatedPreset,
     yAxis: yAxisConfig, /* xAxis: xAxisConfig = {}, */
     date, setDate, area_data, activeLineages,
     type, width, height = 120, stroke = 'blueGray', className
   } = props
 
   const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
+
+  const config = getConfig()
+
+  const preset = useMemo(() => {
+    const param = config.parameters.find(_ => _.id === parameter)
+    if (param && param.format === 'percentage') return 'percentage'
+
+    // back compat
+    if (deprecatedPreset) return deprecatedPreset
+    if (parameter === 'p') return 'percentage'
+
+    return null
+  }, [parameter, deprecatedPreset])
 
   const chart = useMemo(() => {
     const dataByDate = {}

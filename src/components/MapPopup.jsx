@@ -4,7 +4,7 @@ import { Popup } from 'react-map-gl'
 const MapPopup = ({ value, percentage, lat, long, onClick, label }) => {
   const formatValue = React.useMemo(() =>
     percentage
-      ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
+      ? v => { const _v = v * 100; return `${Number.isInteger(_v) ? _v : _v.toFixed(1)}%` }
       : v => `${Number.isInteger(v) ? v : v.toFixed(2)}`
   , [percentage])
   return (

@@ -6,7 +6,8 @@
     },
     {
       "id": "p",
-      "display": "Proportion"
+      "display": "Proportion",
+      "format": "percentage"
     },
     {
       "id": "R",
@@ -60,8 +61,7 @@
       "parameter": "p",
       "heading": "Proportion",
       "default_type": "area",
-      "allow_stack": true,
-      "preset": "percentage"
+      "allow_stack": true
     },
     {
       "parameter": "R",

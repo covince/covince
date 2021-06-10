@@ -82,7 +82,6 @@ const useLineages = (dataPath, options, lineages) => {
       max = Math.max(max, ...mean[i])
     }
     // TODO: generalise/remove this
-    if (current.colorBy === 'p') max *= 100
     if (current.colorBy === 'R') max = 4
     if (current.colorBy === 'lambda') max = Math.min(max, 1000)
 
@@ -96,9 +95,9 @@ const useLineages = (dataPath, options, lineages) => {
         const upper = values.upper ? values.upper[i][j] : null
         const lower = values.lower ? values.lower[i][j] : null
         lookup[dates[j]] = {
-          mean: current.colorBy === 'p' && value !== null ? value * 100 : value,
-          upper: current.colorBy === 'p' && upper !== null ? upper * 100 : upper,
-          lower: current.colorBy === 'p' && lower !== null ? lower * 100 : lower
+          mean: value,
+          upper: upper,
+          lower: lower
         }
       }
       areaLookups.push({ area, lookup })

@@ -29,7 +29,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `precision [number|object]` (optional) decimal places for tooltip, can be an object with the following keys:
   * `mean [number]`
   * `range [number]`
-* `preset ['percentage']` (optional) applies formatting rules
+* `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
 * `y_axis [object]` (optional) 
 
 ### Chart Y-Axis
@@ -72,6 +72,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 * `id [string]`
 * `display [string]`
+* `format ['percentage']` (optional) values should be 0-1 and are formatted as percentages
 
 ### Timeline
 * `label [string]` (optional) e.g. "timeline",
