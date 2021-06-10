@@ -141,7 +141,7 @@ const Chloropleth = (props) => {
       pitch: 0,
       bearing: 0
     }),
-    confidence: 1
+    confidence: '1'
   }
   )
 
