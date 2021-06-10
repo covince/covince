@@ -38,7 +38,7 @@ export const setConfig = (userConfig) => {
   merge(config, defaults, userConfig)
 
   // normalise options
-  const { map, timeline, colors } = config
+  const { map, timeline, colors, charts } = config
   if (typeof timeline.date_format === 'string') {
     timeline.date_format = {
       heading: timeline.date_format,
@@ -54,6 +54,14 @@ export const setConfig = (userConfig) => {
   }
   if (typeof colors === 'undefined') {
     config.colors = tolMutedQualitative
+  }
+  for (const chart of charts) {
+    if (typeof chart.precision === 'number') {
+      chart.precision = {
+        mean: chart.precision,
+        range: chart.precision
+      }
+    }
   }
 }
 

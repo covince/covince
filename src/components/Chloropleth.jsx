@@ -133,14 +133,16 @@ const doesNotMatch = (a, b) => (
 const Chloropleth = (props) => {
   const { geojson, values, selected_area, config = {} } = props
 
-  const [query, updateQuery] = useQueryAsState(
-    mapViewportToQuery({
+  const [query, updateQuery] = useQueryAsState({
+    ...mapViewportToQuery({
       latitude: config.default_lat,
       longitude: config.default_lon,
       zoom: props.isMobile ? config.default_zoom_mob : config.default_zoom,
       pitch: 0,
       bearing: 0
-    })
+    }),
+    confidence: 1
+  }
   )
 
   const [viewport, setViewport] = useState({
@@ -227,9 +229,9 @@ const Chloropleth = (props) => {
     return scale
   }, [max_val, min_val, color_scale_type])
 
-  const [showConfidence, setShowConfidence] = useState(true)
-
   const { lineColor = 'blueGray' } = props
+
+  const showConfidence = useMemo(() => query.confidence === '1', [query.confidence])
 
   const mapStyle = useMemo(() => ({
     version: 8,
@@ -408,7 +410,7 @@ const Chloropleth = (props) => {
                   id='map_confidence_intervals'
                   className='text-primary'
                   checked={showConfidence}
-                  onChange={e => console.log(e.target.value) || setShowConfidence(e.target.checked)}
+                  onChange={e => updateQuery({ confidence: e.target.checked ? 1 : 0 }, 'replace')}
                 >
                   <span className='text-xs tracking-wide select-none'>Confidence intervals</span>
                 </Checkbox>

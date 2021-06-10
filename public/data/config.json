@@ -50,7 +50,11 @@
       "parameter": "lambda",
       "heading": "Incidence",
       "default_type": "line",
-      "allow_stack": true
+      "allow_stack": true,
+      "_precision": {
+        "mean": 2,
+        "range": 1
+      }
     },
     {
       "parameter": "p",
