@@ -6,7 +6,6 @@ const formatNumber = (v, precision = 2) => `${Number.isInteger(v) ? v : v.toFixe
 
 const MapPopup = ({ value, format, precision = {}, lat, long, onClick, label }) => {
   const formatValue = React.useMemo(() => format === 'percentage' ? formatPct : formatNumber, [format])
-  console.log(precision)
   return (
     <Popup
       closeButton={false}

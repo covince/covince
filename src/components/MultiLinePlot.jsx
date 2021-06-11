@@ -256,7 +256,7 @@ const MultiLinePlot = props => {
           [`${d.lineage}_range`]: d.range
         }
         if (d.lineage in activeLineages && activeLineages[d.lineage].active) {
-          next.maxY = Math.max(next.maxY || 0, d.range[1])
+          next.maxY = Math.max(next.maxY || 0, d.range[1] || d.mean)
           next.sumY = (next.sumY || 0) + d.mean
         }
         dataByDate[d.date] = next
