@@ -39,7 +39,7 @@ export const setConfig = (userConfig) => {
   merge(config, defaults, userConfig)
 
   // normalise options
-  const { map, timeline, colors } = config
+  const { map, timeline, colors, parameters } = config
   if (typeof timeline.date_format === 'string') {
     timeline.date_format = {
       heading: timeline.date_format,
@@ -55,6 +55,14 @@ export const setConfig = (userConfig) => {
   }
   if (typeof colors === 'undefined') {
     config.colors = tolMutedQualitative
+  }
+  for (const parameter of parameters) {
+    if (typeof parameter.precision === 'number') {
+      parameter.precision = {
+        mean: parameter.precision,
+        range: parameter.precision
+      }
+    }
   }
 }
 

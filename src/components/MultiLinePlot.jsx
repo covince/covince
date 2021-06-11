@@ -7,73 +7,17 @@ import * as tailwindColors from 'tailwindcss/colors'
 import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
+import ChartTooltip from './ChartTooltip'
+
 import useChartZoom from '../hooks/useChartZoom'
 import getConfig from '../config'
-
-const formatLargeNumber = number => {
-  const fixed = number.toFixed(2)
-  return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
-}
-
-const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
-  const config = getConfig()
-  if (active && payload) {
-    const _payload = payload.filter(_ => _.value > 0)
-    _payload.sort((a, b) => {
-      if (a.value < b.value) return 1
-      if (a.value > b.value) return -1
-      return 0
-    })
-    const { timeline, nomenclature = {} } = config
-    return (
-      <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
-        <h4 className='text-center text-gray-700 font-bold mb-1'>
-          {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
-        </h4>
-        <table className='tabular-nums w-full'>
-          <thead className='sr-only'>
-            <tr>
-              <th>Color</th>
-              <th>Alternative name</th>
-              <th>Lineage</th>
-              <th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700'>No data</td></tr>}
-          {_payload.map(item => {
-            if (item.name === '_range') {
-              return null
-            }
-            return (
-              <tr key={item.name} className='tooltip_entry'>
-                <td>
-                  <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
-                </td>
-                <td className='px-3 text-inherit'>
-                  {nomenclature[item.name] || item.name}
-                </td>
-                <td className='text-right'>
-                  {percentage ? `${item.value.toFixed(1)}%` : formatLargeNumber(item.value)}
-                </td>
-              </tr>
-            )
-          })}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  return null
-}
 
 const animationDuration = 500
 
 const MainChart = React.memo((props) => {
   const {
     activeLineages, chart, chartZoom,
-    stroke, preset, type,
+    stroke, precision, preset, type,
     xAxisProps, yAxisConfig = {},
     zoomArea, ...chartProps
   } = props
@@ -149,12 +93,13 @@ const MainChart = React.memo((props) => {
 
   const tooltip = useMemo(() =>
     <Tooltip
-      content={CustomTooltip}
+      content={ChartTooltip}
       percentage={preset === 'percentage'}
+      precision={precision}
       dates={dates}
       cursor={{ stroke: tailwindColors[stroke][400] }}
     />
-  , [format, stroke, dates])
+  , [stroke, dates, preset, precision])
 
   const xAxis = useMemo(() =>
     <XAxis
@@ -183,14 +128,14 @@ const MainChart = React.memo((props) => {
 
   const areas = useMemo(() => {
     if (type === 'area') {
-      return lineages.map(({ lineage, colour, label }) => (
+      return lineages.map(({ lineage, colour }) => (
         <Area
           key={lineage}
           activeDot={{ stroke: tailwindColors[stroke][400] }}
           dataKey={lineage}
           dot={false}
           fill={colour}
-          name={label}
+          name={lineage}
           stackId='1'
           stroke={colour}
           type='monotone'
@@ -199,33 +144,35 @@ const MainChart = React.memo((props) => {
         />
       ))
     }
-    return lineages.map(({ lineage, colour }) => {
-      const key = `${lineage}_range`
-      return (
-        <Area
-          key={key}
-          activeDot={false}
-          dataKey={key}
-          fill={colour}
-          name='_range'
-          strokeWidth={0}
-          type='monotone'
-          animationDuration={animationDuration}
-          isAnimationActive={true}
-        />
-      )
-    })
+    return lineages
+      .filter(_ => _.average !== 0)
+      .map(({ lineage, colour }) => {
+        const key = `${lineage}_range`
+        return (
+          <Area
+            key={key}
+            activeDot={false}
+            dataKey={key}
+            fill={colour}
+            name='_range'
+            strokeWidth={0}
+            type='monotone'
+            animationDuration={animationDuration}
+            isAnimationActive={true}
+          />
+        )
+      })
   }, [lineages, stroke, type])
 
   const lines = useMemo(() => {
     if (type === 'area') return null
-    return lineages.map(({ lineage, colour, label }) =>
+    return lineages.map(({ lineage, colour }) =>
       <Line
         key={lineage}
         activeDot={{ stroke: tailwindColors[stroke][400] }}
         dataKey={lineage}
         dot={false}
-        name={label}
+        name={lineage}
         stroke={colour}
         type='monotone'
         animationDuration={animationDuration}
@@ -270,7 +217,7 @@ MainChart.displayName = 'MainChart'
 
 const MultiLinePlot = props => {
   const {
-    parameter, preset = parameter === 'p' ? 'percentage' : null, // back compat
+    parameter, preset: deprecatedPreset,
     yAxis: yAxisConfig, /* xAxis: xAxisConfig = {}, */
     date, setDate, area_data, activeLineages,
     type, width, height = 120, stroke = 'blueGray', className
@@ -278,9 +225,26 @@ const MultiLinePlot = props => {
 
   const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
 
+  const config = getConfig()
+  const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
+
+  const preset = useMemo(() => {
+    if (parameterConfig && parameterConfig.format === 'percentage') return 'percentage'
+
+    // back compat
+    if (deprecatedPreset) return deprecatedPreset
+    if (parameter === 'p') return 'percentage'
+
+    return null
+  }, [parameter, deprecatedPreset])
+
+  const precision = useMemo(() => {
+    return parameterConfig ? parameterConfig.precision : undefined
+  }, [parameter])
+
   const chart = useMemo(() => {
     const dataByDate = {}
-    const presentLineages = new Set()
+    const lineageSum = {}
 
     for (const d of area_data) {
       if (d.parameter === parameter && d.lineage !== 'total') {
@@ -291,21 +255,12 @@ const MultiLinePlot = props => {
           [`${d.lineage}_range`]: d.range
         }
         if (d.lineage in activeLineages && activeLineages[d.lineage].active) {
-          next.maxY = Math.max(next.maxY || 0, d.range[1])
+          next.maxY = Math.max(next.maxY || 0, d.range[1] || d.mean)
           next.sumY = (next.sumY || 0) + d.mean
         }
         dataByDate[d.date] = next
-        presentLineages.add(d.lineage)
-      }
-    }
-
-    const lineages = []
-    for (const lineage of Array.from(presentLineages)) {
-      if (lineage in activeLineages) {
-        const { active, colour, label } = activeLineages[lineage]
-        if (active) {
-          lineages.push({ lineage, colour, label })
-        }
+        const sum = lineageSum[d.lineage] || 0
+        lineageSum[d.lineage] = (sum + d.mean)
       }
     }
 
@@ -315,8 +270,16 @@ const MultiLinePlot = props => {
 
     const dates = data.map(_ => _.date)
 
+    const lineages = []
+    for (const lineage of Object.keys(lineageSum)) {
+      const { active, colour } = activeLineages[lineage]
+      if (active) {
+        lineages.push({ lineage, colour, average: lineageSum[lineage] / dates.length })
+      }
+    }
+
     return {
-      lineages,
+      lineages: orderBy(lineages, 'average', 'asc'),
       data,
       dates
     }
@@ -417,6 +380,7 @@ const MultiLinePlot = props => {
           chart,
           chartZoom,
           cursor,
+          precision,
           preset,
           stroke,
           type,

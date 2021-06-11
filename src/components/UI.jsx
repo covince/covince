@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/bs'
@@ -143,11 +143,17 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { activeLineages, sortedLineages } = lineageFilter
   const selectedLineage = lineageState.loading.lineage || lineageState.lineage
-  useEffect(() => {
-    if (!(selectedLineage in activeLineages)) {
-      lineageActions.setLineage(Object.keys(activeLineages)[0])
+
+  const mapParameterConfig = useMemo(() => {
+    const param = config.parameters.find(_ => _.id === lineageState.colorBy)
+    if (param) {
+      return {
+        format: param.format || lineageState.colorBy === 'p' ? 'percentage' : undefined,
+        precision: param.precision
+      }
     }
-  }, [selectedLineage, activeLineages])
+    return undefined
+  }, [lineageState.colorBy])
 
   return (
     <>
@@ -250,8 +256,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               values={mapValues}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
-              percentage={lineageState.colorBy === 'p'}
               lineColor={lineColor}
+              parameterConfig={mapParameterConfig}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>

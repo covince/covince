@@ -2,11 +2,17 @@
   "parameters": [
     {
       "id": "lambda",
-      "display": "Incidence"
+      "display": "Incidence",
+      "_precision": {
+        "mean": 2,
+        "range": 1
+      }
     },
     {
       "id": "p",
-      "display": "Proportion"
+      "display": "Proportion",
+      "format": "percentage",
+      "_precision": 0
     },
     {
       "id": "R",
@@ -56,8 +62,7 @@
       "parameter": "p",
       "heading": "Proportion",
       "default_type": "area",
-      "allow_stack": true,
-      "preset": "percentage"
+      "allow_stack": true
     },
     {
       "parameter": "R",
