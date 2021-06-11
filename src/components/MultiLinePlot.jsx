@@ -97,10 +97,9 @@ const MainChart = React.memo((props) => {
       percentage={preset === 'percentage'}
       precision={precision}
       dates={dates}
-      type={type}
       cursor={{ stroke: tailwindColors[stroke][400] }}
     />
-  , [stroke, dates, type, preset, precision])
+  , [stroke, dates, preset, precision])
 
   const xAxis = useMemo(() =>
     <XAxis

@@ -29,7 +29,7 @@ const ConfidenceRange = ({ item, percentage, precision }) => {
   return <><td /><td /><td /></>
 }
 
-const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, type }) => {
+const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates }) => {
   const config = getConfig()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
@@ -50,12 +50,9 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
               <th>Color</th>
               <th>Lineage</th>
               <th>Value</th>
-              {type === 'line' &&
-                <>
-                  <th>Confidence Min.</th>
-                  <th></th>
-                  <th>Confidence Max.</th>
-                </> }
+              <th>Confidence Min.</th>
+              <th></th>
+              <th>Confidence Max.</th>
             </tr>
           </thead>
           <tbody>
@@ -75,12 +72,11 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}
                 </td>
-                { type === 'line' &&
-                  <ConfidenceRange
-                    item={item}
-                    percentage={percentage}
-                    precision={precision.range}
-                  /> }
+                <ConfidenceRange
+                  item={item}
+                  percentage={percentage}
+                  precision={precision.range}
+                />
               </tr>
             )
           })}
