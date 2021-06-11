@@ -16,6 +16,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `map [object]`
   *  [`settings [object]`](#map-settings) (optional)
   *  [`viewport [object]`](#map-viewport)
+* `nomenclature [object]` (optional) lineages mapped to preferred names
 * [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions
 * [`timeline [object]`](#timeline) (optional)

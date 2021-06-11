@@ -29,35 +29,6 @@ import useChartZoom from '../hooks/useChartZoom'
 
 import getConfig from '../config'
 
-const RouletteOptions = ({ roulette, lineages }) => {
-  return lineages.map(({ lineage, who }) => {
-    if (roulette === 'pango-who') {
-      return (
-        <option key={lineage} value={lineage}>
-          {lineage}
-          {who && ` (${who.name})`}
-        </option>
-      )
-    }
-    if (roulette === 'who-pango') {
-      return (
-        <option key={lineage} value={lineage}>
-          {who && who.name}
-          {who ? ` (${lineage})` : lineage}
-        </option>
-      )
-    }
-    if (roulette === 'who (pango)') {
-      return (
-        <option key={lineage} value={lineage}>
-          {who ? who.name : `(${lineage})`}
-        </option>
-      )
-    }
-    return null
-  })
-}
-
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
   const config = getConfig()
   const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
@@ -152,7 +123,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }
 
-  const lineageFilter = useLineageFilter(unique_lineages, config.colors)
+  const lineageFilter = useLineageFilter(unique_lineages, config)
 
   const formattedLastModified = useMemo(
     () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
@@ -170,7 +141,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const { chartZoom, clearChartZoom } = useChartZoom()
 
-  const { activeLineages } = lineageFilter
+  const { activeLineages, sortedLineages } = lineageFilter
   const selectedLineage = lineageState.loading.lineage || lineageState.lineage
   useEffect(() => {
     if (!(selectedLineage in activeLineages)) {
@@ -232,10 +203,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
-                <RouletteOptions
-                  lineages={lineageFilter.sortedLineages}
-                  roulette={lineageFilter.roulette}
-                />
+                {sortedLineages.map(({ lineage, altName }) =>
+                  <option key={lineage} value={lineage}>
+                    {altName}
+                    {altName ? ` (${lineage})` : lineage}
+                  </option>
+                )}
               </Select>
             </div>
             <div>

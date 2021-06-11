@@ -2,9 +2,8 @@ import { useCallback, useMemo } from 'react'
 import { sortBy } from 'lodash'
 
 import useQueryAsState from './useQueryAsState'
-import { useRoulette, pangoToWHO } from './useWHONames'
 
-export default (uniqueLineages, colors) => {
+export default (uniqueLineages, { colors, nomenclature }) => {
   const [{ show }, updateQuery] = useQueryAsState()
 
   const queryLineages = useMemo(() =>
@@ -17,8 +16,7 @@ export default (uniqueLineages, colors) => {
         lineage,
         colour: colors[Array.isArray(colors) ? index : lineage],
         active: queryLineages.has(lineage),
-        who: pangoToWHO[lineage]
-        // who: pangoToWHO[lineage] || (lineage === 'other' ? null : { name: 'Omicron' })
+        altName: nomenclature[lineage]
       }
       return memo
     }, {})
@@ -50,7 +48,6 @@ export default (uniqueLineages, colors) => {
       updateQuery({ show: Array.from(queryLineages).join(',') })
     },
     allSelected,
-    toggleAll,
-    ...useRoulette()
+    toggleAll
   }
 }

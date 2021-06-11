@@ -4,35 +4,7 @@ import classNames from 'classnames'
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
 
-const RouletteLabel = ({ roulette, lineage, who }) => {
-  if (roulette === 'pango-who') {
-    return (
-      <>
-        <span className={classNames('text-gray-700', { block: who })}>{lineage}</span>
-        {who ? <span className='text-xs tracking-wide leading-none text-gray-500 '>{who.name}</span> : null}
-      </>
-    )
-  }
-  if (roulette === 'who-pango') {
-    return (
-      <>
-        {who ? <span className={classNames('block text-gray-700')}>{who.name}</span> : null}
-        <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500': who })}>{lineage}</span>
-      </>
-    )
-  }
-  if (roulette === 'who (pango)') {
-    return (
-      who
-        ? who.name
-        : <span className='text-gray-500'>({lineage})</span>
-    )
-  }
-
-  return null
-}
-
-const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll, roulette, setRoulette }) => {
+const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll }) => {
   const formStyle = useMemo(() => {
     const numLineages = sortedLineages.length
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), 5))
@@ -42,16 +14,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
   return (
     <div className={className}>
       <header className='flex justify-between space-x-6 md:-mb-0.5'>
-        <DescriptiveHeading>
-          Lineages
-          &mdash; <select className='uppercase font-medium border border-gray-300 rounded shadow-sm p-0.5'
-          value={roulette} onChange={e => setRoulette(e.target.value)}
-        >
-            <option value='pango-who'>1. PANGO-WHO</option>
-            <option value='who-pango'>2. WHO-PANGO</option>
-            <option value='who (pango)'>3. WHO (PANGO)</option>
-          </select>
-        </DescriptiveHeading>
+        <DescriptiveHeading>Lineages</DescriptiveHeading>
         <div className='flex items-center'>
           <label
             htmlFor='lineage_toggle_all'
@@ -72,7 +35,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
         style={formStyle}
       >
         {sortedLineages
-          .map(({ lineage, active, colour, who }) => {
+          .map(({ lineage, active, colour, altName }) => {
             return (
               <Checkbox
                 key={lineage}
@@ -82,7 +45,8 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
                 checked={active}
                 onChange={() => toggleLineage(lineage)}
               >
-                <RouletteLabel roulette={roulette} lineage={lineage} who={who} />
+                {altName ? <span className={classNames('block text-gray-700')}>{altName}</span> : null}
+                <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500': altName })}>{lineage}</span>
               </Checkbox>
             )
           })}

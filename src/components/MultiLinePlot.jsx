@@ -8,7 +8,6 @@ import classNames from 'classnames'
 import { orderBy } from 'lodash'
 
 import useChartZoom from '../hooks/useChartZoom'
-import { pangoToWHO, useRoulette } from '../hooks/useWHONames'
 import getConfig from '../config'
 
 const formatLargeNumber = number => {
@@ -16,19 +15,8 @@ const formatLargeNumber = number => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: 2 })
 }
 
-const RouletteName = ({ lineage, roulette }) => {
-  if (roulette === 'who-pango') {
-    return lineage in pangoToWHO ? pangoToWHO[lineage].name : lineage
-  }
-  if (roulette === 'who (pango)') {
-    return lineage in pangoToWHO ? pangoToWHO[lineage].name : `(${lineage})`
-  }
-  return lineage
-}
-
 const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
   const config = getConfig()
-  const { roulette } = useRoulette()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
     _payload.sort((a, b) => {
@@ -36,7 +24,7 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
       if (a.value > b.value) return -1
       return 0
     })
-    const { timeline } = config
+    const { timeline, nomenclature = {} } = config
     return (
       <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
         <h4 className='text-center text-gray-700 font-bold mb-1'>
@@ -46,7 +34,7 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
-              <th>WHO Name</th>
+              <th>Alternative name</th>
               <th>Lineage</th>
               <th>Value</th>
             </tr>
@@ -63,7 +51,7 @@ const CustomTooltip = ({ active, payload, label, percentage, dates }) => {
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
                 <td className='px-3 text-inherit'>
-                  <RouletteName lineage={item.name} roulette={roulette} />
+                  {nomenclature[item.name] || item.name}
                 </td>
                 <td className='text-right'>
                   {percentage ? `${item.value.toFixed(1)}%` : formatLargeNumber(item.value)}
