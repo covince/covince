@@ -24,7 +24,10 @@ export default (uniqueLineages, { colors, nomenclature }) => {
   , [queryLineages])
 
   const sortedLineages = useMemo(() => {
-    return sortBy(Object.values(activeLineages), ['who.sort', 'lineage'])
+    return [
+      ...Object.keys(nomenclature).filter(lineage => lineage in activeLineages).map(lineage => activeLineages[lineage]),
+      ...sortBy(Object.values(activeLineages).filter(_ => _.altName === undefined), 'lineage')
+    ]
   }, [activeLineages])
 
   const allSelected = useMemo(
