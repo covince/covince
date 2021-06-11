@@ -3,7 +3,7 @@ import './Checkbox.css'
 import React from 'react'
 import classNames from 'classnames'
 
-const Checkbox = ({ id, name, label, checked, onChange, className, style }) => (
+const Checkbox = ({ id, name, children, label = children, checked, onChange, className, style }) => (
   <div className={classNames('heron-checkbox flex items-center', className)} style={style}>
     <div className="flex items-center h-5">
       <input

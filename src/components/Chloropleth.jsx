@@ -12,6 +12,7 @@ import FadeTransition from './FadeTransition'
 import MapPopup from './MapPopup'
 
 import useQueryAsState from '../hooks/useQueryAsState'
+import Checkbox from './Checkbox'
 
 // original RGBs left in for reference
 const colourStops = [
@@ -51,7 +52,7 @@ const gradients = {
   R_scale: `linear-gradient(to left, ${RColourStops.map(_ => `${_.rgb} ${_.index * 100}%`).join(',')})`
 }
 
-const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
+const ColourBar = ({ dmin, dmax, type, percentage, opacity }) => {
   let midpoint
   if (dmax > 2) {
     midpoint = Math.ceil((dmin + dmax) * 0.5)
@@ -63,13 +64,13 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
 
   const formatValue = useMemo(() =>
     percentage
-      ? v => `${Number.isInteger(v) ? v : v.toFixed(1)}%`
+      ? v => { const _v = v * 100; return `${Number.isInteger(_v) ? _v : _v.toFixed(1)}%` }
       : (v, method = 'round') => Math[method](v).toLocaleString()
   , [percentage])
 
   return (
-    <div className={classnames('p-2 pb-0 bg-white bg-opacity-80', className)}>
-      <div className='h-3 rounded-sm' style={{ backgroundImage: gradient }} />
+    <>
+      <div className='h-3 rounded-sm bg-white' style={{ backgroundImage: gradient, opacity }} />
       <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
           {formatValue(dmin, 'floor')}
@@ -81,7 +82,7 @@ const ColourBar = ({ dmin, dmax, type, className, percentage }) => {
           {formatValue(dmax, 'ceil')}
         </span>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -132,14 +133,16 @@ const doesNotMatch = (a, b) => (
 const Chloropleth = (props) => {
   const { geojson, values, selected_area, config = {} } = props
 
-  const [query, updateQuery] = useQueryAsState(
-    mapViewportToQuery({
+  const [query, updateQuery] = useQueryAsState({
+    ...mapViewportToQuery({
       latitude: config.default_lat,
       longitude: config.default_lon,
       zoom: props.isMobile ? config.default_zoom_mob : config.default_zoom,
       pitch: 0,
       bearing: 0
-    })
+    }),
+    confidence: '1'
+  }
   )
 
   const [viewport, setViewport] = useState({
@@ -167,6 +170,19 @@ const Chloropleth = (props) => {
     setViewport(newViewport)
   }
 
+  const hasConfidence = useMemo(() => {
+    for (const v of Object.values(values)) {
+      if (v === undefined) return false
+      const { upper, lower } = v
+      if (upper !== null && lower !== null && upper !== lower) {
+        return true
+      }
+    }
+    return false
+  }, [values])
+
+  const { min_val, max_val } = props
+
   const features = useMemo(() => {
     const features = {
       selected: [],
@@ -181,28 +197,31 @@ const Chloropleth = (props) => {
 
     for (const feature of geojson.features) {
       const { area_id } = feature.properties
-      const value = values[area_id]
-      if (value === null) {
+      const areaValues = values[area_id] || {}
+      if (areaValues.mean === null) {
         features.nulls.push(feature)
         if (area_id === selected_area) features.selected.push(feature)
-      } else if (value !== undefined) {
+      } else if (areaValues.mean !== undefined) {
+        const { mean, lower, upper } = areaValues
         const _feature = {
           ...feature,
           properties: {
             ...feature.properties,
-            value
+            value: mean,
+            alpha: hasConfidence ? max_val - (upper - lower) : 1
           }
         }
         features.active.push(_feature)
+        if (hasConfidence) features.nulls.push(feature) // white bg for alpha
         if (area_id === selected_area) features.selected.push(feature)
       } else {
         features.others.push(feature)
       }
     }
     return features
-  }, [geojson, values, selected_area])
+  }, [geojson, values, selected_area, hasConfidence, max_val])
 
-  const { color_scale_type, min_val, max_val } = props
+  const { color_scale_type } = props
 
   const colorScale = useMemo(() => {
     if (max_val === 0) {
@@ -225,6 +244,8 @@ const Chloropleth = (props) => {
   }, [max_val, min_val, color_scale_type])
 
   const { lineColor = 'blueGray' } = props
+
+  const showConfidence = useMemo(() => query.confidence === '1', [query.confidence])
 
   const mapStyle = useMemo(() => ({
     version: 8,
@@ -305,7 +326,8 @@ const Chloropleth = (props) => {
               ? ['sqrt', ['get', 'value']]
               : ['get', 'value'],
             ...colorScale
-          ]
+          ],
+          'fill-opacity': showConfidence ? ['get', 'alpha'] : 1
         }
       },
       {
@@ -327,11 +349,12 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [features, colorScale, color_scale_type])
+  }), [features, colorScale, color_scale_type, showConfidence])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 
-  const { percentage, handleOnClick } = props
+  const { parameterConfig, handleOnClick } = props
+  const percentage = parameterConfig && parameterConfig.format === 'percentage'
 
   const hoverPopup = useMemo(() => {
     if (hoveredFeature === null) return null
@@ -341,6 +364,18 @@ const Chloropleth = (props) => {
       return { lat, long, value, label: area_name, onClick: () => handleOnClick(area_id) }
     }
   }, [hoveredFeature, values, handleOnClick])
+
+  const colourBarOpacity = useMemo(() => {
+    if (hasConfidence && showConfidence) {
+      return 0.666
+      // let sum = 0
+      // for (const { properties } of features.active) {
+      //   sum += properties.alpha
+      // }
+      // return sum / features.active.length
+    }
+    return 1
+  }, [hasConfidence, showConfidence, features.active])
 
   return (
     <Measure
@@ -393,16 +428,29 @@ const Chloropleth = (props) => {
             }}
           >
             <NavigationControl className='right-2 top-2 z-10' />
-            { hoverPopup && <MapPopup {...hoverPopup} percentage={percentage} /> }
+            { hoverPopup && <MapPopup {...hoverPopup} {...parameterConfig} /> }
           </ReactMapGL>
-          <FadeTransition in={max_val > 0} mountOnEnter>
-            <ColourBar
-              className='absolute left-0 bottom-0 w-60 z-10'
-              dmin={min_val}
-              dmax={max_val}
-              type={color_scale_type}
-              percentage={percentage}
-            />
+          <FadeTransition in={max_val > 0}>
+            <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white bg-opacity-80'>
+              { hasConfidence &&
+                <form className='mb-1.5 ml-2'>
+                  <Checkbox
+                    id='map_confidence_intervals'
+                    className='text-primary'
+                    checked={showConfidence}
+                    onChange={e => updateQuery({ confidence: e.target.checked ? 1 : 0 }, 'replace')}
+                  >
+                    <span className='text-xs tracking-wide select-none'>show confidence</span>
+                  </Checkbox>
+                </form> }
+              <ColourBar
+                dmin={min_val}
+                dmax={max_val}
+                type={color_scale_type}
+                percentage={percentage}
+                opacity={colourBarOpacity}
+              />
+            </div>
           </FadeTransition>
         </div>
       )}
