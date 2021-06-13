@@ -24,7 +24,7 @@ const defaults = {
       chart_tooltip: 'd MMMM y'
     }
   },
-  nomenclature: {}
+  nomenclature: []
 }
 
 let config

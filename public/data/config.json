@@ -84,7 +84,10 @@
       }
     }
   ],
-  "nomenclature": {
-    "B.1.1.7": "Alpha"
-  }
+  "nomenclature": [
+    {
+      "lineage": "B.1.1.7",
+      "alt_name": "Alpha"
+    }
+  ]
 }

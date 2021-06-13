@@ -2,9 +2,11 @@ import { useCallback, useMemo } from 'react'
 import { sortBy } from 'lodash'
 
 import useQueryAsState from './useQueryAsState'
+import useNomenclature from './useNomenclature'
 
-export default (uniqueLineages, { colors, nomenclature }) => {
+export default (uniqueLineages, { colors }) => {
   const [{ show }, updateQuery] = useQueryAsState()
+  const { nomenclature, nomenclatureLookup } = useNomenclature()
 
   const queryLineages = useMemo(() =>
     new Set(show === undefined ? uniqueLineages : show.split(',').filter(_ => _.length))
@@ -16,7 +18,7 @@ export default (uniqueLineages, { colors, nomenclature }) => {
         lineage,
         colour: colors[Array.isArray(colors) ? index : lineage],
         active: queryLineages.has(lineage),
-        altName: nomenclature[lineage]
+        altName: nomenclatureLookup[lineage]
       }
       return memo
     }, {})
@@ -25,7 +27,7 @@ export default (uniqueLineages, { colors, nomenclature }) => {
 
   const sortedLineages = useMemo(() => {
     return [
-      ...Object.keys(nomenclature).filter(lineage => lineage in activeLineages).map(lineage => activeLineages[lineage]),
+      ...nomenclature.filter(({ lineage }) => lineage in activeLineages).map(({ lineage }) => activeLineages[lineage]),
       ...sortBy(Object.values(activeLineages).filter(_ => _.altName === undefined), 'lineage')
     ]
   }, [activeLineages])
