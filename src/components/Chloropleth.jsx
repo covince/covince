@@ -141,7 +141,7 @@ const Chloropleth = (props) => {
       pitch: 0,
       bearing: 0
     }),
-    confidence: '1'
+    uncertainty: '1'
   }
   )
 
@@ -170,7 +170,7 @@ const Chloropleth = (props) => {
     setViewport(newViewport)
   }
 
-  const hasConfidence = useMemo(() => {
+  const hasUncertainty = useMemo(() => {
     for (const v of Object.values(values)) {
       if (v === undefined) return false
       const { upper, lower } = v
@@ -208,18 +208,18 @@ const Chloropleth = (props) => {
           properties: {
             ...feature.properties,
             value: mean,
-            alpha: hasConfidence ? max_val - (upper - lower) : 1
+            alpha: hasUncertainty ? max_val - (upper - lower) : 1
           }
         }
         features.active.push(_feature)
-        if (hasConfidence) features.nulls.push(feature) // white bg for alpha
+        if (hasUncertainty) features.nulls.push(feature) // white bg for alpha
         if (area_id === selected_area) features.selected.push(feature)
       } else {
         features.others.push(feature)
       }
     }
     return features
-  }, [geojson, values, selected_area, hasConfidence, max_val])
+  }, [geojson, values, selected_area, hasUncertainty, max_val])
 
   const { color_scale_type } = props
 
@@ -245,7 +245,7 @@ const Chloropleth = (props) => {
 
   const { lineColor = 'blueGray' } = props
 
-  const showConfidence = useMemo(() => query.confidence === '1', [query.confidence])
+  const showUncertainty = useMemo(() => query.uncertainty === '1', [query.uncertainty])
 
   const mapStyle = useMemo(() => ({
     version: 8,
@@ -327,7 +327,7 @@ const Chloropleth = (props) => {
               : ['get', 'value'],
             ...colorScale
           ],
-          'fill-opacity': showConfidence ? ['get', 'alpha'] : 1
+          'fill-opacity': showUncertainty ? ['get', 'alpha'] : 1
         }
       },
       {
@@ -349,7 +349,7 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [features, colorScale, color_scale_type, showConfidence])
+  }), [features, colorScale, color_scale_type, showUncertainty])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 
@@ -366,7 +366,7 @@ const Chloropleth = (props) => {
   }, [hoveredFeature, values, handleOnClick])
 
   const colourBarOpacity = useMemo(() => {
-    if (hasConfidence && showConfidence) {
+    if (hasUncertainty && showUncertainty) {
       return 0.666
       // let sum = 0
       // for (const { properties } of features.active) {
@@ -375,7 +375,7 @@ const Chloropleth = (props) => {
       // return sum / features.active.length
     }
     return 1
-  }, [hasConfidence, showConfidence, features.active])
+  }, [hasUncertainty, showUncertainty, features.active])
 
   return (
     <Measure
@@ -432,15 +432,17 @@ const Chloropleth = (props) => {
           </ReactMapGL>
           <FadeTransition in={max_val > 0}>
             <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white bg-opacity-80'>
-              { hasConfidence &&
+              { hasUncertainty &&
                 <form className='mb-1.5 ml-2'>
                   <Checkbox
-                    id='map_confidence_intervals'
+                    id='map_uncertainty'
                     className='text-primary'
-                    checked={showConfidence}
-                    onChange={e => updateQuery({ confidence: e.target.checked ? 1 : 0 }, 'replace')}
+                    checked={showUncertainty}
+                    onChange={e => updateQuery({ uncertainty: e.target.checked ? 1 : 0 }, 'replace')}
                   >
-                    <span className='text-xs tracking-wide select-none'>show confidence</span>
+                    <span className='text-xs tracking-wide select-none'>
+                      fade areas by uncertainty
+                    </span>
                   </Checkbox>
                 </form> }
               <ColourBar

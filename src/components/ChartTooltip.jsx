@@ -11,7 +11,7 @@ const formatNumber = (number, percentage, precision = percentage ? 1 : 2) => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: precision })
 }
 
-const ConfidenceRange = ({ item, percentage, precision }) => {
+const UncertaintyRange = ({ item, percentage, precision }) => {
   const range = item.payload[`${item.name}_range`]
   if (range && range[0] !== null && range[1] !== null) {
     return (
@@ -53,9 +53,9 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
               <th>Color</th>
               <th>Name/Lineage</th>
               <th>Value</th>
-              <th>Confidence Min.</th>
+              <th>Uncertainty Min.</th>
               <th></th>
-              <th>Confidence Max.</th>
+              <th>Uncertainty Max.</th>
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}
                 </td>
-                <ConfidenceRange
+                <UncertaintyRange
                   item={item}
                   percentage={percentage}
                   precision={precision.range}
