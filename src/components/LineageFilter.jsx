@@ -4,12 +4,16 @@ import classNames from 'classnames'
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
 
+import useNomenclature from '../hooks/useNomenclature'
+
 const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll }) => {
   const formStyle = useMemo(() => {
     const numLineages = sortedLineages.length
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), 5))
     return { gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))` }
   }, [sortedLineages])
+
+  const { nomenclature } = useNomenclature()
 
   return (
     <div className={className}>
@@ -39,7 +43,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
             return (
               <Checkbox
                 key={lineage}
-                className='w-1/3 my-1 md:my-0 md:mx-2' // add md:h-7 here to cancel auto alignment
+                className={classNames('w-1/3 my-1 md:my-0 md:mx-2', { 'md:mb-1': nomenclature.length === 0 })}
                 style={{ color: colour }}
                 id={`lineage_filter_${lineage}`}
                 checked={active}
