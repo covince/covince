@@ -23,7 +23,8 @@ const defaults = {
       mobile_nav: 'd MMMM y',
       chart_tooltip: 'd MMMM y'
     }
-  }
+  },
+  nomenclature: []
 }
 
 let config

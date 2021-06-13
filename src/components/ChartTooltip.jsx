@@ -1,6 +1,8 @@
 import React from 'react'
 import format from 'date-fns/format'
 
+import useNomenclature from '../hooks/useNomenclature'
+
 import getConfig from '../config'
 
 const formatNumber = (number, percentage, precision = percentage ? 1 : 2) => {
@@ -31,6 +33,7 @@ const ConfidenceRange = ({ item, percentage, precision }) => {
 
 const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates }) => {
   const config = getConfig()
+  const { nomenclatureLookup } = useNomenclature()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
     _payload.sort((a, b) => {
@@ -48,7 +51,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
           <thead className='sr-only'>
             <tr>
               <th>Color</th>
-              <th>Lineage</th>
+              <th>Name/Lineage</th>
               <th>Value</th>
               <th>Confidence Min.</th>
               <th></th>
@@ -67,7 +70,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
                 <td className='px-3'>
-                  {item.name}
+                  {nomenclatureLookup[item.name] || item.name}
                 </td>
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}

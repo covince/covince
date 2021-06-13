@@ -83,5 +83,11 @@
         "reference_line": 1
       }
     }
+  ],
+  "nomenclature": [
+    {
+      "lineage": "B.1.1.7",
+      "alt_name": "Alpha"
+    }
   ]
 }
