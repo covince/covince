@@ -441,7 +441,7 @@ const Chloropleth = (props) => {
                     onChange={e => updateQuery({ uncertainty: e.target.checked ? 1 : 0 }, 'replace')}
                   >
                     <span className='text-xs tracking-wide select-none'>
-                      show uncertainty with intensity
+                      fade areas by uncertainty
                     </span>
                   </Checkbox>
                 </form> }
