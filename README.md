@@ -16,7 +16,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `map [object]`
   *  [`settings [object]`](#map-settings) (optional)
   *  [`viewport [object]`](#map-viewport)
-* `nomenclature [object]` (optional) lineages mapped to preferred names. The order of keys will be reflected on the UI.
+* `nomenclature [array]` (optional) list of [nomenclature](#nomenclature) definitions, the order will be reflected on the UI
 * [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions
 * [`timeline [object]`](#timeline) (optional)
@@ -55,6 +55,11 @@ Demo of the code in this repository (with old static data): http://covince.verce
   * `max_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `min_latitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `max_latitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
+
+### Nomenclature
+
+* `lineage [string]` should match a lineage in lists
+* `alt_name [string]` alternative name
 
 ### Ontology
 
