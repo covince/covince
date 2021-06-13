@@ -123,7 +123,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     }
   }
 
-  const lineageFilter = useLineageFilter(unique_lineages, config.colors)
+  const lineageFilter = useLineageFilter(unique_lineages, config)
 
   const formattedLastModified = useMemo(
     () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
@@ -140,6 +140,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   }, [results, date])
 
   const { chartZoom, clearChartZoom } = useChartZoom()
+
+  const { activeLineages, sortedLineages } = lineageFilter
+  const selectedLineage = lineageState.loading.lineage || lineageState.lineage
 
   const mapParameterConfig = useMemo(() => {
     const param = config.parameters.find(_ => _.id === lineageState.colorBy)
@@ -171,8 +174,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           <Card className='w-80 box-content flex-shrink-0'>
             <LocationFilter className='relative' {...locationFilter} />
           </Card>
-          <Card className='box-content flex-shrink-0 xl:flex-shrink'>
-            <LineageFilter className='h-20' {...lineageFilter} />
+          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-1.5'>
+            <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
@@ -202,11 +205,16 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 Lineage
               </label>
               <Select
-                value={lineageState.loading.lineage || lineageState.lineage}
+                value={selectedLineage}
                 name='lineages'
                 onChange={e => lineageActions.setLineage(e.target.value)}
               >
-                {unique_lineages.map((x) => <option key={x}>{x}</option>)}
+                {sortedLineages.map(({ lineage, altName }) =>
+                  <option key={lineage} value={lineage}>
+                    {altName}
+                    {altName ? ` (${lineage})` : lineage}
+                  </option>
+                )}
               </Select>
             </div>
             <div>
@@ -220,7 +228,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               >
                 {parameter_options}
               </Select>
-            </div> {lineageState.scale !== undefined &&
+            </div>
+            { lineageState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
                   Colour Scale
@@ -285,7 +294,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             values={areaState.data}
             isMobile={isMobile}
             lineColor={lineColor}
-            activeLineages={lineageFilter.activeLineages}
+            activeLineages={activeLineages}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>

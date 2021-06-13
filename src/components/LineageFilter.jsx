@@ -1,18 +1,19 @@
 import React, { useMemo } from 'react'
+import classNames from 'classnames'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
 
-const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, toggleAll }) => {
+const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll }) => {
   const formStyle = useMemo(() => {
-    const numLineages = Object.keys(activeLineages).length
+    const numLineages = sortedLineages.length
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), 5))
     return { gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))` }
-  }, [activeLineages])
+  }, [sortedLineages])
 
   return (
     <div className={className}>
-      <header className='flex justify-between space-x-6'>
+      <header className='flex justify-between space-x-6 md:-mb-0.5'>
         <DescriptiveHeading>Lineages</DescriptiveHeading>
         <div className='flex items-center'>
           <label
@@ -30,22 +31,23 @@ const LineageFilter = ({ className, toggleLineage, activeLineages, allSelected, 
         </div>
       </header>
       <form
-        className='flex-grow flex flex-wrap md:grid grid-flow-row overflow-y-auto -mx-4 md:-mx-2'
+        className='flex-grow flex flex-wrap md:grid grid-flow-row md:content-center md:gap-0.5 overflow-y-auto md:-mx-2'
         style={formStyle}
       >
-        {Object.keys(activeLineages)
-          .map(lineage => {
-            const { active, colour } = activeLineages[lineage]
+        {sortedLineages
+          .map(({ lineage, active, colour, altName }) => {
             return (
               <Checkbox
                 key={lineage}
-                className='mx-4 md:mx-2 h-8 md:h-7'
+                className='w-1/3 my-1 md:my-0 md:mx-2' // add md:h-7 here to cancel auto alignment
                 style={{ color: colour }}
                 id={`lineage_filter_${lineage}`}
-                label={lineage}
                 checked={active}
                 onChange={() => toggleLineage(lineage)}
-              />
+              >
+                {altName ? <span className={classNames('block text-gray-700')}>{altName}</span> : null}
+                <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500': altName })}>{lineage}</span>
+              </Checkbox>
             )
           })}
       </form>
