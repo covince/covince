@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { orderBy } from 'lodash'
 
-function useAreaLookupTable (results, lookupTable) {
+function useAreaList (results, lookupTable) {
   return useMemo(() => {
     const list = []
 
@@ -17,4 +17,4 @@ function useAreaLookupTable (results, lookupTable) {
   }, [lookupTable, results])
 }
 
-export default useAreaLookupTable
+export default useAreaList
