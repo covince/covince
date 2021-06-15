@@ -164,11 +164,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           Data updated <span className='font-medium'>{formattedLastModified}</span>
         </p> }
       { mobileView === 'chart' &&
-        <LocationFilter
-          className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
-          {...locationFilter}
-          {...locationSearch}
-        /> }
+        <div className='bg-white px-4 pt-3 relative z-10'>
+          <LocationFilter
+            className='relative h-22'
+            {...locationFilter}
+            {...locationSearch}
+          />
+        </div> }
       { !isMobile &&
         <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
           <Card className='w-80 box-content flex-shrink-0'>
@@ -270,7 +272,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || locationSearch.isSearching })}>
+        <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || (isMobile && locationSearch.isSearching) })}>
           { !isMobile &&
             <FadeTransition in={!!chartZoom}>
               <div className='absolute left-0 right-0 -top-6 h-0 flex'>

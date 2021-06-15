@@ -46,7 +46,7 @@ const useAreas = (dataPath) => {
   }, [area])
 
   const actions = {
-    load: (area) => updateQuery({ area })
+    load: (area) => console.log(area) || updateQuery({ area })
   }
 
   return [state, actions]

@@ -1,3 +1,35 @@
-.covince-location-select:focus-within .covince-location-select-focus {
-  @apply ring-2 ring-offset-2 ring-primary;
+:root {
+  --reach-combobox: 1;
+}
+
+[data-reach-combobox-popover] {
+  background: hsla(0, 100%, 100%, 0.99);
+}
+
+[data-reach-combobox-list] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+[data-reach-combobox-option] {
+  cursor: pointer;
+  margin: 0
+}
+
+[data-reach-combobox-option][aria-selected="true"] {
+  background: hsl(211, 10%, 95%);
+}
+
+[data-reach-combobox-option]:hover {
+  background: hsl(211, 10%, 92%);
+}
+
+[data-reach-combobox-option][aria-selected="true"]:hover {
+  background: hsl(211, 10%, 90%);
+}
+
+[data-suggested-value] {
+  font-weight: bold;
 }
