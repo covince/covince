@@ -2,12 +2,15 @@ import './LocationFilter.css'
 
 import React, { useCallback, useEffect, useRef } from 'react'
 import { BsArrowUpShort, BsSearch, BsX } from 'react-icons/bs'
+import { HiX } from 'react-icons/hi'
 import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import { InlineButton, Button } from './Button'
+
+import getConfig from '../config'
 
 const Search = ({ onSelect, items, value, onChange, onClose }) => {
   const _onChange = useCallback((e) => {
@@ -19,33 +22,34 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
 
-  const _onSelect = useCallback(item => {
+  const _onSelect = useCallback(value => {
     inputRef.current.blur()
     onClose()
-    onSelect(item)
+    onSelect(value)
   }, [onSelect])
 
-  const onEscape = useCallback((e) => {
+  const onKeyUp = useCallback((e) => {
     if (e.code === 'Escape') onClose()
+    if (e.code === 'Enter' && items.length === 1) _onSelect(items[0].id)
   }, [onClose])
 
+  const { ontology } = getConfig()
+  const placeholder = `Search ${ontology.area.noun_plural}`
   return (
-    <Combobox aria-label="Areas" openOnFocus onSelect={_onSelect} onKeyUp={onEscape}>
+    <Combobox aria-label="Areas" openOnFocus onSelect={_onSelect} onKeyUp={onKeyUp}>
       <div className='flex items-center space-x-3'>
         <ComboboxInput
           ref={inputRef}
-          className="w-full text-base h-6 box-content pb-2 border-b-2 border-gray-200 focus:border-primary focus:outline-none"
+          type="text"
+          className="w-full h-9 text-sm rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40"
           value={value}
           onChange={_onChange}
           autocomplete={false}
-          placeholder={''}
+          placeholder={placeholder}
         />
-        <button className='flex-shrink-0 focus:outline-none border-2 border-transparent focus:border-primary rounded-full' onClick={onClose}>
-          <BsX className='w-6 h-6 text-gray-500' />
-        </button>
       </div>
       { items && !!value.length && (
-        <ComboboxPopover className="rounded-md md:shadow-lg mt-1.5 md:ring-1 ring-black ring-opacity-5 md:text-sm py-1.5 z-20">
+        <ComboboxPopover className="rounded-md md:shadow-lg mt-2 md:ring-1 ring-black ring-opacity-5 md:text-sm py-1.5 z-20">
           { items.length > 0
             ? <ComboboxList className='w-full'>
               {items.slice(0, 10).map((result, index) => (
@@ -104,7 +108,18 @@ const LocationFilter = (props) => {
       </p>
       <FadeTransition in={isSearching}>
         <div className='bg-white absolute inset-0 z-10'>
-          <DescriptiveHeading className='h-6 mb-3'>Search</DescriptiveHeading>
+          <div className='flex justify-between items-center h-6 mb-2'>
+            <DescriptiveHeading className='whitespace-nowrap'>
+              Search
+            </DescriptiveHeading>
+            <InlineButton
+              className='box-content relative z-10'
+              title='Close'
+              onClick={() => setIsSearching(false)}
+            >
+              <HiX className='h-4 w-4 fill-current' />
+            </InlineButton>
+          </div>
           <Search
             onSelect={onChange}
             items={filteredItems}
