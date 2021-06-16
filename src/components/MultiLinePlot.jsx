@@ -117,7 +117,6 @@ const MainChart = React.memo((props) => {
       type='number'
       allowDataOverflow={chartZoom || yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
-      fontSize='12'
       width={48}
       stroke='currentcolor'
       tickMargin='4'

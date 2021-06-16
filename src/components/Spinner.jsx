@@ -4,7 +4,7 @@ import React from 'react'
 
 const Spinner = ({ className }) => {
   return (
-    <i className={`heron-spinner ${className}`} />
+    <i className={`covince-spinner ${className}`} />
   )
 }
 
