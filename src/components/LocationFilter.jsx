@@ -1,14 +1,14 @@
 import './LocationFilter.css'
 
 import React, { useCallback, useEffect, useRef } from 'react'
-import { BsArrowUpShort, BsSearch, BsX } from 'react-icons/bs'
+import { BsArrowUpShort, BsSearch } from 'react-icons/bs'
 import { HiX } from 'react-icons/hi'
 import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
-import { InlineButton, Button } from './Button'
+import Button, { InlineButton } from './Button'
 
 import getConfig from '../config'
 
@@ -22,16 +22,16 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
 
-  const _onSelect = useCallback(value => {
+  const _onSelect = value => {
     inputRef.current.blur()
     onClose()
     onSelect(value)
-  }, [onSelect])
+  }
 
-  const onKeyUp = useCallback((e) => {
+  const onKeyUp = (e) => {
     if (e.code === 'Escape') onClose()
     if (e.code === 'Enter' && items.length === 1) _onSelect(items[0].id)
-  }, [onClose])
+  }
 
   const { ontology } = getConfig()
   const placeholder = `Search ${ontology.area.noun_plural}`
@@ -77,6 +77,13 @@ const LocationFilter = (props) => {
     category, heading, subheading, showOverviewButton, loadOverview, overview,
     isSearching, setIsSearching, filteredItems, searchTerm, setSearchTerm
   } = props
+
+  const searchButtonRef = useRef()
+  const onSearchClose = useCallback(() => {
+    setIsSearching(false)
+    searchButtonRef.current.focus()
+  }, [setIsSearching])
+
   return (
     <div className={className}>
       <div className='flex justify-between items-center h-6'>
@@ -96,6 +103,7 @@ const LocationFilter = (props) => {
       <Heading className='max-w-max flex items-center justify-between space-x-2 relative z-0 h-6'>
         <span className='truncate select-none'>{heading}</span>
         <Button
+          ref={searchButtonRef}
           className='flex-shrink-0 h-7 w-8 flex items-center justify-center'
           onClick={() => setIsSearching(true)} title='Search areas'
           tabIndex={isSearching ? '-1' : undefined}
@@ -106,32 +114,32 @@ const LocationFilter = (props) => {
       <p className='text-sm leading-6 h-6 mt-1 text-gray-600 font-medium'>
         {subheading}
       </p>
+      <FadeTransition in={loading}>
+        <div className='bg-white absolute inset-0 grid place-content-center z-10'>
+          <Spinner className='text-gray-500 w-6 h-6' />
+        </div>
+      </FadeTransition>
       <FadeTransition in={isSearching}>
         <div className='bg-white absolute inset-0 z-10'>
           <div className='flex justify-between items-center h-6 mb-2'>
             <DescriptiveHeading className='whitespace-nowrap'>
               Search
             </DescriptiveHeading>
-            <InlineButton
-              className='box-content relative z-10'
+            <Button
+              className='box-content relative z-10 h-6 pt-0 pb-0 pl-1 pr-1'
               title='Close'
-              onClick={() => setIsSearching(false)}
+              onClick={onSearchClose}
             >
-              <HiX className='h-4 w-4 fill-current' />
-            </InlineButton>
+              <HiX className='h-4 w-4 fill-current text-gray-600' />
+            </Button>
           </div>
           <Search
             onSelect={onChange}
             items={filteredItems}
             value={searchTerm}
             onChange={setSearchTerm}
-            onClose={() => setIsSearching(false)}
+            onClose={onSearchClose}
           />
-        </div>
-      </FadeTransition>
-      <FadeTransition in={loading}>
-        <div className='bg-white absolute inset-0 grid place-content-center z-10'>
-          <Spinner className='text-gray-500 w-6 h-6' />
         </div>
       </FadeTransition>
     </div>
