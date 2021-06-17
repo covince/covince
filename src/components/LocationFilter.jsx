@@ -54,10 +54,10 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
             {items.map(({ id, name, isNameMatch, matchIndex, terms }) => (
               <ComboboxOption
                 key={id}
-                className='py-3 md:py-2 px-4 md:px-3 truncate no-webkit-tap'
+                className='py-3 md:py-2 px-4 md:px-3 no-webkit-tap'
                 value={id}
               >
-                <div>
+                <div className='truncate'>
                   { isNameMatch
                     ? <HighlightMatch index={matchIndex} length={value.length}>{name}</HighlightMatch>
                     : name }
