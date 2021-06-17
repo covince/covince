@@ -39,50 +39,53 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
   const { ontology } = getConfig()
   const { noun_plural, search_placeholder = noun_plural } = ontology.area
 
+  const list = value.length
+    ? (
+        items.length > 0
+          ? <ComboboxList className='w-full'>
+            {items.map(({ id, name, matchingName, terms }) => (
+              <ComboboxOption
+                key={id}
+                className='py-3 md:py-2 px-4 md:px-3 truncate no-webkit-tap'
+                value={id}
+              >
+                <div>
+                  { matchingName
+                    ? <><span className='font-bold'>{name.slice(0, value.length)}</span>{name.slice(value.length)}</>
+                    : name }
+                  &nbsp;<span className='font-medium text-xs tracking-wide text-gray-500'>{id}</span>
+                </div>
+                {terms &&
+                  <ul className='covince-search-term-list text-gray-500 text-sm truncate'>
+                    {terms.map(term => <li key={term}><span className='font-bold'>{term.slice(0, value.length)}</span>{term.slice(value.length)}</li>)}
+                  </ul> }
+              </ComboboxOption>
+            ))}
+          </ComboboxList>
+          : <span className='block py-3 md:py-2 px-4 md:px-3 text-sm'>
+        No matches
+      </span>
+      )
+    : null
+
   return (
-    <Combobox aria-label="Areas" openOnFocus onSelect={_onSelect} onKeyUp={onKeyUp}>
-      <div className='flex items-center space-x-3'>
-        <ComboboxInput
-          ref={inputRef}
-          type="text"
-          className="w-full h-11 md:h-9 md:text-sm rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40"
-          value={value}
-          onChange={_onChange}
-          autocomplete={false}
-          placeholder={search_placeholder}
-        />
-      </div>
-      { items && !!value.length && (
-        <ComboboxPopover
-          className="rounded-md md:shadow-lg mt-2 -mx-4 md:mx-0 md:ring-1 ring-black ring-opacity-5 py-1.5 z-20"
-          portal={!isMobile}
+    <Combobox aria-label="Areas" onSelect={_onSelect} onKeyUp={onKeyUp}>
+      <ComboboxInput
+        ref={inputRef}
+        type="text"
+        className="w-full h-11 md:h-9 md:text-sm rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40"
+        value={value}
+        onChange={_onChange}
+        autocomplete={false}
+        placeholder={search_placeholder}
+      />
+      { !!value.length && (isMobile
+        ? <div className='mt-3 -mx-4'>{list}</div>
+        : <ComboboxPopover
+          className="rounded-md shadow-lg mt-2 mx-0 ring-1 ring-black ring-opacity-5 py-1.5 z-20"
         >
-          { items.length > 0
-            ? <ComboboxList className='w-full'>
-              {items.map(({ id, name, matchingName, terms }) => (
-                <ComboboxOption
-                  key={id}
-                  className='py-3 md:py-2 px-4 md:px-3 truncate no-webkit-tap'
-                  value={id}
-                >
-                  <div>
-                    { matchingName
-                      ? <><span className='font-bold'>{name.slice(0, value.length)}</span>{name.slice(value.length)}</>
-                      : name }
-                    &nbsp;<span className='font-medium text-xs tracking-wide text-gray-500'>{id}</span>
-                  </div>
-                  {terms &&
-                    <ul className='covince-search-term-list text-gray-500 text-sm truncate'>
-                      {terms.map(term => <li key={term}><span className='font-bold'>{term.slice(0, value.length)}</span>{term.slice(value.length)}</li>)}
-                    </ul> }
-                </ComboboxOption>
-              ))}
-            </ComboboxList>
-            : <span className='block py-3 md:py-2 px-4 md:px-3'>
-              No matches
-            </span> }
-        </ComboboxPopover>
-      )}
+          {list}
+        </ComboboxPopover>)}
     </Combobox>
   )
 }
@@ -111,7 +114,7 @@ const LocationFilter = (props) => {
     <div className={className}>
       { isSearching
         ? <>
-          <div className='flex justify-between items-center h-6 mb-2'>
+          <div className='flex justify-between items-center h-6 mb-3'>
             <DescriptiveHeading className='whitespace-nowrap'>
               Search
             </DescriptiveHeading>
@@ -146,20 +149,24 @@ const LocationFilter = (props) => {
               {overview.short_heading}
             </InlineButton> }
           </div>
-          <Heading className='flex items-center relative z-0 h-8'>
-            <span className='truncate select-none'>{heading}</span>
+          <div className='flex justify-between space-x-2 w-full'>
+            <div className='flex-shrink min-w-0'>
+              <Heading className='relative z-0 leading-6 truncate my-0.5'>
+                {heading}
+              </Heading>
+              <p className='text-sm leading-6 h-6 text-gray-600 font-medium'>
+                {subheading}
+              </p>
+            </div>
             <Button
               ref={searchButtonRef}
-              className='flex-shrink-0 ml-auto md:ml-2 h-7 w-8 flex items-center justify-center'
+              className='flex-shrink-0 h-10 md:h-8 w-11 md:w-9 flex items-center justify-center mt-0.5'
               onClick={() => setIsSearching(true)} title='Search areas'
               tabIndex={isSearching ? '-1' : undefined}
             >
-              <BsSearch className='flex-shrink-0 h-4 w-4 text-current' />
+              <BsSearch className='flex-shrink-0 h-5 md:h-4 w-5 md:w-4 text-current' />
             </Button>
-          </Heading>
-          <p className='text-sm leading-6 h-6 text-gray-600 font-medium'>
-            {subheading}
-          </p>
+          </div>
         </> }
       <FadeTransition in={loading}>
         <div className='bg-white absolute inset-0 grid place-content-center z-10'>

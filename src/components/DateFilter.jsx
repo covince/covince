@@ -28,10 +28,8 @@ const DateFilter = ({ className, dates = [], heading, label = 'Timeline', value,
             </> }
       </Button>
     </div>
-    <div className='flex items-center justify-between h-8'>
-      <Heading>{heading}</Heading>
-    </div>
-    <div className='h-6'>
+    <Heading className='mt-0.5'>{heading}</Heading>
+    <div className='h-6 mt-1.5'>
       <Slider
         min={0}
         max={dates ? dates.length - 1 : 1}

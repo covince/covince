@@ -1,5 +1,4 @@
 import { useMemo, useReducer } from 'react'
-import { orderBy } from 'lodash'
 import { useQuery } from 'react-query'
 
 export default (lookupTable, hasSearchTerms, dataPath) => {
@@ -63,18 +62,19 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
     if (searchTerm.length === 0) return []
 
     const toMatch = searchTerm.toLowerCase()
-    const matchingTerms = Object.keys(termsToMatch).filter(term => term.startsWith(toMatch)).slice(0, 10)
+    const matchingTerms = Object.keys(termsToMatch).filter(term => term.startsWith(toMatch))
 
+    let count = 0
     const idToLabels = {}
     for (const term of matchingTerms) {
       const id = termsToMatch[term]
+      if (count === 10 && !(id in idToLabels)) continue
       const searchTerm = searchTermLookup[term]
       const matchingName = term === lookupTable[id].toLowerCase()
       if (id in idToLabels) {
-        if (searchTerm !== undefined && !matchingName) {
+        if (!matchingName) {
           idToLabels[id].terms.push(searchTerm)
-        }
-        if (matchingName && idToLabels[id].matchingName === false) {
+        } else if (idToLabels[id].matchingName === false) {
           idToLabels[id].matchingName = true
         }
       } else {
@@ -83,10 +83,23 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
           matchingName,
           terms: searchTerm !== undefined ? [searchTerm] : []
         }
+        count++
       }
     }
 
-    return orderBy(Object.keys(idToLabels).map(id => ({ ...idToLabels[id], id })), 'name', 'asc')
+    const collator = new Intl.Collator(undefined, { numeric: true })
+    const nameEntries = []
+    const termEntries = []
+    for (const id of Object.keys(idToLabels)) {
+      const entry = idToLabels[id]
+      entry.terms.sort(collator.compare)
+      const list = entry.matchingName ? nameEntries : termEntries
+      list.push({ ...entry, id })
+    }
+    nameEntries.sort((a, b) => collator.compare(a.name, b.name))
+    termEntries.sort((a, b) => collator.compare(a.terms[0], b.terms[0]))
+
+    return [...nameEntries, ...termEntries]
   }, [searchTerm, termsToMatch])
 
   return {
