@@ -51,7 +51,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
   const areaLookupTable = useAreaLookupTable(tiles, results, config.ontology)
-  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms, dataPath)
+  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
     lineageState.lineage === null || areaState.currentArea === null
@@ -317,7 +317,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
-                {!chartZoom && <span>&nbsp;on {mobileNavDate}</span>}
+                {!chartZoom && !!mobileNavDate && <span>&nbsp;on {mobileNavDate}</span>}
               </PillButton>
               { chartZoom &&
                 <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>

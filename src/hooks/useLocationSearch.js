@@ -1,7 +1,7 @@
 import { useMemo, useReducer } from 'react'
 import { useQuery } from 'react-query'
 
-export default (lookupTable, hasSearchTerms, dataPath) => {
+export default (lookupTable, searchTermConfig = {}) => {
   const [state, dispatch] = useReducer((state, action) => {
     if (action.type === 'IS_SEARCHING') {
       return {
@@ -22,10 +22,10 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
   })
 
   const getSearchTerms = async () => {
-    const response = await fetch(`${dataPath}/area-search.json`)
+    const response = await fetch(searchTermConfig.url)
     return await response.json()
   }
-  const { data: searchTerms, isLoading } = useQuery('searchTerms', getSearchTerms, { enabled: !!hasSearchTerms })
+  const { data: searchTerms, isLoading } = useQuery('searchTerms', getSearchTerms, { enabled: !!searchTermConfig.url })
 
   const searchTermLookup = useMemo(() => {
     const lookup = {}
@@ -38,11 +38,11 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
   }, [searchTerms])
 
   const termsToMatch = useMemo(() => {
-    const terms = {}
+    const terms = []
     if (lookupTable) {
       for (const key of Object.keys(lookupTable)) {
         if (key !== 'overview') {
-          terms[lookupTable[key].toLowerCase()] = key
+          terms.push({ term: lookupTable[key].toLowerCase(), id: key })
         }
       }
     }
@@ -50,7 +50,7 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
       for (const key of Object.keys(searchTerms)) {
         const id = searchTerms[key]
         if (id in lookupTable) {
-          terms[key.toLowerCase()] = id
+          terms.push({ term: key.toLowerCase(), id, mode: searchTermConfig.mode })
         }
       }
     }
@@ -61,24 +61,35 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
   const filteredItems = useMemo(() => {
     if (searchTerm.length === 0) return []
 
-    const toMatch = searchTerm.toLowerCase()
+    const input = searchTerm.toLowerCase()
     const matchingTerms = []
     const ids = new Set()
-    for (const term of Object.keys(termsToMatch)) {
-      const tokens = term.split(' ')
-      for (const t of tokens) {
-        if (t.startsWith(toMatch) || (toMatch.startsWith(t) && term.includes(toMatch))) {
-          matchingTerms.push({ term, matchIndex: term.indexOf(t) })
-          ids.add(termsToMatch[term])
-          break
+    for (const { term, id, mode } of termsToMatch) {
+      let matchIndex = null
+      if (mode === 'padded-first-input-token') {
+        const paddedInput = input.split(' ')[0].padEnd(input.length)
+        const paddedTerm = term.padEnd(input.length)
+        if (paddedTerm.startsWith(paddedInput)) {
+          matchIndex = 0
         }
+      } else {
+        const tokens = term.split(' ')
+        for (const t of tokens) {
+          if (t.startsWith(input) || (input.startsWith(t) && term.includes(input))) {
+            matchIndex = term.indexOf(t)
+            break
+          }
+        }
+      }
+      if (matchIndex !== null) {
+        matchingTerms.push({ term, id, matchIndex })
+        ids.add(id)
       }
       if (ids.size === 10) break
     }
 
     const matchesById = {}
-    for (const { term, matchIndex } of matchingTerms) {
-      const id = termsToMatch[term]
+    for (const { term, id, matchIndex } of matchingTerms) {
       const searchTerm = searchTermLookup[term]
       const isNameMatch = term === lookupTable[id].toLowerCase()
       if (id in matchesById) {

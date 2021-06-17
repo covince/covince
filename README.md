@@ -10,6 +10,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 ### Top-level sections
 
+* [`area_search_terms`](#area-search-terms) (optional) enable additional search terms for areas
 * `charts [array]` list of [chart](#chart) definitions
 * `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
@@ -20,7 +21,13 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions
 * [`timeline [object]`](#timeline) (optional)
-   
+
+### Area Search Terms
+
+* `url [string]` should load a JSON file with the following structure: `{ "search_term": "area_id", ... }`
+* `mode [string]` type of search to apply to additional terms:
+  * `padded-first-input-token` pads the term to the length of the input and matches against the first token of the input padded to the original length
+
 ### Chart
 
 * `allow_stack [boolean]` (optional) enables stacking

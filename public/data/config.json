@@ -1,5 +1,8 @@
 {
-  "area_search_terms": true,
+  "area_search_terms": {
+    "url": "./data/area-search.json",
+    "mode": "padded-first-input-token"
+  },
   "parameters": [
     {
       "id": "lambda",
