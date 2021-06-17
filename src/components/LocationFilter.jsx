@@ -13,6 +13,14 @@ import Button, { InlineButton } from './Button'
 import { useMobile } from '../hooks/useMediaQuery'
 import getConfig from '../config'
 
+const HighlightMatch = ({ index, length, children }) => (
+  <>
+    {children.slice(0, index)}
+    <span className='font-bold'>{children.slice(index, index + length)}</span>
+    {children.slice(index + length)}
+  </>
+)
+
 const Search = ({ onSelect, items, value, onChange, onClose }) => {
   const isMobile = useMobile()
 
@@ -43,21 +51,21 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
     ? (
         items.length > 0
           ? <ComboboxList className='w-full'>
-            {items.map(({ id, name, matchingName, terms }) => (
+            {items.map(({ id, name, isNameMatch, matchIndex, terms }) => (
               <ComboboxOption
                 key={id}
                 className='py-3 md:py-2 px-4 md:px-3 truncate no-webkit-tap'
                 value={id}
               >
                 <div>
-                  { matchingName
-                    ? <><span className='font-bold'>{name.slice(0, value.length)}</span>{name.slice(value.length)}</>
+                  { isNameMatch
+                    ? <HighlightMatch index={matchIndex} length={value.length}>{name}</HighlightMatch>
                     : name }
                   &nbsp;<span className='font-medium text-xs tracking-wide text-gray-500'>{id}</span>
                 </div>
-                {terms &&
+                { terms &&
                   <ul className='covince-search-term-list text-gray-500 text-sm truncate'>
-                    {terms.map(term => <li key={term}><span className='font-bold'>{term.slice(0, value.length)}</span>{term.slice(value.length)}</li>)}
+                    {terms.map(({ term, matchIndex }) => <li key={term}><HighlightMatch index={matchIndex} length={value.length}>{term}</HighlightMatch></li>)}
                   </ul> }
               </ComboboxOption>
             ))}

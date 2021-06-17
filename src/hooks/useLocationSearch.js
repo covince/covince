@@ -62,26 +62,39 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
     if (searchTerm.length === 0) return []
 
     const toMatch = searchTerm.toLowerCase()
-    const matchingTerms = Object.keys(termsToMatch).filter(term => term.startsWith(toMatch))
+    const matchingTerms = []
+    for (const term of Object.keys(termsToMatch)) {
+      const tokens = term.split(' ')
+      for (const t of tokens) {
+        if (t.startsWith(toMatch)) {
+          matchingTerms.push({ term, matchIndex: term.indexOf(t) })
+        }
+      }
+    }
 
     let count = 0
     const idToLabels = {}
-    for (const term of matchingTerms) {
+    for (const { term, matchIndex } of matchingTerms) {
       const id = termsToMatch[term]
       if (count === 10 && !(id in idToLabels)) continue
       const searchTerm = searchTermLookup[term]
-      const matchingName = term === lookupTable[id].toLowerCase()
+      const isNameMatch = term === lookupTable[id].toLowerCase()
       if (id in idToLabels) {
-        if (!matchingName) {
-          idToLabels[id].terms.push(searchTerm)
-        } else if (idToLabels[id].matchingName === false) {
-          idToLabels[id].matchingName = true
+        if (isNameMatch) {
+          idToLabels[id] = {
+            ...idToLabels[id],
+            isNameMatch,
+            matchIndex
+          }
+        } else {
+          idToLabels[id].terms.push({ term: searchTerm, matchIndex })
         }
       } else {
         idToLabels[id] = {
           name: lookupTable[id],
-          matchingName,
-          terms: searchTerm !== undefined ? [searchTerm] : []
+          isNameMatch,
+          matchIndex: isNameMatch ? matchIndex : undefined,
+          terms: isNameMatch ? [] : [{ term: searchTerm, matchIndex }]
         }
         count++
       }
@@ -93,7 +106,7 @@ export default (lookupTable, hasSearchTerms, dataPath) => {
     for (const id of Object.keys(idToLabels)) {
       const entry = idToLabels[id]
       entry.terms.sort(collator.compare)
-      const list = entry.matchingName ? nameEntries : termEntries
+      const list = entry.isNameMatch ? nameEntries : termEntries
       list.push({ ...entry, id })
     }
     nameEntries.sort((a, b) => collator.compare(a.name, b.name))
