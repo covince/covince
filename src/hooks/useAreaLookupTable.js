@@ -1,17 +1,30 @@
 import { useMemo } from 'react'
 
-function useAreaLookupTable (tiles, ontology) {
+function useAreaLookupTable (tiles, results, ontology) {
   return useMemo(() => {
     const lookupTable = {
       overview: ontology.overview.short_heading
     }
+
+    if (results === null) {
+      return lookupTable
+    }
+
+    const nameLookup = {}
     if (tiles !== null) {
       for (const feature of tiles.features) {
-        lookupTable[feature.properties.area_id] = feature.properties.area_name
+        nameLookup[feature.properties.area_id] = feature.properties.area_name
       }
     }
+
+    for (const { area } of results.values) {
+      if (area in nameLookup) {
+        lookupTable[area] = nameLookup[area]
+      }
+    }
+
     return lookupTable
-  }, [tiles, ontology.overview])
+  }, [tiles, results, ontology.overview])
 }
 
 export default useAreaLookupTable

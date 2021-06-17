@@ -1,3 +1,15 @@
+.covince-search-term-list li {
+  display: inline;
+}
+
+.covince-search-term-list li::after {
+  content: ', ';
+}
+
+.covince-search-term-list li:last-child::after {
+  content: '';
+}
+
 :root {
   --reach-combobox: 1;
 }

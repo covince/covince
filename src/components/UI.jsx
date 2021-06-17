@@ -24,7 +24,6 @@ import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
-import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
 
 import getConfig from '../config'
@@ -32,7 +31,6 @@ import useLocationSearch from '../hooks/useLocationSearch'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
   const config = getConfig()
-  const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages
 
@@ -52,8 +50,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
-  const areaList = useAreaList(results, areaLookupTable)
-  const locationSearch = useLocationSearch(areaList)
+  const areaLookupTable = useAreaLookupTable(tiles, results, config.ontology)
+  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms, dataPath)
 
   const isInitialLoad = useMemo(() => (
     lineageState.lineage === null || areaState.currentArea === null
@@ -63,8 +61,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     const { ontology } = config
 
     const props = {
-      loading: isInitialLoad || areaState.status === 'LOADING',
-      areaList,
+      loading: isInitialLoad || areaState.status === 'LOADING' || locationSearch.isLoading,
       onChange: areaActions.load,
       value: areaState.currentArea,
       overview: ontology.overview
@@ -94,7 +91,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       showOverviewButton: areaState.loadingArea !== 'overview',
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])
+  }, [areaState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
 
   const { timeline } = config
   const formattedDate = useMemo(

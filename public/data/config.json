@@ -1,4 +1,5 @@
 {
+  "area_search_terms": true,
   "parameters": [
     {
       "id": "lambda",
@@ -27,7 +28,8 @@
     },
     "area": {
       "category": "Local authority",
-      "noun_plural": "local authorities"
+      "noun_plural": "local authorities",
+      "search_placeholder": "local authority or postcode"
     }
   },
   "map": {
