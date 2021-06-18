@@ -1,10 +1,8 @@
-import './Checkbox.css'
-
 import React from 'react'
 import classNames from 'classnames'
 
 const Checkbox = ({ id, name, children, label = children, checked, onChange, className, style }) => (
-  <div className={classNames('heron-checkbox flex items-center', className)} style={style}>
+  <div className={classNames('flex items-center', className)} style={style}>
     <div className="flex items-center h-5">
       <input
         id={id}
@@ -12,7 +10,7 @@ const Checkbox = ({ id, name, children, label = children, checked, onChange, cla
         checked={checked}
         onChange={onChange}
         type="checkbox"
-        className="outline-none focus:ring-2 ring-current ring-offset-2 h-4 w-4 text-current border-gray-300 rounded"
+        className="outline-none focus:ring-2 focus:ring-current ring-offset-2 h-4 w-4 text-current border-gray-300 rounded"
       />
     </div>
     { label &&

@@ -1,5 +1,5 @@
 /* Works on Firefox */
-.heron-filter-section {
+.covince-filter-section {
   scrollbar-width: thin;
   scrollbar-color: theme('colors.gray.300') transparent;
 
@@ -7,18 +7,18 @@
 }
 
 /* Works on Chrome, Edge, and Safari */
-.heron-filter-section::-webkit-scrollbar {
+.covince-filter-section::-webkit-scrollbar {
   @apply h-1.5;
 }
 
-.heron-filter-section::-webkit-scrollbar-track {
+.covince-filter-section::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.heron-filter-section::-webkit-scrollbar-thumb {
+.covince-filter-section::-webkit-scrollbar-thumb {
   @apply rounded bg-gray-300;
 }
 
-.heron-filter-section::-webkit-scrollbar-thumb:hover {
+.covince-filter-section::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400;
 }

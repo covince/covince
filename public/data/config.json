@@ -1,4 +1,8 @@
 {
+  "area_search_terms": {
+    "url": "./data/area-search.json",
+    "mode": "padded-first-input-token"
+  },
   "parameters": [
     {
       "id": "lambda",
@@ -27,7 +31,8 @@
     },
     "area": {
       "category": "Local authority",
-      "noun_plural": "local authorities"
+      "noun_plural": "local authorities",
+      "search_placeholder": "local authority or postcode"
     }
   },
   "map": {

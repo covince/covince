@@ -7,5 +7,5 @@
 }
 
 .recharts-cartesian-axis-tick-value {
-  @apply tracking-wide;
+  @apply tracking-wide text-xs;
 }

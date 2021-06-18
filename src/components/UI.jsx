@@ -24,14 +24,13 @@ import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
-import useAreaList from '../hooks/useAreaList'
 import useChartZoom from '../hooks/useChartZoom'
 
 import getConfig from '../config'
+import useLocationSearch from '../hooks/useLocationSearch'
 
 const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
   const config = getConfig()
-  const areaLookupTable = useAreaLookupTable(tiles, config.ontology)
 
   const unique_lineages = data.lineages
 
@@ -51,7 +50,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
-  const areaList = useAreaList(results, areaLookupTable)
+  const areaLookupTable = useAreaLookupTable(tiles, results, config.ontology)
+  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
     lineageState.lineage === null || areaState.currentArea === null
@@ -61,8 +61,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     const { ontology } = config
 
     const props = {
-      loading: isInitialLoad || areaState.status === 'LOADING',
-      areaList,
+      loading: isInitialLoad || areaState.status === 'LOADING' || locationSearch.isLoading,
       onChange: areaActions.load,
       value: areaState.currentArea,
       overview: ontology.overview
@@ -92,7 +91,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
       showOverviewButton: areaState.loadingArea !== 'overview',
       loadOverview: () => areaActions.load('overview')
     }
-  }, [areaState, isMobile, areaLookupTable.overview, areaList, isInitialLoad])
+  }, [areaState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -162,17 +161,20 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           Data updated <span className='font-medium'>{formattedLastModified}</span>
         </p> }
       { mobileView === 'chart' &&
-        <LocationFilter
-          className='px-4 pt-3 pb-0 bg-white relative z-10 h-22'
-          {...locationFilter}
-        /> }
+        <div className='bg-white px-4 pt-3 relative z-10'>
+          <LocationFilter
+            className='relative h-22'
+            {...locationFilter}
+            {...locationSearch}
+          />
+        </div> }
       { !isMobile &&
         <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
           <Card className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative' {...locationFilter} />
+            <LocationFilter className='relative' {...locationFilter} {...locationSearch} />
           </Card>
           <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-1.5'>
             <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
@@ -267,7 +269,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </div>
         </div>
-        <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' })}>
+        <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || (isMobile && locationSearch.isSearching) })}>
           { !isMobile &&
             <FadeTransition in={!!chartZoom}>
               <div className='absolute left-0 right-0 -top-6 h-0 flex'>
@@ -303,7 +305,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               </p>
             </div> }
         </div>
-        { mobileView === 'chart' &&
+        { mobileView === 'chart' && !locationSearch.isSearching &&
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3'>
             <LineageFilter {...lineageFilter} />
             <div
@@ -315,7 +317,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
-                {!chartZoom && <span>&nbsp;on {mobileNavDate}</span>}
+                {!chartZoom && !!mobileNavDate && <span>&nbsp;on {mobileNavDate}</span>}
               </PillButton>
               { chartZoom &&
                 <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
