@@ -134,7 +134,7 @@ const Chloropleth = (props) => {
   const {
     color_scale_type,
     config = {},
-    enable_fade_uncertainty = false,
+    enable_fade_uncertainty,
     geojson,
     handleOnClick,
     lineColor = 'blueGray',
@@ -184,7 +184,7 @@ const Chloropleth = (props) => {
   const percentage = parameterConfig && parameterConfig.format === 'percentage'
 
   const hasUncertainty = useMemo(() => {
-    if (enable_fade_uncertainty) return true
+    if (enable_fade_uncertainty !== undefined) return enable_fade_uncertainty
     if (percentage) { // back compat
       for (const v of Object.values(values)) {
         if (v === undefined) return false

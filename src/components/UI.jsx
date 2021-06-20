@@ -156,7 +156,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
 
   const fadeUncertaintyEnabled = useMemo(() => {
     const { fade_uncertainty = {} } = config.map
-    return !!fade_uncertainty[lineageState.colorBy]
+    return lineageState.colorBy in fade_uncertainty ? fade_uncertainty[lineageState.colorBy] : undefined
   }, [lineageState.colorBy])
 
   return (
