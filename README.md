@@ -15,8 +15,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
 * `map [object]`
-  *  [`settings [object]`](#map-settings) (optional)
-  *  [`viewport [object]`](#map-viewport)
+  * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
+  * [`settings [object]`](#map-settings) (optional)
+  * [`viewport [object]`](#map-viewport)
 * `nomenclature [array]` (optional) list of [nomenclature](#nomenclature) definitions, the order will be reflected on the UI
 * [`ontology [object]`](#ontology)
 * `parameters [array]` list of [parameter](#parameter) definitions

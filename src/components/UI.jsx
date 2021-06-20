@@ -154,6 +154,11 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     return undefined
   }, [lineageState.colorBy])
 
+  const fadeUncertaintyEnabled = useMemo(() => {
+    const { fade_uncertainty = {} } = config.map
+    return !!fade_uncertainty[lineageState.colorBy]
+  }, [lineageState.colorBy])
+
   return (
     <>
       { isMobile && lastModified &&
@@ -249,17 +254,18 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              selected_area={areaState.loadingArea || areaState.currentArea}
-              geojson={tiles}
-              config={config.map.viewport}
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
-              max_val={results ? results.max : 0}
-              min_val={results ? results.min : 0}
-              values={mapValues}
+              config={config.map.viewport}
+              enable_fade_uncertainty={fadeUncertaintyEnabled}
+              geojson={tiles}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               lineColor={lineColor}
+              max_val={results ? results.max : 0}
+              min_val={results ? results.min : 0}
               parameterConfig={mapParameterConfig}
+              selected_area={areaState.loadingArea || areaState.currentArea}
+              values={mapValues}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>
