@@ -1,6 +1,6 @@
 import React, { lazy, useRef } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import './index.css'
+import './Covince.css'
 
 import DataProvider from './components/DataProvider'
 
