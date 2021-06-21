@@ -222,7 +222,7 @@ const Chloropleth = (props) => {
           properties: {
             ...feature.properties,
             value: mean,
-            alpha: hasUncertainty ? max_val - (upper - lower) : 1
+            alpha: hasUncertainty ? 1 - (upper - lower) : 1
           }
         }
         features.active.push(_feature)
@@ -233,7 +233,7 @@ const Chloropleth = (props) => {
       }
     }
     return features
-  }, [geojson, values, selected_area, hasUncertainty, max_val])
+  }, [geojson, values, selected_area, hasUncertainty])
 
   const colorScale = useMemo(() => {
     if (max_val === 0) {
