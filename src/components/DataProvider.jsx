@@ -30,6 +30,8 @@ const DataProvider = (props) => {
           const parsedUrl = new URL(value, document.baseURI)
           if (trustedOrigins.some(origin => origin === parsedUrl.origin)) {
             urls[key] = value
+          } else {
+            console.log('[CovInce]', parsedUrl.origin, 'is not a trusted origin, ignoring.')
           }
         } catch (e) {}
       }
