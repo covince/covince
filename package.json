@@ -11,7 +11,7 @@
   "dependencies": {
     "covince": "github:theosanderson/covince#d11e9be1e7f631bed4592d80763aa1ba3e11d610",
     "tailwindcss": "^2.0.3",
-    "vite": "^2.0.5",
+    "vite": "2.2.3",
     "web-vitals": "^0.2.4"
   },
   "devDependencies": {
