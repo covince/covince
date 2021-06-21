@@ -9,7 +9,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "covince": "github:theosanderson/covince#281b8b7fd7d6b1b62408ee82763f0796949d6da0",
+    "covince": "github:theosanderson/covince#d11e9be1e7f631bed4592d80763aa1ba3e11d610",
     "tailwindcss": "^2.0.3",
     "vite": "^2.0.5",
     "web-vitals": "^0.2.4"
