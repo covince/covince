@@ -8,5 +8,5 @@ module.exports = {
   purge: {
     content: ["./src/**/*.jsx", "./node_modules/covince/src/**/*.jsx"],
   },
-  plugins: [],
+  plugins: []
 };
