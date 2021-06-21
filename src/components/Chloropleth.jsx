@@ -131,7 +131,19 @@ const doesNotMatch = (a, b) => (
 )
 
 const Chloropleth = (props) => {
-  const { geojson, values, selected_area, config = {} } = props
+  const {
+    color_scale_type,
+    config = {},
+    enable_fade_uncertainty,
+    geojson,
+    handleOnClick,
+    lineColor = 'blueGray',
+    max_val,
+    min_val,
+    parameterConfig,
+    selected_area,
+    values
+  } = props
 
   const [query, updateQuery] = useQueryAsState({
     ...mapViewportToQuery({
@@ -142,8 +154,7 @@ const Chloropleth = (props) => {
       bearing: 0
     }),
     uncertainty: '1'
-  }
-  )
+  })
 
   const [viewport, setViewport] = useState({
     width: 0,
@@ -170,18 +181,21 @@ const Chloropleth = (props) => {
     setViewport(newViewport)
   }
 
+  const percentage = parameterConfig && parameterConfig.format === 'percentage'
+
   const hasUncertainty = useMemo(() => {
-    for (const v of Object.values(values)) {
-      if (v === undefined) return false
-      const { upper, lower } = v
-      if (upper !== null && lower !== null && upper !== lower) {
-        return true
+    if (enable_fade_uncertainty !== undefined) return enable_fade_uncertainty
+    if (percentage) { // back compat
+      for (const v of Object.values(values)) {
+        if (v === undefined) return false
+        const { upper, lower } = v
+        if (upper !== null && lower !== null && upper !== lower) {
+          return true
+        }
       }
     }
     return false
-  }, [values])
-
-  const { min_val, max_val } = props
+  }, [enable_fade_uncertainty, values, percentage])
 
   const features = useMemo(() => {
     const features = {
@@ -221,8 +235,6 @@ const Chloropleth = (props) => {
     return features
   }, [geojson, values, selected_area, hasUncertainty, max_val])
 
-  const { color_scale_type } = props
-
   const colorScale = useMemo(() => {
     if (max_val === 0) {
       return [0, '#fff']
@@ -242,8 +254,6 @@ const Chloropleth = (props) => {
 
     return scale
   }, [max_val, min_val, color_scale_type])
-
-  const { lineColor = 'blueGray' } = props
 
   const showUncertainty = useMemo(() => query.uncertainty === '1', [query.uncertainty])
 
@@ -352,9 +362,6 @@ const Chloropleth = (props) => {
   }), [features, colorScale, color_scale_type, showUncertainty])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
-
-  const { parameterConfig, handleOnClick } = props
-  const percentage = parameterConfig && parameterConfig.format === 'percentage'
 
   const hoverPopup = useMemo(() => {
     if (hoveredFeature === null) return null
