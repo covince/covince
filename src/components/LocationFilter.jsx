@@ -25,7 +25,7 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
   const isMobile = useMobile()
 
   const _onChange = useCallback((e) => {
-    onChange(e.target.value.toLowerCase())
+    onChange(e.target.value)
   }, [onChange])
 
   const inputRef = useRef()
