@@ -1,6 +1,6 @@
 # CovInce
 
-CovInce is an an application built in React for visualising numbers and proportions of lineages for cases of SARS-CoV2. It is currently used primarily for the spatiotemporal display at https://covid19.sanger.ac.uk/.
+CovInce is an an application built in React for visualising numbers and proportions of lineages for cases of SARS-CoV2. It is currently used primarily for the spatiotemporal displays at https://covid19.sanger.ac.uk/ and https://covglobe.org/.
 
 If you would like to deploy your own version of covince and need assistance please raise an issue and we will try to help.
 
