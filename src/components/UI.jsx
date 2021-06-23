@@ -134,7 +134,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     return values
   }, [results, date])
 
-  const { chartZoom, clearChartZoom } = useChartZoom()
+  const { chartZoom, clearChartZoom, zoomEnabled, setZoomEnabled } = useChartZoom()
 
   const { activeLineages, sortedLineages } = lineageFilter
   const selectedLineage = lineageState.loading.lineage || lineageState.lineage
@@ -299,6 +299,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             isMobile={isMobile}
             lineColor={lineColor}
             activeLineages={activeLineages}
+            zoomEnabled={isMobile ? zoomEnabled : true}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>
@@ -315,9 +316,22 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
               </PillButton>
-              <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
-                <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
-              </PillButton>
+              { chartZoom
+                ? <PillButton
+                  onClick={clearChartZoom}
+                  className='text-center border border-gray-300 text-gray-700 focus:outline-none'
+                >
+                  <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
+                </PillButton>
+                : <PillButton
+                  onClick={() => setZoomEnabled(!zoomEnabled)}
+                  className={classNames(
+                    'text-center border border-gray-300 text-gray-700 focus:outline-none',
+                    { 'text-primary ring ring-primary ring-opacity-40 border-primary': zoomEnabled }
+                  )}
+                >
+                  <span className='whitespace-nowrap truncate font-medium'>Set date range</span>
+                </PillButton> }
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>

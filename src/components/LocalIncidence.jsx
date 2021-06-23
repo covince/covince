@@ -4,7 +4,19 @@ import classNames from 'classnames'
 
 import Chart from './Chart'
 
-function LocalIncidence ({ chartDefinitions, values, date, setDate, className, isMobile = false, lineColor, activeLineages }) {
+function LocalIncidence (props) {
+  const {
+    activeLineages,
+    chartDefinitions,
+    className,
+    date,
+    isMobile = false,
+    lineColor,
+    setDate,
+    values,
+    zoomEnabled
+  } = props
+
   const area_data = useMemo(() => values || [], [values])
 
   const [width, setWidth] = useState(0)
@@ -24,20 +36,22 @@ function LocalIncidence ({ chartDefinitions, values, date, setDate, className, i
             <Chart
               key={chart.parameter}
               activeLineages={activeLineages}
-              width={width}
-              isMobile={isMobile}
-              heading={chart.heading}
+              allowStack={chart.allow_stack}
               area_data={area_data}
               date={date}
-              setDate={setDate}
-              parameter={chart.parameter}
               defaultType={chart.default_type}
-              stroke={lineColor}
-              allowStack={chart.allow_stack}
               format={chart.format}
-              yAxis={chart.y_axis}
-              xAxis={chart.x_axis}
+              heading={chart.heading}
+              isMobile={isMobile}
               numCharts={chartDefinitions.length}
+              parameter={chart.parameter}
+              setDate={setDate}
+              stroke={lineColor}
+              tooltipEnabled={isMobile ? !zoomEnabled : true}
+              width={width}
+              xAxis={chart.x_axis}
+              yAxis={chart.y_axis}
+              zoomEnabled={zoomEnabled}
             />
           )}
         </div>

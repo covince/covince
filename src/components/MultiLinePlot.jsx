@@ -16,10 +16,18 @@ const animationDuration = 500
 
 const MainChart = React.memo((props) => {
   const {
-    activeLineages, chart, chartZoom,
-    stroke, precision, preset, type,
-    xAxisProps, yAxisConfig = {},
-    zoomArea, ...chartProps
+    activeLineages,
+    chart,
+    chartZoom,
+    stroke,
+    precision,
+    preset,
+    tooltipEnabled,
+    type,
+    xAxisProps,
+    yAxisConfig = {},
+    zoomArea,
+    ...chartProps
   } = props
 
   const { lineages, data, dates } = chart
@@ -93,13 +101,15 @@ const MainChart = React.memo((props) => {
 
   const tooltip = useMemo(() =>
     <Tooltip
-      content={ChartTooltip}
+      active={tooltipEnabled}
+      content={tooltipEnabled ? ChartTooltip : () => null}
+      cursor={{ stroke: tailwindColors[stroke][400] }}
+      dates={dates}
       percentage={preset === 'percentage'}
       precision={precision}
-      dates={dates}
-      cursor={{ stroke: tailwindColors[stroke][400] }}
+      shared
     />
-  , [stroke, dates, preset, precision])
+  , [tooltipEnabled, stroke, dates, preset, precision])
 
   const xAxis = useMemo(() =>
     <XAxis
@@ -216,10 +226,21 @@ MainChart.displayName = 'MainChart'
 
 const MultiLinePlot = props => {
   const {
-    parameter, preset: deprecatedPreset,
-    yAxis: yAxisConfig, /* xAxis: xAxisConfig = {}, */
-    date, setDate, area_data, activeLineages,
-    type, width, height = 120, stroke = 'blueGray', className
+    activeLineages,
+    area_data,
+    className,
+    date,
+    height = 120,
+    parameter,
+    preset: deprecatedPreset,
+    setDate,
+    stroke = 'blueGray',
+    tooltipEnabled,
+    type,
+    width,
+    /* xAxis: xAxisConfig = {}, */
+    yAxis: yAxisConfig,
+    zoomEnabled
   } = props
 
   const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
@@ -330,21 +351,25 @@ const MultiLinePlot = props => {
         if (item && !zoomArea.dragged) {
           setDate(data[item.activeLabel].date)
         }
-        setZoomArea({ dragged: zoomArea.dragged })
+        if (zoomEnabled) {
+          setZoomArea({ dragged: zoomArea.dragged })
+        }
       },
       onMouseDown: e => {
-        if (e) {
+        if (e && zoomEnabled) {
           setZoomArea({ start: e.activeLabel, end: e.activeLabel, dragged: false })
         }
       },
       onMouseMove: e => {
-        setIsHovering(e.activeLabel !== undefined)
-        if (zoomArea.start === undefined) return
-        let end = e.activeLabel
-        if (e.activeLabel === undefined) { // outside of axes
-          end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
+        if (e) {
+          setIsHovering(e.activeLabel !== undefined)
+          if (zoomArea.start === undefined) return
+          let end = e.activeLabel
+          if (e.activeLabel === undefined) { // outside of axes
+            end = xAxisDomain[zoomArea.end >= data.length / 2 ? 1 : 0]
+          }
+          setZoomArea({ start: zoomArea.start, end, dragged: true })
         }
-        setZoomArea({ start: zoomArea.start, end, dragged: true })
       },
       onMouseLeave: e => {
         setIsHovering(false)
@@ -358,7 +383,7 @@ const MultiLinePlot = props => {
         setZoomArea({ dragged: zoomArea.dragged })
       }
     }
-  }, [zoomArea, isHovering])
+  }, [zoomEnabled, data, zoomArea, isHovering])
 
   const cursor = useMemo(() => {
     if (zoomArea.start) return 'ew-resize'
@@ -382,6 +407,7 @@ const MultiLinePlot = props => {
           precision,
           preset,
           stroke,
+          tooltipEnabled,
           type,
           xAxisProps,
           yAxisConfig,
