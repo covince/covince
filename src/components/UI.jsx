@@ -98,10 +98,6 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     () => date ? format(new Date(date), timeline.date_format.heading) : '',
     [date]
   )
-  const mobileNavDate = useMemo(
-    () => date ? format(new Date(date), timeline.date_format.mobile_nav) : '',
-    [date]
-  )
 
   const dateFilter = {
     label: config.timeline.label,
@@ -138,7 +134,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
     return values
   }, [results, date])
 
-  const { chartZoom, clearChartZoom } = useChartZoom()
+  const { chartZoom, clearChartZoom, zoomEnabled, setZoomEnabled } = useChartZoom()
 
   const { activeLineages, sortedLineages } = lineageFilter
   const selectedLineage = lineageState.loading.lineage || lineageState.lineage
@@ -303,6 +299,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             isMobile={isMobile}
             lineColor={lineColor}
             activeLineages={activeLineages}
+            zoomEnabled={isMobile ? zoomEnabled : true}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>
@@ -312,23 +309,31 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
             </div> }
         </div>
         { mobileView === 'chart' && !locationSearch.isSearching &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
             <LineageFilter {...lineageFilter} />
-            <div
-              className={classNames(
-                'grid items-center gap-3 grid-flow-col h-12 box-content pt-1 _gap-3',
-                chartZoom ? 'auto-cols-fr' : 'justify-center'
-              )}
-            >
+            <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
               <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
-                {!chartZoom && !!mobileNavDate && <span>&nbsp;on {mobileNavDate}</span>}
               </PillButton>
-              { chartZoom &&
-                <PillButton onClick={clearChartZoom} className='flex justify-center border border-gray-300 text-gray-700'>
+              { chartZoom
+                ? <PillButton
+                  onClick={clearChartZoom}
+                  className='text-center border border-gray-300 text-gray-700 focus:outline-none'
+                >
                   <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
-                </PillButton> }
+                </PillButton>
+                : <PillButton
+                    onClick={() => setZoomEnabled(!zoomEnabled)}
+                    className={classNames(
+                      'flex justify-center border border-gray-300 text-gray-700 focus:outline-none',
+                      { 'text-primary ring ring-primary ring-opacity-40 border-primary': zoomEnabled }
+                    )}
+                  >
+                    <span className='whitespace-nowrap font-medium'>
+                      {zoomEnabled ? 'Select range on chart' : 'Set date range'}
+                    </span>
+                  </PillButton> }
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>

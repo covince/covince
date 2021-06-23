@@ -8,7 +8,7 @@ import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
-import Button, { InlineButton } from './Button'
+import Button from './Button'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import getConfig from '../config'
@@ -147,15 +147,16 @@ const LocationFilter = (props) => {
             <DescriptiveHeading className='whitespace-nowrap'>
               {category}
             </DescriptiveHeading>
-            {showOverviewButton && <InlineButton
-              title='Return to overview'
-              className='pr-1 relative z-10'
-              onClick={loadOverview}
-              tabIndex={isSearching ? '-1' : undefined}
-            >
-              <BsArrowUpShort className='h-6 w-6 fill-current' />
-              {overview.short_heading}
-            </InlineButton> }
+            { showOverviewButton &&
+              <Button
+                title='Return to overview'
+                className='relative z-10 -top-0.5 h-6 pl-0.5 pr-2 flex items-center text-primary hover:bg-gray-50'
+                onClick={loadOverview}
+                tabIndex={isSearching ? '-1' : undefined}
+              >
+                <BsArrowUpShort className='h-6 w-6 fill-current' />
+                {overview.short_heading}
+              </Button> }
           </div>
           <div className='flex justify-between space-x-2 w-full'>
             <div className='flex-shrink min-w-0'>

@@ -93,7 +93,6 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `initial_date [string]` (optional) should be in ISO format e.g. "2021-01-01", defaults to latest date
 * `date_format [string|object]` (optional) can be a string for all dates or an object with the following required keys:
   * `heading [string]` [reference](https://date-fns.org/docs/format)
-  * `mobile_nav [string]` [reference](https://date-fns.org/docs/format)
   * `chart_tooltip [string]` [reference](https://date-fns.org/docs/format)
 * `frame_length [number]` (optional) time in milliseconds per date when playing the timeline. Defaults to 100.
 
