@@ -35,7 +35,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
         </div>
       </header>
       <form
-        className='flex-grow flex flex-wrap md:grid grid-flow-row md:content-center md:gap-0.5 overflow-y-auto md:-mx-2'
+        className='flex-grow flex flex-wrap md:grid grid-flow-row md:content-center md:gap-0.5 md:overflow-y-auto md:-mx-2'
         style={formStyle}
       >
         {sortedLineages

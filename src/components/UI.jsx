@@ -311,7 +311,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
         { mobileView === 'chart' && !locationSearch.isSearching &&
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
             <LineageFilter {...lineageFilter} />
-            <div className='grid items-center gap-3 grid-flow-col h-12 box-content pt-1 _gap-3 auto-cols-fr'>
+            <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
               <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
@@ -324,14 +324,16 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
                   <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
                 </PillButton>
                 : <PillButton
-                  onClick={() => setZoomEnabled(!zoomEnabled)}
-                  className={classNames(
-                    'text-center border border-gray-300 text-gray-700 focus:outline-none',
-                    { 'text-primary ring ring-primary ring-opacity-40 border-primary': zoomEnabled }
-                  )}
-                >
-                  <span className='whitespace-nowrap truncate font-medium'>Set date range</span>
-                </PillButton> }
+                    onClick={() => setZoomEnabled(!zoomEnabled)}
+                    className={classNames(
+                      'flex justify-center border border-gray-300 text-gray-700 focus:outline-none',
+                      { 'text-primary ring ring-primary ring-opacity-40 border-primary': zoomEnabled }
+                    )}
+                  >
+                    <span className='whitespace-nowrap font-medium'>
+                      {zoomEnabled ? 'Select range on chart' : 'Set date range'}
+                    </span>
+                  </PillButton> }
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>

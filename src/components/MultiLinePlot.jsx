@@ -100,13 +100,15 @@ const MainChart = React.memo((props) => {
     <CartesianGrid stroke={tailwindColors[stroke][300]} />
 
   const tooltip = useMemo(() =>
-    <Tooltip
-      content={tooltipEnabled ? ChartTooltip : () => null}
-      cursor={{ stroke: tailwindColors[stroke][400] }}
-      dates={dates}
-      percentage={preset === 'percentage'}
-      precision={precision}
-    />
+    tooltipEnabled
+      ? <Tooltip
+          content={ChartTooltip}
+          cursor={{ stroke: tailwindColors[stroke][400] }}
+          dates={dates}
+          percentage={preset === 'percentage'}
+          precision={precision}
+        />
+      : null
   , [tooltipEnabled, stroke, dates, preset, precision])
 
   const xAxis = useMemo(() =>
@@ -344,7 +346,7 @@ const MultiLinePlot = props => {
   const [isHovering, setIsHovering] = React.useState(false)
 
   const eventHandlers = useMemo(() => {
-    return {
+    const clickHandlers = {
       onClick: item => {
         if (item && !zoomArea.dragged) {
           setDate(data[item.activeLabel].date)
@@ -372,7 +374,7 @@ const MultiLinePlot = props => {
       onMouseLeave: e => {
         setIsHovering(false)
       },
-      onMouseUp: () => {
+      onMouseUp: (_, e) => {
         if (zoomArea.end !== zoomArea.start) {
           const xMin = data[zoomArea.start].date
           const xMax = data[zoomArea.end].date
@@ -381,6 +383,15 @@ const MultiLinePlot = props => {
         setZoomArea({ dragged: zoomArea.dragged })
       }
     }
+    if (!tooltipEnabled) { // touch handlers need to be replaced when tooltip is missing
+      return {
+        ...clickHandlers,
+        onTouchStart: clickHandlers.onMouseDown,
+        onTouchMove: clickHandlers.onMouseMove,
+        onTouchEnd: clickHandlers.onMouseUp
+      }
+    }
+    return clickHandlers
   }, [zoomEnabled, data, zoomArea, isHovering])
 
   const cursor = useMemo(() => {
@@ -391,7 +402,7 @@ const MultiLinePlot = props => {
 
   return (
     <div
-      className={classNames('relative select-none', className)}
+      className={classNames('relative select-none focus:outline-none', className)}
       onDoubleClick={clearChartZoom}
     >
       <MainChart
