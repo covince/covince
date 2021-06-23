@@ -101,13 +101,11 @@ const MainChart = React.memo((props) => {
 
   const tooltip = useMemo(() =>
     <Tooltip
-      active={tooltipEnabled}
       content={tooltipEnabled ? ChartTooltip : () => null}
       cursor={{ stroke: tailwindColors[stroke][400] }}
       dates={dates}
       percentage={preset === 'percentage'}
       precision={precision}
-      shared
     />
   , [tooltipEnabled, stroke, dates, preset, precision])
 
