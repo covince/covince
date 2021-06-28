@@ -19,9 +19,10 @@ const MainChart = React.memo((props) => {
     activeLineages,
     chart,
     chartZoom,
-    stroke,
+    darkMode,
     precision,
     preset,
+    stroke,
     tooltipEnabled,
     type,
     xAxisProps,
@@ -97,13 +98,13 @@ const MainChart = React.memo((props) => {
   }, [preset, lineages, activeLineages, yAxisConfig, chartZoom])
 
   const grid =
-    <CartesianGrid stroke={tailwindColors[stroke][300]} />
+    <CartesianGrid stroke={tailwindColors[stroke][darkMode ? 500 : 300]} />
 
   const tooltip = useMemo(() =>
     tooltipEnabled
       ? <Tooltip
           content={ChartTooltip}
-          cursor={{ stroke: tailwindColors[stroke][400] }}
+          cursor={{ stroke: tailwindColors[stroke][darkMode ? 300 : 400] }}
           dates={dates}
           percentage={preset === 'percentage'}
           precision={precision}
@@ -195,11 +196,11 @@ const MainChart = React.memo((props) => {
     return (
       <ReferenceLine
         y={yAxisConfig.reference_line}
-        stroke={tailwindColors[stroke][600]}
+        stroke={tailwindColors[stroke][darkMode ? 400 : 600]}
         strokeDasharray={[8, 8]}
         label=''
         strokeWidth={2}
-        style={{ mixBlendMode: 'multiply' }}
+        style={{ mixBlendMode: darkMode ? 'screen' : 'multiply' }}
       />
     )
   }, [yAxisConfig.reference_line, stroke])
@@ -229,6 +230,7 @@ const MultiLinePlot = props => {
     activeLineages,
     area_data,
     className,
+    darkMode,
     date,
     height = 120,
     parameter,
@@ -413,6 +415,7 @@ const MultiLinePlot = props => {
           chart,
           chartZoom,
           cursor,
+          darkMode,
           precision,
           preset,
           stroke,
@@ -437,10 +440,10 @@ const MultiLinePlot = props => {
           />
           <ReferenceLine
             x={dates.indexOf(date)}
-            stroke={tailwindColors[stroke][400]}
+            stroke={tailwindColors[stroke][darkMode ? 500 : 400]}
             label=''
             strokeWidth={2}
-            style={{ mixBlendMode: 'multiply' }}
+            style={{ mixBlendMode: darkMode ? 'screen' : 'multiply' }}
           />
         </ComposedChart>
       </div>

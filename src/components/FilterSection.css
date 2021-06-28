@@ -22,3 +22,17 @@
 .covince-filter-section::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400;
 }
+
+.dark {
+  .covince-filter-section {
+    scrollbar-color: theme('colors.gray.500') transparent;
+  }
+
+  .covince-filter-section::-webkit-scrollbar-thumb {
+    @apply rounded bg-gray-500;
+  }
+
+  .covince-filter-section::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}

@@ -131,7 +131,7 @@ const LocationFilter = (props) => {
               title='Close'
               onClick={onSearchClose}
             >
-              <HiX className='h-4 w-4 fill-current text-gray-600' />
+              <HiX className='h-4 w-4 fill-current text-gray-600 dark:text-gray-300' />
             </Button>
           </div>
           <Search
@@ -163,7 +163,7 @@ const LocationFilter = (props) => {
               <Heading className='relative z-0 leading-6 truncate my-0.5'>
                 {heading}
               </Heading>
-              <p className='text-sm leading-6 h-6 text-gray-600 font-medium'>
+              <p className='text-sm leading-6 h-6 text-gray-600 dark:text-gray-400 font-medium'>
                 {subheading}
               </p>
             </div>

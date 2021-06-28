@@ -17,13 +17,13 @@ input[type=range]:focus-visible {
 
 .covince-slider-thumb {
   @apply
-    bg-white
+    bg-white dark:bg-gray-600
     h-6 w-6
     md:h-5 md:w-5
     box-border
     border
     border-solid
-    border-gray-400
+    border-gray-400 dark:border-gray-500
     rounded-full
     shadow
     cursor-pointer
@@ -48,7 +48,7 @@ input[type=range]::-moz-range-thumb {
     h-2 w-full
     cursor-pointer
     shadow-inner
-    bg-gray-100
+    bg-gray-100 dark:bg-gray-800
     rounded-full
   ;
 }

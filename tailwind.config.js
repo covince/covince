@@ -7,7 +7,7 @@ module.exports = {
       './src/**/*.jsx'
     ]
   },
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'class',
   theme: {
     fontFamily: {
       sans: defaultTheme.fontFamily.sans,

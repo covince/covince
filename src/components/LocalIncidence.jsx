@@ -10,6 +10,7 @@ function LocalIncidence (props) {
     chartDefinitions,
     className,
     date,
+    darkMode,
     isMobile = false,
     lineColor,
     setDate,
@@ -38,6 +39,7 @@ function LocalIncidence (props) {
               activeLineages={activeLineages}
               allowStack={chart.allow_stack}
               area_data={area_data}
+              darkMode={darkMode}
               date={date}
               defaultType={chart.default_type}
               format={chart.format}

@@ -16,13 +16,13 @@ const UncertaintyRange = ({ item, percentage, precision }) => {
   if (range && range[0] !== null && range[1] !== null) {
     return (
       <>
-        <td className='text-xs tracking-wide text-gray-600 text-right pl-3'>
+        <td className='text-xs tracking-wide text-gray-600 dark:text-gray-200 text-right pl-3'>
           {formatNumber(range[0], percentage, precision)}
         </td>
-        <td className='text-xs tracking-wide text-gray-600 text-center'>
+        <td className='text-xs tracking-wide text-gray-600 dark:text-gray-200 text-center'>
           &ndash;
         </td>
-        <td className='text-xs tracking-wide text-gray-600 text-left'>
+        <td className='text-xs tracking-wide text-gray-600 dark:text-gray-200 text-left'>
           {formatNumber(range[1], percentage, precision)}
         </td>
       </>
@@ -43,8 +43,8 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
     })
     const { timeline } = config
     return (
-      <div className='p-3 bg-white shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
-        <h4 className='text-center text-gray-700 font-bold mb-1'>
+      <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
+        <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
           {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
         </h4>
         <table className='tabular-nums w-full'>

@@ -29,7 +29,7 @@ import useChartZoom from '../hooks/useChartZoom'
 import getConfig from '../config'
 import useLocationSearch from '../hooks/useLocationSearch'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => {
+const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkMode }) => {
   const config = getConfig()
 
   const unique_lineages = data.lineages
@@ -252,6 +252,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               className='flex-grow'
               color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
               config={config.map.viewport}
+              darkMode={darkMode}
               enable_fade_uncertainty={fadeUncertaintyEnabled}
               geojson={tiles}
               handleOnClick={handleOnClick}
@@ -285,24 +286,25 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified }) => 
               </div>
             </FadeTransition> }
           <LocalIncidence
-            chartDefinitions={config.charts}
             className={classNames(
               'transition-opacity flex-grow', {
                 'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
               }
             )}
-            name={areaLookupTable[areaState.currentArea]}
+            activeLineages={activeLineages}
+            chartDefinitions={config.charts}
             date={date}
-            setDate={persistDate}
-            selected_area={areaState.currentArea}
-            values={areaState.data}
+            darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            activeLineages={activeLineages}
+            name={areaLookupTable[areaState.currentArea]}
+            selected_area={areaState.currentArea}
+            setDate={persistDate}
+            values={areaState.data}
             zoomEnabled={isMobile ? zoomEnabled : true}
           />
           { !isMobile && lastModified &&
-            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 rounded-tl-md h-6'>
+            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 dark:border-gray-400 rounded-tl-md h-6'>
               <p className='text-xs tracking-wide leading-6 text-heading'>
                 Data updated <span className='font-medium'>{formattedLastModified}</span>
               </p>

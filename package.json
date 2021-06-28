@@ -19,6 +19,7 @@
     "date-fns": "^2.19.0",
     "maplibre-gl": "^1.13.0-rc.5",
     "moment": "^2.29.1",
+    "postcss-nested": "^5.0.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-icons": "^4.1.0",

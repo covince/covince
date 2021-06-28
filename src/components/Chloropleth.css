@@ -1,3 +1,17 @@
 .mapboxgl-popup-content {
-  @apply shadow-lg p-0 rounded ring-1 ring-black ring-opacity-5;
+  @apply shadow-lg p-0 rounded ring-1 ring-black ring-opacity-5 dark:bg-gray-600;
+}
+
+.dark {
+  .mapboxgl-popup-tip {
+    border-top-color: theme('colors.gray.600')
+  }
+  .mapboxgl-ctrl-group {
+    @apply bg-gray-500;
+  }
+  .mapboxgl-ctrl-icon {
+    @apply border-gray-900;
+    mix-blend-mode: screen;
+    filter: brightness(3)
+  }
 }

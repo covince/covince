@@ -1,0 +1,15 @@
+.dark {
+
+  html&, body {
+    @apply text-gray-100 bg-gray-900;
+  }
+
+  .text-heading {
+    @apply text-gray-200;
+  }
+  
+  .text-subheading {
+    @apply text-gray-300;
+  }
+
+}
