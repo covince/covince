@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { BsArrowUpShort, BsSearch } from 'react-icons/bs'
 import { HiX } from 'react-icons/hi'
 import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
+import classNames from 'classnames'
 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
@@ -57,14 +58,14 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
                 className='py-3 md:py-2 px-4 md:px-3 no-webkit-tap'
                 value={id}
               >
-                <div className='truncate'>
+                <div className='truncate dark:text-white'>
                   { isNameMatch
                     ? <HighlightMatch index={matchIndex} length={value.length}>{name}</HighlightMatch>
                     : name }
-                  &nbsp;<span className='font-medium text-xs tracking-wide text-gray-500'>{id}</span>
+                  &nbsp;<span className='font-medium text-xs tracking-wide text-subheading'>{id}</span>
                 </div>
                 { terms &&
-                  <ul className='covince-search-term-list text-gray-500 text-sm truncate'>
+                  <ul className='covince-search-term-list text-subheading text-sm truncate'>
                     {terms.map(({ term, matchIndex }) => <li key={term}><HighlightMatch index={matchIndex} length={value.length}>{term}</HighlightMatch></li>)}
                   </ul> }
               </ComboboxOption>
@@ -77,11 +78,16 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
     : null
 
   return (
-    <Combobox aria-label="Areas" onSelect={_onSelect} onKeyUp={onKeyUp}>
+    <Combobox aria-label="Areas" onSelect={_onSelect} onKeyUp={onKeyUp} openOnFocus={value.length > 0}>
       <ComboboxInput
         ref={inputRef}
         type="text"
-        className="w-full h-11 md:h-9 md:text-sm rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40"
+        className={classNames(
+          'w-full h-11 md:h-9 md:text-sm rounded-md border-gray-300 shadow-sm focus:border-primary',
+          'focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40',
+          'dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400',
+          'dark:focus:border-dark-primary dark:focus:ring-dark-primary dark:focus:ring-opacity-40'
+        )}
         value={value}
         onChange={_onChange}
         autocomplete={false}
@@ -90,7 +96,7 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
       { !!value.length && (isMobile
         ? <div className='mt-3 -mx-4'>{list}</div>
         : <ComboboxPopover
-          className="rounded-md shadow-lg mt-2 mx-0 ring-1 ring-black ring-opacity-5 py-1.5 z-20"
+          className="rounded-md shadow-lg mt-2 mx-0 ring-1 ring-black dark:ring-gray-400 ring-opacity-5 py-1.5 z-20"
         >
           {list}
         </ComboboxPopover>)}
@@ -178,8 +184,8 @@ const LocationFilter = (props) => {
           </div>
         </> }
       <FadeTransition in={loading}>
-        <div className='bg-white absolute inset-0 grid place-content-center z-10'>
-          <Spinner className='text-gray-500 w-6 h-6' />
+        <div className='bg-white dark:bg-gray-700 absolute inset-0 grid place-content-center z-10'>
+          <Spinner className='text-gray-500 dark:text-gray-300 w-6 h-6' />
         </div>
       </FadeTransition>
     </div>

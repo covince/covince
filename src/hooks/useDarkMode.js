@@ -23,6 +23,7 @@ export default () => {
 
   return {
     isDark,
+    mode,
     setMode
   }
 }

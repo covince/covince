@@ -4,12 +4,30 @@
     @apply text-gray-100 bg-gray-900;
   }
 
+  .text-primary {
+    @apply text-dark-primary;
+  }
+
   .text-heading {
-    @apply text-gray-200;
+    @apply text-dark-heading;
   }
   
   .text-subheading {
-    @apply text-gray-300;
+    @apply text-dark-subheading;
   }
+
+  [type=checkbox] {
+    @apply bg-gray-500 border-gray-400;
+  }
+  [type=checkbox]:checked {
+    @apply bg-current border-current bg-none;
+  }
+
+  .shadow-sm { @apply shadow; }
+  .shadow { @apply shadow-md; }
+  .shadow-md { @apply shadow-lg; }
+  .shadow-lg { @apply shadow-xl; }
+  .shadow-xl { @apply shadow-2xl; }
+  .shadow-2xl { /* ? */ }
 
 }

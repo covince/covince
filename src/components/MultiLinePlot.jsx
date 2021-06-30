@@ -440,7 +440,7 @@ const MultiLinePlot = props => {
           />
           <ReferenceLine
             x={dates.indexOf(date)}
-            stroke={tailwindColors[stroke][darkMode ? 500 : 400]}
+            stroke={tailwindColors[stroke][darkMode ? 300 : 400]}
             label=''
             strokeWidth={2}
             style={{ mixBlendMode: darkMode ? 'screen' : 'multiply' }}

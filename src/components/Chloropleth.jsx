@@ -360,7 +360,7 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [features, colorScale, color_scale_type, showUncertainty])
+  }), [features, colorScale, color_scale_type, showUncertainty, darkMode])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 

@@ -16,6 +16,10 @@
 
 [data-reach-combobox-popover] {
   background: hsla(0, 100%, 100%, 0.99);
+
+  .dark & {
+    @apply bg-gray-600 ring-gray-500;
+  }
 }
 
 [data-reach-combobox-list] {
@@ -34,16 +38,28 @@
 [data-reach-combobox-option]:only-child {
   /* background: hsl(211, 10%, 95%); */
   @apply bg-gray-200 bg-opacity-50;
+
+  .dark & {
+    @apply bg-gray-800 bg-opacity-50;
+  }
 }
 
 [data-reach-combobox-option]:hover {
   /* background: hsl(211, 10%, 92%); */
   @apply bg-gray-200 bg-opacity-70;
+
+  .dark & {
+    @apply bg-gray-800 bg-opacity-70;
+  }
 }
 
 [data-reach-combobox-option][aria-selected="true"]:hover {
   /* background: hsl(211, 10%, 90%); */
   @apply bg-gray-200 bg-opacity-90;
+
+  .dark & {
+    @apply bg-gray-800 bg-opacity-90;
+  }
 }
 
 [data-suggested-value] {

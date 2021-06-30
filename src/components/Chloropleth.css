@@ -1,5 +1,5 @@
 .mapboxgl-popup-content {
-  @apply shadow-lg p-0 rounded ring-1 ring-black ring-opacity-5 dark:bg-gray-600;
+  @apply shadow-lg p-0 rounded dark:bg-gray-600 ring-1 ring-black dark:ring-gray-500 ring-opacity-5;
 }
 
 .dark {
@@ -7,11 +7,11 @@
     border-top-color: theme('colors.gray.600')
   }
   .mapboxgl-ctrl-group {
-    @apply bg-gray-500;
+    @apply bg-gray-600;
   }
   .mapboxgl-ctrl-icon {
     @apply border-gray-900;
     mix-blend-mode: screen;
-    filter: brightness(3)
+    filter: brightness(2.25);
   }
 }

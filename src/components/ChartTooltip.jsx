@@ -43,7 +43,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
     })
     const { timeline } = config
     return (
-      <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black ring-opacity-5'>
+      <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
         <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
           {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
         </h4>

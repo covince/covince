@@ -12,9 +12,9 @@ const StickyMobileSection = props => {
       <div
         className={classNames(
           props.className,
-          'sticky bottom-0 bg-white rounded-t-lg transition-colors',
+          'sticky bottom-0 bg-white dark:bg-gray-600 rounded-t-lg transition-colors',
           'border-solid border-0 border-t border-transparent',
-          { 'shadow-2xl border-gray-200 z-30': !inView }
+          { 'shadow-2xl border-gray-200 dark:border-gray-400 z-30': !inView }
         )}
       >
         {props.children}

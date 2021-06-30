@@ -118,7 +118,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
     }
   }
 
-  const lineageFilter = useLineageFilter(unique_lineages, config)
+  const lineageFilter = useLineageFilter(unique_lineages, config, darkMode)
 
   const formattedLastModified = useMemo(
     () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
@@ -162,7 +162,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           Data updated <span className='font-medium'>{formattedLastModified}</span>
         </p> }
       { mobileView === 'chart' &&
-        <div className='bg-white px-4 pt-3 relative z-10'>
+        <div className='bg-white dark:bg-gray-700 px-4 pt-3 relative z-10'>
           <LocationFilter
             className='relative h-22'
             {...locationFilter}
@@ -191,7 +191,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
                   <Spinner className='h-4 w-4 mr-2 text-gray-500' />
                 </FadeTransition>
                 <PillButton
-                  className='flex items-center bg-primary text-white space-x-1 min-w-0 h-8 pr-2'
+                  className='flex items-center bg-primary dark:bg-dark-primary text-white dark:text-gray-900 space-x-1 min-w-0 h-8 pr-2'
                   onClick={() => setMobileView('chart')}
                 >
                   <span className='truncate'>{locationFilter.heading}</span>
@@ -265,8 +265,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
               values={mapValues}
             />
             <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
-              <div className='bg-white bg-opacity-75 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-500 w-6 h-6' />
+              <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
+                <Spinner className='text-gray-500 dark:text-gray-200 w-6 h-6' />
               </div>
             </FadeTransition>
             <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
@@ -304,7 +304,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             zoomEnabled={isMobile ? zoomEnabled : true}
           />
           { !isMobile && lastModified &&
-            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 dark:border-gray-400 rounded-tl-md h-6'>
+            <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 dark:border-gray-500 rounded-tl-md h-6'>
               <p className='text-xs tracking-wide leading-6 text-heading'>
                 Data updated <span className='font-medium'>{formattedLastModified}</span>
               </p>
@@ -314,7 +314,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
             <LineageFilter {...lineageFilter} />
             <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
-              <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary text-white'>
+              <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary dark:bg-dark-primary text-white dark:text-gray-900'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
               </PillButton>
@@ -328,8 +328,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
                 : <PillButton
                     onClick={() => setZoomEnabled(!zoomEnabled)}
                     className={classNames(
-                      'flex justify-center border border-gray-300 text-gray-700 focus:outline-none',
-                      { 'text-primary ring ring-primary ring-opacity-40 border-primary': zoomEnabled }
+                      'flex justify-center border border-gray-300 dark:border-gray-400 text-gray-700 dark:text-current focus:outline-none',
+                      { 'text-primary ring ring-primary dark:ring-gray-500 ring-opacity-40 border-primary': zoomEnabled }
                     )}
                   >
                     <span className='whitespace-nowrap font-medium'>
@@ -339,12 +339,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
-          <div className='bg-white bg-opacity-50 absolute inset-0 md:rounded-md' />
+          <div className='bg-white dark:bg-gray-400 bg-opacity-50 dark:bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
       </Card>
       { mobileView === 'map' &&
         <DateFilter
-          className='p-3 bg-white shadow border-t border-gray-100 relative z-10'
+          className='p-3 bg-white dark:bg-gray-700 shadow border-t border-gray-100 dark:border-gray-600 relative z-10'
           {...dateFilter}
         /> }
     </>

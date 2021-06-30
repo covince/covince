@@ -1,17 +1,18 @@
 import { merge } from 'lodash'
 
 // https://personal.sron.nl/~pault/
-const tolMutedQualitative = [
-  '#332288', // indigo
-  '#88CCEE', // cyan
-  '#44AA99', // teal
-  '#117733', // green
-  '#999933', // olive
-  '#DDCC77', // sand
-  '#CC6677', // rose
-  '#882255', // wine
-  '#AA4499', // purple
-  '#DDDDDD' // grey
+// light: muted qualitative, dark: light qualitative (w/ muted purple)
+const defaultColours = [
+  { light: '#332288', /* indigo */ dark: '#77AADD' /* light blue */ },
+  { light: '#88CCEE', /* cyan */ dark: '#99DDFF' /* light cyan */ },
+  { light: '#44AA99', /* teal */ dark: '#44BB99' /* mint */ },
+  { light: '#117733', /* green */ dark: '#BBCC33' /* pear */ },
+  { light: '#999933', /* olive */ dark: '#AAAA00' /* olive */ },
+  { light: '#DDCC77', /* sand */ dark: '#EEDD88' /* light yellow */ },
+  { light: '#CC6677', /* rose */ dark: '#FFAABB' /* pink */ },
+  { light: '#882255', /* wine */ dark: '#EE8866' /* orange */ },
+  { light: '#AA4499', /* purple */ dark: '#AA4499' },
+  { light: '#DDDDDD', /* grey */ dark: '#DDDDDD' /* pale grey */ }
 ]
 
 const defaults = {
@@ -54,7 +55,7 @@ export const setConfig = (userConfig) => {
     map.settings.default_color_by = userConfig.parameters[0].id
   }
   if (typeof colors === 'undefined') {
-    config.colors = tolMutedQualitative
+    config.colors = defaultColours
   }
   for (const parameter of parameters) {
     if (typeof parameter.precision === 'number') {

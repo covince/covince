@@ -43,24 +43,27 @@ html, body {
   }
 }
 
-/* Debug */
-.baseline-grid {
-  background-image: linear-gradient(180deg,red 1px,transparent 0);
-  background-position: 0 0;
-  background-repeat: repeat;
+@layer utilities {
+  /* Debug */
+  .baseline-grid {
+    background-image: linear-gradient(180deg,red 1px,transparent 0);
+    background-position: 0 0;
+    background-repeat: repeat;
+  }
+  
+  .baseline-grid-6 {
+    @apply baseline-grid;
+    background-size: 100% theme('spacing.6');
+  }
+  
+  .baseline-grid-5 {
+    @apply baseline-grid;
+    background-size: 100% theme('spacing.5');
+  }
+  
+  .baseline-grid-4 {
+    @apply baseline-grid;
+    background-size: 100% theme('spacing.4');
+  }
 }
 
-.baseline-grid-6 {
-  @apply baseline-grid;
-  background-size: 100% theme('spacing.6');
-}
-
-.baseline-grid-5 {
-  @apply baseline-grid;
-  background-size: 100% theme('spacing.5');
-}
-
-.baseline-grid-4 {
-  @apply baseline-grid;
-  background-size: 100% theme('spacing.4');
-}
