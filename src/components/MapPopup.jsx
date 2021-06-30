@@ -17,14 +17,14 @@ const MapPopup = ({ value, format, precision = {}, lat, long, onClick, label }) 
     >
       <div className='p-2' onClick={onClick}>
         { value.mean !== null &&
-          <p className='font-bold text-gray-700 dark:text-gray-300'>
+          <p className='font-bold text-gray-700 dark:text-gray-200'>
             {formatValue(value.mean, precision.mean)}
           </p> }
-        <p className='text-sm'>
+        <p className='text-sm dark:text-white'>
           {label}
         </p>
       { value && value.upper !== null && value.lower !== null &&
-        <p className='text-xs tracking-wide text-gray-700 _font-bold'>
+        <p className='text-xs tracking-wide text-gray-700 dark:text-gray-200'>
           {formatValue(value.lower, precision.range)} &ndash; {formatValue(value.upper, precision.range)}
         </p> }
       </div>
