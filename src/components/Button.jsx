@@ -6,8 +6,9 @@ export const Button = React.forwardRef(({ as = 'button', ...props }, ref) => (
     ...props,
     ref,
     className: classnames(props.className,
-      'bg-white py-2 px-3 border rounded-md shadow-sm text-sm leading-5',
-      'focus:outline-none focus:border-primary focus:ring focus:ring-offset-0 focus:ring-primary focus:ring-opacity-40'
+      'bg-white dark:bg-gray-600 py-2 px-3 border rounded-md shadow-sm text-sm leading-5',
+      'focus:outline-none focus:border-primary dark:focus:border-primary focus:ring focus:ring-offset-0 focus:ring-primary focus:ring-opacity-40',
+      'dark:focus:border-dark-primary dark:focus:ring-dark-primary dark:focus:ring-opacity-40'
     )
   })
 ))
@@ -18,7 +19,7 @@ export const DefaultButton = React.forwardRef((props, ref) =>
     {...props}
     ref={ref}
     className={classnames(props.className,
-      'font-medium text-gray-700 hover:bg-gray-50 border-gray-300'
+      'font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 border-gray-300 dark:border-gray-500'
     )}
   />
 )

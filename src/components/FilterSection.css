@@ -3,7 +3,11 @@
   scrollbar-width: thin;
   scrollbar-color: theme('colors.gray.300') transparent;
 
-  @apply pb-1.5 mb-1.5
+  @apply pb-1.5 mb-1.5;
+
+  .dark & {
+    scrollbar-color: theme('colors.gray.500') transparent;
+  }
 }
 
 /* Works on Chrome, Edge, and Safari */
@@ -17,6 +21,10 @@
 
 .covince-filter-section::-webkit-scrollbar-thumb {
   @apply rounded bg-gray-300;
+
+  .dark & {
+    @apply bg-gray-500;
+  }
 }
 
 .covince-filter-section::-webkit-scrollbar-thumb:hover {

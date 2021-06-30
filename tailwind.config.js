@@ -2,12 +2,13 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
+  mode: 'jit',
   purge: {
     content: [
       './src/**/*.jsx'
     ]
   },
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'class',
   theme: {
     fontFamily: {
       sans: defaultTheme.fontFamily.sans,
@@ -19,7 +20,12 @@ module.exports = {
         gray: colors.blueGray,
         primary: colors.blue[700],
         heading: 'theme("colors.gray.600")',
-        subheading: 'theme("colors.gray.500")'
+        subheading: 'theme("colors.gray.500")',
+        dark: {
+          primary: '#9fc5ff', // inverted and hue-rotated
+          heading: 'theme("colors.gray.200")',
+          subheading: 'theme("colors.gray.300")'
+        }
       },
       spacing: {
         header: defaultTheme.spacing[16],

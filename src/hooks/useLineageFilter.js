@@ -4,7 +4,7 @@ import { sortBy } from 'lodash'
 import useQueryAsState from './useQueryAsState'
 import useNomenclature from './useNomenclature'
 
-export default (uniqueLineages, { colors }) => {
+export default (uniqueLineages, { colors }, darkMode) => {
   const [{ show }, updateQuery] = useQueryAsState()
   const { nomenclature, nomenclatureLookup } = useNomenclature()
 
@@ -14,16 +14,17 @@ export default (uniqueLineages, { colors }) => {
 
   const activeLineages = useMemo(() => {
     return uniqueLineages.reduce((memo, lineage, index) => {
+      const colour = colors[Array.isArray(colors) ? index : lineage]
       memo[lineage] = {
         lineage,
-        colour: colors[Array.isArray(colors) ? index : lineage],
+        colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
         active: queryLineages.has(lineage),
         altName: nomenclatureLookup[lineage]
       }
       return memo
     }, {})
   }
-  , [queryLineages])
+  , [queryLineages, darkMode])
 
   const sortedLineages = useMemo(() => {
     return [
