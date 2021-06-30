@@ -181,7 +181,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
           </Card>
         </FilterSection> }
-      <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0 md:px-6 md:py-6'>
+      <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0' extraPadding>
         <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'chart' })}>
           <div className='flex justify-between items-center space-x-3 overflow-hidden'>
             <Heading>Map</Heading>
