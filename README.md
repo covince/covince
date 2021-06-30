@@ -12,7 +12,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 * [`area_search_terms`](#area-search-terms) (optional) enable additional search terms for areas
 * `charts [array]` list of [chart](#chart) definitions
-* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors
+* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
