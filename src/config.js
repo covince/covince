@@ -3,14 +3,14 @@ import { merge } from 'lodash'
 // https://personal.sron.nl/~pault/
 // light: muted qualitative, dark: light qualitative (w/ muted purple)
 const defaultColours = [
-  { light: '#332288', /* indigo */ dark: '#77AADD' /* light blue */ },
-  { light: '#88CCEE', /* cyan */ dark: '#99DDFF' /* light cyan */ },
-  { light: '#44AA99', /* teal */ dark: '#44BB99' /* mint */ },
-  { light: '#117733', /* green */ dark: '#BBCC33' /* pear */ },
-  { light: '#999933', /* olive */ dark: '#AAAA00' /* olive */ },
-  { light: '#DDCC77', /* sand */ dark: '#EEDD88' /* light yellow */ },
   { light: '#CC6677', /* rose */ dark: '#FFAABB' /* pink */ },
+  { light: '#332288', /* indigo */ dark: '#77AADD' /* light blue */ },
+  { light: '#DDCC77', /* sand */ dark: '#EEDD88' /* light yellow */ },
+  { light: '#117733', /* green */ dark: '#BBCC33' /* pear */ },
+  { light: '#88CCEE', /* cyan */ dark: '#99DDFF' /* light cyan */ },
   { light: '#882255', /* wine */ dark: '#EE8866' /* orange */ },
+  { light: '#44AA99', /* teal */ dark: '#44BB99' /* mint */ },
+  { light: '#999933', /* olive */ dark: '#AAAA00' /* olive */ },
   { light: '#AA4499', /* purple */ dark: '#AA4499' },
   { light: '#DDDDDD', /* grey */ dark: '#DDDDDD' /* pale grey */ }
 ]

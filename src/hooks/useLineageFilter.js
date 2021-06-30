@@ -15,7 +15,6 @@ export default (uniqueLineages, { colors }, darkMode) => {
   const activeLineages = useMemo(() => {
     return uniqueLineages.reduce((memo, lineage, index) => {
       const colour = colors[Array.isArray(colors) ? index : lineage]
-      console.log(colour)
       memo[lineage] = {
         lineage,
         colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
