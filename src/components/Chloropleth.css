@@ -17,7 +17,7 @@
   }
   
   .mapboxgl-ctrl-group {
-    @apply bg-gray-700;
+    @apply bg-gray-700 ring-1 ring-gray-500;
   }
   .mapboxgl-ctrl-icon {
     @apply border-gray-900;

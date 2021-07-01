@@ -405,7 +405,7 @@ const Chloropleth = (props) => {
             onViewportChange={onViewportChange}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
-            className='bg-gray-50 dark:bg-gray-500'
+            className='bg-gray-50 dark:bg-gray-600'
             interactiveLayerIds={['null-areas-fill', 'active-areas-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features
@@ -439,7 +439,7 @@ const Chloropleth = (props) => {
             { hoverPopup && <MapPopup {...hoverPopup} {...parameterConfig} /> }
           </ReactMapGL>
           <FadeTransition in={max_val > 0}>
-            <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white dark:bg-gray-600 bg-opacity-80 dark:bg-opacity-80'>
+            <div className='absolute left-0 bottom-0 w-60 z-10 p-2 pb-0 bg-white dark:bg-gray-700 bg-opacity-80 dark:bg-opacity-80'>
               { hasUncertainty &&
                 <form className='mb-1.5 ml-2'>
                   <Checkbox
