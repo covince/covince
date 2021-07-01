@@ -304,7 +304,7 @@ const Chloropleth = (props) => {
         type: 'line',
         source: 'otherAreas',
         paint: {
-          'line-color': tailwindColors[lineColor][darkMode ? 500 : 300],
+          'line-color': tailwindColors[lineColor][darkMode ? 400 : 300],
           'line-width': 0.5
         }
       },
@@ -360,7 +360,7 @@ const Chloropleth = (props) => {
         }
       }
     ]
-  }), [features, colorScale, color_scale_type, showUncertainty, darkMode])
+  }), [features, colorScale, color_scale_type, showUncertainty, darkMode, lineColor])
 
   const [hoveredFeature, setHoveredFeature] = useState(null)
 
@@ -405,7 +405,7 @@ const Chloropleth = (props) => {
             onViewportChange={onViewportChange}
             mapStyle={mapStyle}
             mapboxApiUrl={null}
-            className='bg-gray-50 dark:bg-gray-800'
+            className='bg-gray-50 dark:bg-gray-500'
             interactiveLayerIds={['null-areas-fill', 'active-areas-fill']}
             onNativeClick={e => { // faster for some reason
               const [feature] = e.features

@@ -17,11 +17,11 @@
   }
   
   .mapboxgl-ctrl-group {
-    @apply bg-gray-600;
+    @apply bg-gray-700;
   }
   .mapboxgl-ctrl-icon {
     @apply border-gray-900;
     mix-blend-mode: screen;
-    filter: brightness(2.25);
+    filter: brightness(2);
   }
 }
