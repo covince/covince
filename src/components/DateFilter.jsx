@@ -28,7 +28,7 @@ const DateFilter = ({ className, dates = [], heading, label = 'Timeline', value,
             </> }
       </Button>
     </div>
-    <Heading className='mt-0.5'>{heading}</Heading>
+    <Heading className='mt-0.5 h-6'>{heading}</Heading>
     <div className='h-6 mt-1.5'>
       <Slider
         min={0}
