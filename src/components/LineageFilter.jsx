@@ -49,8 +49,8 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
                 checked={active}
                 onChange={() => toggleLineage(lineage)}
               >
-                {altName ? <span className={classNames('block text-gray-700 dark:text-gray-200')}>{altName}</span> : null}
-                <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-400': altName })}>{lineage}</span>
+                {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
+                <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{lineage}</span>
               </Checkbox>
             )
           })}

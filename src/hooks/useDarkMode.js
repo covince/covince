@@ -4,9 +4,9 @@ import { useMemo, useState, useEffect } from 'react'
 
 import useMediaQuery from './useMediaQuery'
 
-export default () => {
+export default (initialMode = 'system') => {
   // 'system', 'light', 'dark'
-  const [mode, setMode] = useState(localStorage.mode || 'system')
+  const [mode, setMode] = useState(localStorage.mode || initialMode)
 
   useEffect(() => {
     localStorage.mode = mode
