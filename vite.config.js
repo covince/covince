@@ -8,7 +8,6 @@ function rechartsPlugin () {
     name: 'recharts_plugin',
     transform (code, id) {
       if (id.includes('reduce-css-calc/dist/parser.js')) {
-        console.log(code)
         return (
           code.replace('typeof require !== \'undefined\'', 'true')
         )
