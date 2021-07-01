@@ -339,7 +339,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
-          <div className='bg-white dark:bg-gray-400 bg-opacity-50 dark:bg-opacity-50 absolute inset-0 md:rounded-md' />
+          <div className='bg-white dark:bg-gray-700 bg-opacity-50 dark:bg-opacity-50 absolute inset-0 md:rounded-md' />
         </FadeTransition>
       </Card>
       { mobileView === 'map' &&
