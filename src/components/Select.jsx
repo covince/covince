@@ -10,8 +10,8 @@ const Select = ({ chevronClass = 'text-gray-500 dark:text-gray-300', ...props })
       className={classnames(
         props.className,
         'block w-full py-2 pl-2 lg:pl-3 pr-6 lg:pr-10 text-sm bg-none',
-        'border border-gray-300  bg-white rounded-md shadow-sm',
-        'focus:outline-none focus:border-primary  focus:ring focus:ring-offset-0 focus:ring-primary focus:ring-opacity-40',
+        'border border-gray-300 bg-white rounded-md shadow-sm',
+        'focus:outline-none focus:border-primary focus:ring focus:ring-offset-0 focus:ring-primary focus:ring-opacity-40',
         'dark:border-gray-500 dark:bg-gray-600 dark:focus:border-dark-primary dark:focus:ring-dark-primary dark:focus:ring-opacity-40'
       )}
     />
