@@ -260,6 +260,9 @@ const Chloropleth = (props) => {
 
   const mapStyle = useMemo(() => ({
     version: 8,
+    transition: {
+      duration: 0
+    },
     sources: {
       selectedAreas: {
         type: 'geojson',
