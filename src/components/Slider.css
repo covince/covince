@@ -25,7 +25,7 @@ input[type=range]::-webkit-slider-thumb {
     box-border
     border
     border-solid
-    border-gray-400 dark:border-gray-500
+    border-gray-400
     rounded-full
     shadow
     cursor-pointer
@@ -43,7 +43,7 @@ input[type=range]::-moz-range-thumb {
     box-border
     border
     border-solid
-    border-gray-400 dark:border-gray-500
+    border-gray-400
     rounded-full
     shadow
     cursor-pointer
@@ -59,6 +59,8 @@ input[type=range]::-webkit-slider-runnable-track {
     shadow-inner
     bg-gray-100 dark:bg-gray-800
     rounded-full
+    box-content
+    dark:border dark:border-solid dark:border-gray-500
   ;
 }
 
@@ -71,5 +73,7 @@ input[type=range]::-moz-range-track {
     shadow-inner
     bg-gray-100 dark:bg-gray-800
     rounded-full
+    box-content
+    dark:border dark:border-solid dark:border-gray-500
   ;
 }
