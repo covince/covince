@@ -4,7 +4,7 @@ input[type=range] {
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
   background: transparent; /* Otherwise white in Chrome */
-  @apply h-3 rounded-md border-2 border-transparent focus:outline-none;
+  @apply h-3 rounded-md border-2 border-transparent focus:outline-none no-webkit-tap;
 }
 
 input[type=range]::-webkit-slider-thumb {
