@@ -70,7 +70,9 @@ const ColourBar = ({ dmin, dmax, type, percentage, opacity }) => {
 
   return (
     <>
-      <div className='h-3 rounded-sm bg-white' style={{ backgroundImage: gradient, opacity }} />
+      <div className='h-3 rounded-sm overflow-hidden bg-white'>
+        <div className='h-full w-full' style={{ backgroundImage: gradient, opacity }} />
+      </div>
       <div className='grid grid-cols-3 text-xs tracking-wide leading-6'>
         <span>
           {formatValue(dmin, 'floor')}
