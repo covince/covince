@@ -4,12 +4,12 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { BsArrowUpShort, BsSearch } from 'react-icons/bs'
 import { HiX } from 'react-icons/hi'
 import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
-import classNames from 'classnames'
 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import Button from './Button'
+import TextInput from './TextInput'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import getConfig from '../config'
@@ -80,14 +80,10 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
   return (
     <Combobox aria-label="Areas" onSelect={_onSelect} onKeyUp={onKeyUp} openOnFocus={value.length > 0}>
       <ComboboxInput
+        as={TextInput}
         ref={inputRef}
         type="text"
-        className={classNames(
-          'w-full h-11 md:h-9 md:text-sm rounded-md border-gray-300 shadow-sm focus:border-primary',
-          'focus:ring focus:ring-primary focus:ring-offset-0 focus:ring-opacity-40',
-          'dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400',
-          'dark:focus:border-dark-primary dark:focus:ring-dark-primary dark:focus:ring-opacity-40'
-        )}
+        className='w-full'
         value={value}
         onChange={_onChange}
         autocomplete={false}
