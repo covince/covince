@@ -7,6 +7,9 @@
   .text-primary {
     @apply text-dark-primary;
   }
+  .\!text-primary {
+    @apply !text-dark-primary;
+  }
 
   .text-heading {
     @apply text-dark-heading;

@@ -164,7 +164,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
       { mobileView === 'chart' &&
         <div className='bg-white dark:bg-gray-700 px-4 pt-3 relative z-10'>
           <LocationFilter
-            className='relative h-22'
+            className='h-22'
             {...locationFilter}
             {...locationSearch}
           />
@@ -174,8 +174,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
-          <Card className='w-80 box-content flex-shrink-0'>
-            <LocationFilter className='relative' {...locationFilter} {...locationSearch} />
+          <Card className='w-80 box-content flex-shrink-0 relative'>
+            <LocationFilter {...locationFilter} {...locationSearch} />
           </Card>
           <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-1.5'>
             <LineageFilter className='h-full flex flex-col' {...lineageFilter} />

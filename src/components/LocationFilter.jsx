@@ -152,7 +152,7 @@ const LocationFilter = (props) => {
             { showOverviewButton &&
               <Button
                 title='Return to overview'
-                className='relative z-10 -top-0.5 h-6 pl-0.5 pr-2 flex items-center text-primary hover:bg-gray-50'
+                className='relative z-10 -top-0.5 h-6 pl-0.5 pr-2 flex items-center !text-primary hover:bg-gray-50'
                 onClick={loadOverview}
                 tabIndex={isSearching ? '-1' : undefined}
               >
@@ -180,8 +180,8 @@ const LocationFilter = (props) => {
           </div>
         </> }
       <FadeTransition in={loading}>
-        <div className='bg-white dark:bg-gray-700 absolute inset-0 grid place-content-center z-10'>
-          <Spinner className='text-gray-500 dark:text-gray-300 w-6 h-6' />
+        <div className='bg-white dark:bg-gray-700 absolute inset-1 grid place-content-center z-10'>
+          <Spinner className='text-gray-500 dark:text-gray-300 w-6 h-6 mt-2' />
         </div>
       </FadeTransition>
     </div>
