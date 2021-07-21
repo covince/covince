@@ -427,7 +427,7 @@ const MultiLinePlot = props => {
         }}
       />
       <div className='absolute top-0 left-0 pointer-events-none'>
-        <ComposedChart {...chartProps} data={data} className='test'>
+        <ComposedChart {...chartProps} data={data}>
           <XAxis
             {...xAxisProps}
             tick={false}
