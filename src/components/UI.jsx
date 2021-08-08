@@ -8,7 +8,7 @@ import LocalIncidence from './LocalIncidence'
 import Card from './Card'
 import Select from './Select'
 import { Heading } from './Typography'
-import { PillButton, Button } from './Button'
+import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import DateFilter from './DateFilter'
@@ -188,15 +188,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             { isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
                 <FadeTransition in={areaState.status === 'LOADING'}>
-                  <Spinner className='h-4 w-4 mr-2 text-gray-500' />
+                  <Spinner className='h-4 w-4 mr-2 text-gray-500 dark:text-gray-200' />
                 </FadeTransition>
-                <PillButton
-                  className='flex items-center bg-primary dark:bg-dark-primary text-white dark:text-gray-900 space-x-1 min-w-0 h-8 pr-2'
+                <PrimaryPillButton
+                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
                   onClick={() => setMobileView('chart')}
                 >
                   <span className='truncate'>{locationFilter.heading}</span>
                   <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
-                </PillButton>
+                </PrimaryPillButton>
               </div> }
           </div>
           <form className={classNames(
@@ -314,28 +314,28 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
             <LineageFilter {...lineageFilter} />
             <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
-              <PillButton onClick={() => setMobileView('map')} className='flex items-center justify-center bg-primary dark:bg-dark-primary text-white dark:text-gray-900'>
+              <PrimaryPillButton onClick={() => setMobileView('map')} className='flex items-center justify-center'>
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
-              </PillButton>
+              </PrimaryPillButton>
               { chartZoom
-                ? <PillButton
+                ? <SecondaryPillButton
                   onClick={clearChartZoom}
-                  className='text-center border border-gray-300 text-gray-700 focus:outline-none'
+                  className='text-center'
                 >
                   <span className='whitespace-nowrap truncate font-medium'>Reset date range</span>
-                </PillButton>
-                : <PillButton
+                </SecondaryPillButton>
+                : <SecondaryPillButton
                     onClick={() => setZoomEnabled(!zoomEnabled)}
                     className={classNames(
-                      'flex justify-center border border-gray-300 dark:border-gray-400 text-gray-700 dark:text-current focus:outline-none',
-                      { 'text-primary ring ring-primary dark:ring-gray-500 ring-opacity-40 border-primary': zoomEnabled }
+                      'flex justify-center',
+                      { 'text-primary ring ring-primary dark:ring-gray-500 ring-opacity-40 border-primary dark:border-dark-primary': zoomEnabled }
                     )}
                   >
                     <span className='whitespace-nowrap font-medium'>
                       {zoomEnabled ? 'Select range on chart' : 'Set date range'}
                     </span>
-                  </PillButton> }
+                  </SecondaryPillButton> }
             </div>
           </StickyMobileSection> }
         <FadeTransition in={isInitialLoad}>
