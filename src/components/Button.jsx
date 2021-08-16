@@ -31,7 +31,27 @@ export const PillButton = (props) => (
   <button
     {...props}
     className={classnames(props.className,
-      'px-4 p-2 text-sm rounded-full font-bold'
+      'px-4 p-2 text-sm rounded-full font-bold focus:outline-none'
+    )}
+  />
+)
+
+export const PrimaryPillButton = (props) => (
+  <PillButton
+    {...props}
+    className={classnames(
+      'bg-primary dark:bg-dark-primary text-white dark:text-gray-900',
+      props.className
+    )}
+  />
+)
+
+export const SecondaryPillButton = (props) => (
+  <PillButton
+    {...props}
+    className={classnames(
+      'border border-gray-300 dark:border-gray-400 text-gray-700 dark:text-current',
+      props.className
     )}
   />
 )
