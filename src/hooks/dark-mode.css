@@ -19,10 +19,10 @@
     @apply text-dark-subheading;
   }
 
-  [type=checkbox] {
+  .covince-checkbox {
     @apply bg-gray-500 border-gray-400;
   }
-  [type=checkbox]:checked {
+  .covince-checkbox:checked {
     @apply bg-current border-current bg-none;
   }
 
