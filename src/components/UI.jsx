@@ -278,7 +278,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
               <div className='absolute left-0 right-0 -top-6 h-0 flex'>
                 <Button
                   onClick={clearChartZoom}
-                  className='ml-auto mr-4 -mt-1.5 h-6 pl-1.5 pr-1.5 flex items-center text-primary hover:bg-gray-50'
+                  className='ml-auto mr-4 -mt-1.5 h-6 pl-1.5 pr-1.5 flex items-center text-primary hover:bg-gray-50 border-gray-300 dark:border-gray-500'
                 >
                   <BsArrowCounterclockwise className='h-4 w-4 mr-1' />
                   <span className='text-xs tracking-wide font-medium'>Reset date range</span>
