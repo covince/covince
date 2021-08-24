@@ -118,7 +118,10 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
     }
   }
 
-  const lineageFilter = useLineageFilter(unique_lineages, config, darkMode)
+  const lineageFilter = {
+    ...useLineageFilter(unique_lineages, config, darkMode),
+    isMobile
+  }
 
   const formattedLastModified = useMemo(
     () => lastModified ? format(new Date(lastModified), config.datetime_format) : '',
@@ -177,8 +180,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           <Card className='w-80 box-content flex-shrink-0 relative'>
             <LocationFilter {...locationFilter} {...locationSearch} />
           </Card>
-          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-1.5'>
-            <LineageFilter className='h-full flex flex-col' {...lineageFilter} />
+          <Card className='box-content flex-shrink-0 xl:flex-shrink md:pb-0'>
+            <LineageFilter className='h-full flex flex-col md:-mb-3' {...lineageFilter} />
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0' extraPadding>
