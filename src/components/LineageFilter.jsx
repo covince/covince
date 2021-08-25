@@ -1,6 +1,7 @@
-import React, { useMemo, useRef, useCallback } from 'react'
+import React, { useMemo, useRef, useCallback, useState, useEffect } from 'react'
 import classNames from 'classnames'
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs'
+import useQueryAsState from '../hooks/useQueryAsState'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
@@ -8,18 +9,28 @@ import { DescriptiveHeading } from './Typography'
 import useNomenclature from '../hooks/useNomenclature'
 
 const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll, isMobile }) => {
-  const _lineages = [
-    sortedLineages[0], sortedLineages[0], sortedLineages[0],
-    sortedLineages[0], sortedLineages[0], sortedLineages[0],
-    sortedLineages[1], sortedLineages[1], sortedLineages[1],
-    sortedLineages[1], sortedLineages[1], sortedLineages[1],
-    sortedLineages[2], sortedLineages[2], sortedLineages[2],
-    sortedLineages[2], sortedLineages[2], sortedLineages[2]
-    // sortedLineages[2], sortedLineages[2], sortedLineages[2]
-    // ...sortedLineages
-  ]
+  const [{ dataPath }] = useQueryAsState()
+
+  const _lineages = dataPath
+    ? sortedLineages
+    : [
+        sortedLineages[0], sortedLineages[0], sortedLineages[0],
+        sortedLineages[0], sortedLineages[0], sortedLineages[0],
+        sortedLineages[1], sortedLineages[1], sortedLineages[1],
+        sortedLineages[1], sortedLineages[1], sortedLineages[1],
+        sortedLineages[2], sortedLineages[2], sortedLineages[2],
+        sortedLineages[2], sortedLineages[2], sortedLineages[2]
+        // ...sortedLineages
+      ]
+
+  const isScrolling = useMemo(() => {
+    return _lineages.length > (isMobile ? 9 : 10)
+  }, [_lineages, isMobile])
 
   const sections = useMemo(() => {
+    if (!isScrolling) {
+      return [_lineages]
+    }
     const sectionSize = isMobile ? 9 : 8
     const _sections = []
     const numSections = Math.ceil(_lineages.length / sectionSize)
@@ -33,20 +44,49 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
   const { nomenclature } = useNomenclature()
 
   const gridStyle = useMemo(() => {
+    if (isMobile) {
+      return {}
+    }
     const numLineages = _lineages.length
-    const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), 4))
+    const maxColumns = isScrolling ? 4 : 5
+    const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
     return { gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))` }
-  }, [_lineages])
+  }, [_lineages, isScrolling, isMobile])
 
   const scrollContainer = useRef()
 
-  const handleScroll = useCallback((direction) => {
+  const doScroll = useCallback((direction) => {
     const { height } = scrollContainer.current.getBoundingClientRect()
     scrollContainer.current.scrollBy({
-      [isMobile ? 'left' : 'top']: height * direction,
+      top: height * direction,
       behavior: 'smooth'
     })
-  }, [isMobile])
+  })
+
+  const sectionRefs = useRef([])
+  const [currentSection, setCurrentSection] = useState(0)
+  useEffect(() => {
+    const callback = entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = (sectionRefs.current).indexOf(entry.target)
+          setCurrentSection(index)
+        }
+      })
+    }
+
+    const observer = new IntersectionObserver(callback, {
+      root: scrollContainer.current,
+      threshold: 0.6
+    })
+    sectionRefs.current.filter(h => h !== undefined).forEach(horse => {
+      observer.observe(horse)
+    })
+
+    return function cleanup () {
+      observer.disconnect()
+    }
+  }, [sectionRefs])
 
   return (
     <div className={className}>
@@ -67,23 +107,24 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
           />
         </div>
       </header>
-      <div className='flex space-x-3'>
+      <div className='md:flex md:space-x-3 md:mt-0.5'>
         <form
           ref={scrollContainer}
-          className={classNames(
-            'overflow-auto hide-scrollbars flex-grow flex md:flex-col md:-mx-2 md:mt-0.5 md:h-14 md:-mb-0.5'
-            // { 'md:-mb-0.5': sections.length > 1 }
-          )}
+          className='overflow-auto hide-scrollbars flex-grow flex md:flex-col md:-mx-2 md:h-16'
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
           {sections.map((lineages, i) => (
-            <section key={i} className='w-full h-full flex-shrink-0 flex flex-wrap md:grid md:gap-0.5 md:content-start' style={{ ...gridStyle, scrollSnapAlign: 'start' }}>
+            <section
+              key={`lineages-${i}`}
+              ref={el => { sectionRefs.current[i] = el }}
+              className='w-full h-full flex-shrink-0 flex flex-wrap content-start md:grid md:gap-0.5' style={{ ...gridStyle, scrollSnapAlign: 'start' }}
+            >
               {lineages
                 .map(({ lineage, active, colour, altName }) => {
                   return (
                     <Checkbox
                       key={lineage}
-                      className={classNames('w-1/3 my-1 md:w-auto md:my-0 md:mx-2', { 'md:mb-1': nomenclature.length === 0 })}
+                      className={classNames('w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2', { 'md:mb-1': nomenclature.length === 0 })}
                       style={{ color: colour }}
                       id={`lineage_filter_${lineage}`}
                       checked={active}
@@ -97,15 +138,36 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
             </section>
           ))}
         </form>
-        { !isMobile && sections.length > 1 &&
-          <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1'>
-            <button onClick={() => handleScroll(-1)}>
+        { sections.length > 1 && (
+          isMobile
+            ? <ol className='list-none p-1 flex justify-center space-x-2'>
+              { sections.map((_, i) =>
+                <li
+                  key={`section-indicator-${i}`}
+                  className={classNames(
+                    'rounded-full bg-gray-500 dark:bg-gray-300 w-2 h-2 transition-opacity',
+                    { 'opacity-50': i !== currentSection }
+                  )}
+                />
+              )}
+            </ol>
+            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-1'>
+            <button
+              className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
+              onClick={() => doScroll(-1)}
+              disabled={currentSection === 0}
+            >
               <BsArrowUpShort className='fill-current w-6 h-6'/>
             </button>
-            <button onClick={() => handleScroll(1)}>
+            <button
+              className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
+              onClick={() => doScroll(1)}
+              disabled={currentSection === sections.length - 1}
+            >
               <BsArrowDownShort className='fill-current w-6 h-6'/>
             </button>
-          </form> }
+          </form>
+        )}
       </div>
     </div>
   )
