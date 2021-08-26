@@ -153,6 +153,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
             </ol>
             : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-1'>
             <button
+              title='Previous lineages'
               className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(-1)}
               disabled={currentSection === 0}
@@ -160,6 +161,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
               <BsArrowUpShort className='fill-current w-6 h-6'/>
             </button>
             <button
+              title='Next lineages'
               className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(1)}
               disabled={currentSection === sections.length - 1}
