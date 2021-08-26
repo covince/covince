@@ -86,7 +86,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
     return function cleanup () {
       observer.disconnect()
     }
-  }, [sectionRefs])
+  }, [sections])
 
   return (
     <div className={className}>
