@@ -29,13 +29,20 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
   const { nomenclature } = useNomenclature()
 
   const gridStyle = useMemo(() => {
+    const style = {
+      scrollSnapAlign: 'start',
+      scrollSnapStop: 'always'
+    }
     if (isMobile) {
-      return {}
+      return style
     }
     const numLineages = sortedLineages.length
     const maxColumns = isScrolling ? 4 : 5
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
-    return { gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))` }
+    return {
+      ...style,
+      gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`
+    }
   }, [sortedLineages, isScrolling, isMobile])
 
   const scrollContainer = useRef()
@@ -95,14 +102,15 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
       <div className='md:flex md:space-x-3 md:mt-0.5'>
         <form
           ref={scrollContainer}
-          className='overflow-auto hide-scrollbars flex-grow flex md:flex-col md:-mx-2 md:h-16'
+          className='overflow-auto hide-scrollbars flex-grow -mx-4 md:-mx-2 flex md:flex-col md:h-16'
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
           {sections.map((lineages, i) => (
             <section
               key={`lineages-${i}`}
               ref={el => { sectionRefs.current[i] = el }}
-              className='w-full h-full flex-shrink-0 flex flex-wrap content-start md:grid md:gap-0.5' style={{ ...gridStyle, scrollSnapAlign: 'start' }}
+              className='w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5'
+              style={gridStyle}
             >
               {lineages
                 .map(({ lineage, active, colour, altName }) => {
