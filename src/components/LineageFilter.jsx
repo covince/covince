@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useCallback, useState, useEffect } from 'react'
 import classNames from 'classnames'
 import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs'
-import useQueryAsState from '../hooks/useQueryAsState'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
@@ -9,37 +8,23 @@ import { DescriptiveHeading } from './Typography'
 import useNomenclature from '../hooks/useNomenclature'
 
 const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll, isMobile }) => {
-  const [{ dataPath }] = useQueryAsState()
-
-  const _lineages = dataPath
-    ? sortedLineages
-    : [
-        sortedLineages[0], sortedLineages[0], sortedLineages[0],
-        sortedLineages[0], sortedLineages[0], sortedLineages[0],
-        sortedLineages[1], sortedLineages[1], sortedLineages[1],
-        sortedLineages[1], sortedLineages[1], sortedLineages[1],
-        sortedLineages[2], sortedLineages[2], sortedLineages[2],
-        sortedLineages[2], sortedLineages[2], sortedLineages[2]
-        // ...sortedLineages
-      ]
-
   const isScrolling = useMemo(() => {
-    return _lineages.length > (isMobile ? 9 : 10)
-  }, [_lineages, isMobile])
+    return sortedLineages.length > (isMobile ? 9 : 10)
+  }, [sortedLineages, isMobile])
 
   const sections = useMemo(() => {
     if (!isScrolling) {
-      return [_lineages]
+      return [sortedLineages]
     }
     const sectionSize = isMobile ? 9 : 8
     const _sections = []
-    const numSections = Math.ceil(_lineages.length / sectionSize)
+    const numSections = Math.ceil(sortedLineages.length / sectionSize)
     for (let i = 0; i < numSections; i++) {
       const start = i * sectionSize
-      _sections.push(_lineages.slice(start, start + sectionSize))
+      _sections.push(sortedLineages.slice(start, start + sectionSize))
     }
     return _sections
-  }, [_lineages, isMobile])
+  }, [sortedLineages, isMobile])
 
   const { nomenclature } = useNomenclature()
 
@@ -47,11 +32,11 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
     if (isMobile) {
       return {}
     }
-    const numLineages = _lineages.length
+    const numLineages = sortedLineages.length
     const maxColumns = isScrolling ? 4 : 5
     const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
     return { gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))` }
-  }, [_lineages, isScrolling, isMobile])
+  }, [sortedLineages, isScrolling, isMobile])
 
   const scrollContainer = useRef()
 
