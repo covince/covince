@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from 'react'
-import { sortBy } from 'lodash'
 
 import useQueryAsState from './useQueryAsState'
 import useNomenclature from './useNomenclature'
+
+const collator = new Intl.Collator(undefined, { numeric: true })
 
 export default (uniqueLineages, { colors }, darkMode) => {
   const [{ show }, updateQuery] = useQueryAsState()
@@ -27,9 +28,11 @@ export default (uniqueLineages, { colors }, darkMode) => {
   , [queryLineages, darkMode])
 
   const sortedLineages = useMemo(() => {
+    const lineagesWithoutAltNames = Object.values(activeLineages).filter(_ => _.altName === undefined)
+    lineagesWithoutAltNames.sort((a, b) => collator.compare(a.lineage, b.lineage))
     return [
       ...nomenclature.filter(({ lineage }) => lineage in activeLineages).map(({ lineage }) => activeLineages[lineage]),
-      ...sortBy(Object.values(activeLineages).filter(_ => _.altName === undefined), 'lineage')
+      ...lineagesWithoutAltNames
     ]
   }, [activeLineages])
 
