@@ -45,6 +45,7 @@ function LocalIncidence (props) {
               format={chart.format}
               heading={chart.heading}
               isMobile={isMobile}
+              lineageOrder={chart.lineage_order}
               numCharts={chartDefinitions.length}
               parameter={chart.parameter}
               setDate={setDate}

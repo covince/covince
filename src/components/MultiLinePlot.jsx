@@ -233,6 +233,7 @@ const MultiLinePlot = props => {
     darkMode,
     date,
     height = 120,
+    lineageOrder = [],
     parameter,
     preset: deprecatedPreset,
     setDate,
@@ -292,16 +293,23 @@ const MultiLinePlot = props => {
 
     const dates = data.map(_ => _.date)
 
-    const lineages = []
+    const lineages = {}
     for (const lineage of Object.keys(lineageSum)) {
       const { active, colour } = activeLineages[lineage]
       if (active) {
-        lineages.push({ lineage, colour, average: lineageSum[lineage] / dates.length })
+        lineages[lineage] = { lineage, colour, average: lineageSum[lineage] / dates.length }
       }
     }
 
+    const ordered = lineageOrder.filter(l => l in lineages).map(l => lineages[l])
+    const unordered = Object.keys(lineages).filter(l => !(lineageOrder.includes(l))).map(l => lineages[l])
+
     return {
-      lineages: orderBy(lineages, 'average', 'asc'),
+      lineages: [
+        ...ordered,
+        ...orderBy(unordered, 'average', 'asc')
+      ],
+      // lineages,
       data,
       dates
     }
