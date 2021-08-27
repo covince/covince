@@ -11,6 +11,8 @@ Demo of the code in this repository (with old static data): http://covince.verce
 ### Top-level sections
 
 * [`area_search_terms`](#area-search-terms) (optional) enable additional search terms for areas
+* `chart_tooltip [object]`
+  * `use_nomenclature [boolean]` defaults to true
 * `charts [array]` list of [chart](#chart) definitions
 * `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
@@ -33,10 +35,11 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 * `allow_stack [boolean]` (optional) enables stacking
 * `default_type ['line'|'area']`
-* `heading [string]` 
+* `heading [string]`
+* `lineage_order [string[]]` order of lineages when chart is stacked
 * `parameter [string]` should match a parameter id
 * `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
-* `y_axis [object]` (optional) 
+* `y_axis [object]` (optional)
 
 ### Chart Y-Axis
 

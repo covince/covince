@@ -41,7 +41,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
       if (a.value > b.value) return -1
       return 0
     })
-    const { timeline } = config
+    const { timeline, chart_tooltip } = config
     return (
       <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
         <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
@@ -70,7 +70,9 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
                 <td className='px-3'>
-                  {nomenclatureLookup[item.name] || item.name}
+                  {chart_tooltip.use_nomenclature
+                    ? nomenclatureLookup[item.name] || item.name
+                    : item.name}
                 </td>
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}
