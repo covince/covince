@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import format from 'date-fns/format'
 
 import useNomenclature from '../hooks/useNomenclature'
@@ -31,7 +32,7 @@ const UncertaintyRange = ({ item, percentage, precision }) => {
   return <><td /><td /><td /></>
 }
 
-const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, sortByValue = true }) => {
+const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, sortByValue = true, highlightedItem }) => {
   const config = getConfig()
   const { nomenclatureLookup } = useNomenclature()
   if (active && payload) {
@@ -69,7 +70,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
               return null
             }
             return (
-              <tr key={item.name} className='tooltip_entry'>
+              <tr key={item.name} className={classNames({ 'font-bold': item.name === highlightedItem })}>
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>

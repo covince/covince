@@ -1,6 +1,6 @@
 import './MultiLinePlot.css'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
@@ -100,6 +100,7 @@ const MainChart = React.memo((props) => {
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][darkMode ? 500 : 300]} />
 
+  const [highlightedLineage, setHighlightedLineage] = useState(null)
   const tooltip = useMemo(() =>
     tooltipEnabled
       ? <Tooltip
@@ -109,9 +110,10 @@ const MainChart = React.memo((props) => {
           percentage={preset === 'percentage'}
           precision={precision}
           sortByValue={type !== 'area'}
+          highlightedItem={highlightedLineage}
         />
       : null
-  , [tooltipEnabled, stroke, dates, preset, precision])
+  , [tooltipEnabled, stroke, dates, preset, precision, highlightedLineage])
 
   const xAxis = useMemo(() =>
     <XAxis
@@ -146,12 +148,15 @@ const MainChart = React.memo((props) => {
           dataKey={lineage}
           dot={false}
           fill={colour}
+          fillOpacity={highlightedLineage === lineage ? 0.8 : undefined}
           name={lineage}
           stackId='1'
           stroke={colour}
           type='monotone'
           animationDuration={animationDuration}
           isAnimationActive={true}
+          onMouseEnter={({ name }) => { setHighlightedLineage(name) }}
+          onMouseLeave={() => { setHighlightedLineage(null) }}
         />
       ))
     }
@@ -173,7 +178,7 @@ const MainChart = React.memo((props) => {
           />
         )
       })
-  }, [lineages, stroke, type])
+  }, [lineages, stroke, type, highlightedLineage])
 
   const lines = useMemo(() => {
     if (type === 'area') return null
