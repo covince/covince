@@ -108,6 +108,7 @@ const MainChart = React.memo((props) => {
           dates={dates}
           percentage={preset === 'percentage'}
           precision={precision}
+          sortByValue={type !== 'area'}
         />
       : null
   , [tooltipEnabled, stroke, dates, preset, precision])

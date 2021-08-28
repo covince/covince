@@ -31,16 +31,20 @@ const UncertaintyRange = ({ item, percentage, precision }) => {
   return <><td /><td /><td /></>
 }
 
-const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates }) => {
+const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, sortByValue = true }) => {
   const config = getConfig()
   const { nomenclatureLookup } = useNomenclature()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
-    _payload.sort((a, b) => {
-      if (a.value < b.value) return 1
-      if (a.value > b.value) return -1
-      return 0
-    })
+    if (sortByValue) {
+      _payload.sort((a, b) => {
+        if (a.value < b.value) return 1
+        if (a.value > b.value) return -1
+        return 0
+      })
+    } else {
+      _payload.reverse()
+    }
     const { timeline, chart_tooltip } = config
     return (
       <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
