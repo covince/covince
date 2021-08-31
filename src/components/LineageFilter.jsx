@@ -53,7 +53,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
       top: height * direction,
       behavior: 'smooth'
     })
-  })
+  }, [])
 
   const sectionRefs = useRef([])
   const [currentSection, setCurrentSection] = useState(0)
