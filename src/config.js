@@ -16,6 +16,9 @@ const defaultColours = [
 ]
 
 const defaults = {
+  chart_tooltip: {
+    use_nomenclature: true
+  },
   datetime_format: 'd MMMM y, HH:mm',
   map: { settings: {} },
   timeline: {

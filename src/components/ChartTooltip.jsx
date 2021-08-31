@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import format from 'date-fns/format'
 
 import useNomenclature from '../hooks/useNomenclature'
@@ -31,17 +32,21 @@ const UncertaintyRange = ({ item, percentage, precision }) => {
   return <><td /><td /><td /></>
 }
 
-const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates }) => {
+const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, sortByValue = true, highlightedItem }) => {
   const config = getConfig()
   const { nomenclatureLookup } = useNomenclature()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)
-    _payload.sort((a, b) => {
-      if (a.value < b.value) return 1
-      if (a.value > b.value) return -1
-      return 0
-    })
-    const { timeline } = config
+    if (sortByValue) {
+      _payload.sort((a, b) => {
+        if (a.value < b.value) return 1
+        if (a.value > b.value) return -1
+        return 0
+      })
+    } else {
+      _payload.reverse()
+    }
+    const { timeline, chart_tooltip } = config
     return (
       <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
         <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
@@ -65,12 +70,14 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
               return null
             }
             return (
-              <tr key={item.name} className='tooltip_entry'>
+              <tr key={item.name} className={classNames({ 'font-bold': item.name === highlightedItem })}>
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
                 <td className='px-3'>
-                  {nomenclatureLookup[item.name] || item.name}
+                  {chart_tooltip.use_nomenclature
+                    ? nomenclatureLookup[item.name] || item.name
+                    : item.name}
                 </td>
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}

@@ -13,3 +13,7 @@
 .recharts-cartesian-axis-tick-value {
   @apply tracking-wide text-xs;
 }
+
+.recharts-active-dot {
+  pointer-events: none;
+}

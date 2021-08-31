@@ -1,6 +1,6 @@
 import './MultiLinePlot.css'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ComposedChart, Area, ReferenceArea } from 'recharts'
 import format from 'date-fns/format'
 import * as tailwindColors from 'tailwindcss/colors'
@@ -100,6 +100,7 @@ const MainChart = React.memo((props) => {
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][darkMode ? 500 : 300]} />
 
+  const [highlightedLineage, setHighlightedLineage] = useState(null)
   const tooltip = useMemo(() =>
     tooltipEnabled
       ? <Tooltip
@@ -108,9 +109,11 @@ const MainChart = React.memo((props) => {
           dates={dates}
           percentage={preset === 'percentage'}
           precision={precision}
+          sortByValue={type !== 'area'}
+          highlightedItem={highlightedLineage}
         />
       : null
-  , [tooltipEnabled, stroke, dates, preset, precision])
+  , [tooltipEnabled, stroke, dates, preset, precision, highlightedLineage])
 
   const xAxis = useMemo(() =>
     <XAxis
@@ -145,12 +148,15 @@ const MainChart = React.memo((props) => {
           dataKey={lineage}
           dot={false}
           fill={colour}
+          fillOpacity={highlightedLineage === lineage ? 0.8 : undefined}
           name={lineage}
           stackId='1'
           stroke={colour}
           type='monotone'
           animationDuration={animationDuration}
           isAnimationActive={true}
+          onMouseEnter={({ name }) => { setHighlightedLineage(name) }}
+          onMouseLeave={() => { setHighlightedLineage(null) }}
         />
       ))
     }
@@ -172,7 +178,7 @@ const MainChart = React.memo((props) => {
           />
         )
       })
-  }, [lineages, stroke, type])
+  }, [lineages, stroke, type, highlightedLineage])
 
   const lines = useMemo(() => {
     if (type === 'area') return null
@@ -233,6 +239,7 @@ const MultiLinePlot = props => {
     darkMode,
     date,
     height = 120,
+    lineageOrder = [],
     parameter,
     preset: deprecatedPreset,
     setDate,
@@ -292,16 +299,23 @@ const MultiLinePlot = props => {
 
     const dates = data.map(_ => _.date)
 
-    const lineages = []
+    const lineages = {}
     for (const lineage of Object.keys(lineageSum)) {
       const { active, colour } = activeLineages[lineage]
       if (active) {
-        lineages.push({ lineage, colour, average: lineageSum[lineage] / dates.length })
+        lineages[lineage] = { lineage, colour, average: lineageSum[lineage] / dates.length }
       }
     }
 
+    const ordered = lineageOrder.filter(l => l in lineages).map(l => lineages[l])
+    const unordered = Object.keys(lineages).filter(l => !(lineageOrder.includes(l))).map(l => lineages[l])
+
     return {
-      lineages: orderBy(lineages, 'average', 'asc'),
+      lineages: [
+        ...ordered,
+        ...orderBy(unordered, 'average', 'asc')
+      ],
+      // lineages,
       data,
       dates
     }
