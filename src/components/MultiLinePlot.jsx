@@ -113,7 +113,7 @@ const MainChart = React.memo((props) => {
           highlightedItem={highlightedLineage}
         />
       : null
-  , [tooltipEnabled, stroke, dates, preset, precision, highlightedLineage])
+  , [tooltipEnabled, stroke, dates, preset, precision, highlightedLineage, type])
 
   const xAxis = useMemo(() =>
     <XAxis
