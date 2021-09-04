@@ -64,7 +64,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
             </tr>
           </thead>
           <tbody>
-          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700'>No data</td></tr>}
+          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700 dark:text-gray-300'>No data</td></tr>}
           {_payload.map(item => {
             if (item.name === '_range') {
               return null
