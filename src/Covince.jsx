@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import DataProvider from './components/DataProvider'
 
+// allows DataProvider to make requests while UI loads
 const UI = lazy(() => import('./components/UI'))
 
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24

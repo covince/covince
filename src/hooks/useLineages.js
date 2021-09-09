@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useReducer } from 'react'
-import axios from 'axios'
 
 import useQueryAsState from './useQueryAsState'
+
+import api from '../api'
 
 const getDefaultScale = (default_color_scale, x) => {
   if (typeof default_color_scale === 'string') {
@@ -13,7 +14,7 @@ const getDefaultScale = (default_color_scale, x) => {
   return 'linear'
 }
 
-const useLineages = (dataPath, options, lineages) => {
+const useLineages = (options, lineages) => {
   const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage || lineages[0], colorBy: options.default_color_by })
   const [{ current, status, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -55,12 +56,10 @@ const useLineages = (dataPath, options, lineages) => {
     data: null
   })
 
-  useEffect(() => {
+  useEffect(async () => {
     dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
-    axios.get(`${dataPath}/lineage/${lineage}/${colorBy}.json`)
-      .then(res => {
-        dispatch({ type: 'FETCHED', payload: { data: res.data, lineage, colorBy } })
-      })
+    const data = await api.fetchMapData(lineage, colorBy)
+    dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
   }, [lineage, colorBy])
 
   const actions = {

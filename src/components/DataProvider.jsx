@@ -1,8 +1,9 @@
 import React from 'react'
 import { useQuery } from 'react-query'
-import axios from 'axios'
 import useQueryAsState from '../hooks/useQueryAsState'
+
 import { setConfig } from '../config'
+import api from '../api'
 
 const DataProvider = (props) => {
   const {
@@ -40,21 +41,22 @@ const DataProvider = (props) => {
     return query
   }, [trustedOrigins, query.geojson, query.dataPath, query.configUrl])
 
+  api.dataPath = dataPath
+
   const getData = async () => {
-    const { data, headers } = await axios.get(`${dataPath}/lists.json`)
-    return [data, headers['last-modified']]
+    return api.fetchLists()
   }
   const getTiles = async () => {
-    const { data } = await axios.get(geojson)
-    return data
+    const response = await fetch(geojson)
+    return response.json()
   }
   const getConfig = async () => {
-    const { data } = await axios.get(configUrl)
-    return data
+    const response = await fetch(configUrl)
+    return response.json()
   }
 
   const { data: lists } = useQuery('data', getData, { suspense: true })
-  const [data, lastModified] = lists || []
+  const { data, lastModified } = lists || {}
 
   const { data: tiles } = useQuery('tiles', getTiles, { suspense: true })
 
@@ -63,7 +65,7 @@ const DataProvider = (props) => {
   setConfig(config)
 
   return (
-    React.cloneElement(children, { data, tiles, dataPath, lastModified })
+    React.cloneElement(children, { data, tiles, lastModified })
   )
 }
 export default DataProvider

@@ -3,19 +3,10 @@ import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/bs'
 
-import Chloropleth from './Chloropleth'
-import LocalIncidence from './LocalIncidence'
-import Card from './Card'
-import Select from './Select'
 import { Heading } from './Typography'
 import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
-import Spinner from './Spinner'
-import FadeTransition from './FadeTransition'
-import DateFilter from './DateFilter'
-import LocationFilter from './LocationFilter'
-import FilterSection from './FilterSection'
-import StickyMobileSection from './StickyMobileSection'
-import LineageFilter from './LineageFilter'
+
+import components, { register } from '../components'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import useAreas from '../hooks/useAreas'
@@ -29,13 +20,27 @@ import useChartZoom from '../hooks/useChartZoom'
 import getConfig from '../config'
 import useLocationSearch from '../hooks/useLocationSearch'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkMode }) => {
+const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode }) => {
   const config = getConfig()
+
+  const {
+    Card,
+    Chloropleth,
+    DateFilter,
+    FadeTransition,
+    FilterSection,
+    LineageFilter,
+    LocalIncidence,
+    LocationFilter,
+    Select,
+    Spinner,
+    StickyMobileSection
+  } = components
 
   const unique_lineages = data.lineages
 
-  const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings, unique_lineages)
+  const [areaState, areaActions] = useAreas()
+  const [lineageState, lineageActions, results] = useLineages(config.map.settings, unique_lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
@@ -354,4 +359,18 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
   )
 }
 
-export default UI
+// A "lock" to make sure components are registered before the UI is rendered
+const RegisterComponentsFirst = ({ components, ...props }) => {
+  const [registered, setRegistered] = React.useState(null)
+
+  React.useEffect(() => {
+    if (typeof components === 'object') {
+      register(components)
+    }
+    setRegistered(components)
+  }, [components])
+
+  return registered === components ? <UI {...props} /> : null
+}
+
+export default RegisterComponentsFirst

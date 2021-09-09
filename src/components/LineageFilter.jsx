@@ -7,7 +7,9 @@ import { DescriptiveHeading } from './Typography'
 
 import useNomenclature from '../hooks/useNomenclature'
 
-const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll, isMobile }) => {
+const defaultHeading = <DescriptiveHeading>Lineages</DescriptiveHeading>
+
+const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, toggleAll, isMobile, heading = defaultHeading }) => {
   const isScrolling = useMemo(() => {
     return sortedLineages.length > (isMobile ? 9 : 10)
   }, [sortedLineages, isMobile])
@@ -83,7 +85,7 @@ const LineageFilter = ({ className, toggleLineage, sortedLineages, allSelected, 
   return (
     <div className={className}>
       <header className='flex justify-between space-x-6'>
-        <DescriptiveHeading>Lineages</DescriptiveHeading>
+        {heading}
         <div className='flex items-center'>
           <label
             htmlFor='lineage_toggle_all'

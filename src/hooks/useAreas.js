@@ -1,8 +1,9 @@
 import { useEffect, useReducer } from 'react'
-import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
-const useAreas = (dataPath) => {
+import api from '../api'
+
+const useAreas = () => {
   const [{ area }, updateQuery] = useQueryAsState({ area: 'overview' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -37,12 +38,10 @@ const useAreas = (dataPath) => {
     }
   }, { status: 'INIT' })
 
-  useEffect(() => {
+  useEffect(async () => {
     dispatch({ type: 'LOADING', payload: area })
-    axios.get(`${dataPath}/area/${area}.json`)
-      .then(res => {
-        dispatch({ type: 'FETCHED', payload: { area, data: res.data.data } })
-      })
+    const data = await api.fetchChartData(area)
+    dispatch({ type: 'FETCHED', payload: { area, data } })
   }, [area])
 
   const actions = {
