@@ -27,6 +27,7 @@ const originals = {
 const components = { ...originals }
 
 export function register (newComponents) {
+  Object.assign(components, originals) // reset
   for (const [key, decorator] of Object.entries(newComponents)) {
     if (key in originals) {
       components[key] = decorator(originals[key])

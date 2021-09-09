@@ -359,8 +359,9 @@ const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode }) => 
   )
 }
 
+const emptyComponents = {}
 // A "lock" to make sure components are registered before the UI is rendered
-const RegisterComponentsFirst = ({ components, ...props }) => {
+const RegisterComponentsFirst = ({ components = emptyComponents, ...props }) => {
   const [registered, setRegistered] = React.useState(null)
 
   React.useEffect(() => {
