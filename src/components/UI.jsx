@@ -20,7 +20,7 @@ import useChartZoom from '../hooks/useChartZoom'
 import getConfig from '../config'
 import useLocationSearch from '../hooks/useLocationSearch'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode }) => {
+const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api }) => {
   const config = getConfig()
 
   const {
@@ -39,8 +39,8 @@ const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode }) => 
 
   const unique_lineages = data.lineages
 
-  const [areaState, areaActions] = useAreas()
-  const [lineageState, lineageActions, results] = useLineages(config.map.settings, unique_lineages)
+  const [areaState, areaActions] = useAreas(api)
+  const [lineageState, lineageActions, results] = useLineages(api, config.map.settings, unique_lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }

@@ -3,7 +3,7 @@ import { useQuery } from 'react-query'
 import useQueryAsState from '../hooks/useQueryAsState'
 
 import { setConfig } from '../config'
-import api from '../api'
+import useAPI from '../api'
 
 const DataProvider = (props) => {
   const {
@@ -11,7 +11,8 @@ const DataProvider = (props) => {
     default_data_url,
     default_tiles_url,
     default_config_url,
-    trustedOrigins
+    trustedOrigins,
+    apiImpl
   } = props
 
   const defaultUrls = {
@@ -41,7 +42,7 @@ const DataProvider = (props) => {
     return query
   }, [trustedOrigins, query.geojson, query.dataPath, query.configUrl])
 
-  api.dataPath = dataPath
+  const api = useAPI({ dataPath, ...apiImpl })
 
   const getData = async () => {
     return api.fetchLists()
@@ -65,7 +66,7 @@ const DataProvider = (props) => {
   setConfig(config)
 
   return (
-    React.cloneElement(children, { data, tiles, lastModified })
+    React.cloneElement(children, { data, tiles, lastModified, api })
   )
 }
 export default DataProvider

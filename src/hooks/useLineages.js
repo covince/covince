@@ -2,8 +2,6 @@ import { useEffect, useMemo, useReducer } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
-import api from '../api'
-
 const getDefaultScale = (default_color_scale, x) => {
   if (typeof default_color_scale === 'string') {
     return default_color_scale
@@ -14,7 +12,7 @@ const getDefaultScale = (default_color_scale, x) => {
   return 'linear'
 }
 
-const useLineages = (options, lineages) => {
+const useLineages = (api, options, lineages) => {
   const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage || lineages[0], colorBy: options.default_color_by })
   const [{ current, status, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {

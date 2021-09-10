@@ -13,6 +13,7 @@ const CovInce = ({
   tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
   config_url = `${data_url}/config.json`,
   trustedQueryParamOrigins,
+  api,
   ...props
 }) => {
   const queryClient = useRef(new QueryClient({
@@ -33,6 +34,7 @@ const CovInce = ({
         default_tiles_url={tiles_url}
         default_config_url={config_url}
         trustedOrigins={trustedQueryParamOrigins}
+        apiImpl={api}
       >
         <UI {...props} />
       </DataProvider>

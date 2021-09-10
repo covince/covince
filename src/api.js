@@ -1,4 +1,6 @@
-const api = {
+import { useMemo } from 'react'
+
+const defaultImpl = {
   dataPath: './data',
   async fetchLists () {
     const response = await fetch(`${this.dataPath}/lists.json`)
@@ -17,4 +19,12 @@ const api = {
   }
 }
 
-export default api
+export default function useAPI (overrides) {
+  const api = useMemo(() => {
+    return {
+      ...defaultImpl,
+      ...overrides
+    }
+  }, [])
+  return api
+}

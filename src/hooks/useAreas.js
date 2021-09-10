@@ -1,9 +1,7 @@
 import { useEffect, useReducer } from 'react'
 import useQueryAsState from './useQueryAsState'
 
-import api from '../api'
-
-const useAreas = () => {
+const useAreas = (api) => {
   const [{ area }, updateQuery] = useQueryAsState({ area: 'overview' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
