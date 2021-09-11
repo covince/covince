@@ -7,12 +7,12 @@ import useAPI from '../api'
 
 const DataProvider = (props) => {
   const {
+    apiImpl,
     children,
     default_data_url,
     default_tiles_url,
     default_config_url,
-    trustedOrigins,
-    apiImpl
+    trustedOrigins
   } = props
 
   const defaultUrls = {
@@ -42,7 +42,7 @@ const DataProvider = (props) => {
     return query
   }, [trustedOrigins, query.geojson, query.dataPath, query.configUrl])
 
-  const api = useAPI({ dataPath, ...apiImpl })
+  const api = useAPI(dataPath, apiImpl)
 
   const getData = async () => {
     return api.fetchLists()
@@ -69,4 +69,5 @@ const DataProvider = (props) => {
     React.cloneElement(children, { data, tiles, lastModified, api })
   )
 }
+
 export default DataProvider

@@ -19,12 +19,13 @@ const defaultImpl = {
   }
 }
 
-export default function useAPI (overrides) {
+export default function useAPI (dataPath, impl) {
   const api = useMemo(() => {
     return {
       ...defaultImpl,
-      ...overrides
+      dataPath,
+      ...impl
     }
-  }, [])
+  }, [dataPath, impl])
   return api
 }
