@@ -10,7 +10,7 @@ import { orderBy } from 'lodash'
 import ChartTooltip from './ChartTooltip'
 
 import useChartZoom from '../hooks/useChartZoom'
-import getConfig from '../config'
+import { useConfig } from '../config'
 
 const animationDuration = 500
 
@@ -253,7 +253,7 @@ const MultiLinePlot = props => {
 
   const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
 
-  const config = getConfig()
+  const config = useConfig()
   const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
 
   const preset = useMemo(() => {

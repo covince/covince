@@ -16,13 +16,11 @@ import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 import useChartZoom from '../hooks/useChartZoom'
-
-import getConfig from '../config'
 import useLocationSearch from '../hooks/useLocationSearch'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api }) => {
-  const config = getConfig()
+import { ConfigContext } from '../config'
 
+export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api, config }) => {
   const {
     Card,
     Chloropleth,
@@ -361,7 +359,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api }
 
 const emptyComponents = {}
 // A "lock" to make sure components are registered before the UI is rendered
-const RegisterComponentsFirst = ({ components = emptyComponents, ...props }) => {
+const InitializeUI = ({ components = emptyComponents, ...props }) => {
   const [registered, setRegistered] = React.useState(null)
 
   React.useEffect(() => {
@@ -371,7 +369,15 @@ const RegisterComponentsFirst = ({ components = emptyComponents, ...props }) => 
     setRegistered(components)
   }, [components])
 
-  return registered === components ? <UI {...props} /> : null
+  if (registered === components) {
+    return (
+      <ConfigContext.Provider value={props.config}>
+        <UI {...props} />
+      </ConfigContext.Provider>
+    )
+  }
+
+  return null
 }
 
-export default RegisterComponentsFirst
+export default InitializeUI

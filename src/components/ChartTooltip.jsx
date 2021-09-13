@@ -4,7 +4,7 @@ import format from 'date-fns/format'
 
 import useNomenclature from '../hooks/useNomenclature'
 
-import getConfig from '../config'
+import { useConfig } from '../config'
 
 const formatNumber = (number, percentage, precision = percentage ? 1 : 2) => {
   const fixed = number.toFixed(precision)
@@ -33,7 +33,7 @@ const UncertaintyRange = ({ item, percentage, precision }) => {
 }
 
 const ChartTooltip = ({ active, payload, label, percentage, precision = {}, dates, sortByValue = true, highlightedItem }) => {
-  const config = getConfig()
+  const config = useConfig()
   const { nomenclatureLookup } = useNomenclature()
   if (active && payload) {
     const _payload = payload.filter(_ => _.value > 0)

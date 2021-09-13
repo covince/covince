@@ -2,7 +2,7 @@ import React from 'react'
 import { useQuery } from 'react-query'
 import useQueryAsState from '../hooks/useQueryAsState'
 
-import { setConfig } from '../config'
+import { createConfig } from '../config'
 import useAPI from '../api'
 
 const DataProvider = (props) => {
@@ -53,7 +53,8 @@ const DataProvider = (props) => {
   }
   const getConfig = async () => {
     const response = await fetch(configUrl)
-    return response.json()
+    const json = await response.json()
+    return createConfig(json)
   }
 
   const { data: lists } = useQuery('data', getData, { suspense: true })
@@ -63,10 +64,8 @@ const DataProvider = (props) => {
 
   const { data: config } = useQuery('config', getConfig, { suspense: true })
 
-  setConfig(config)
-
   return (
-    React.cloneElement(children, { data, tiles, lastModified, api })
+    React.cloneElement(children, { data, tiles, lastModified, api, config })
   )
 }
 
