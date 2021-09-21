@@ -1,3 +1,5 @@
+import React from 'react'
+
 import Card from './Card'
 import Chloropleth from './Chloropleth'
 import DateFilter from './DateFilter'
@@ -24,17 +26,20 @@ const originals = {
   StickyMobileSection
 }
 
-const components = { ...originals }
+export const ComponentDecoratorContext = React.createContext({})
 
-export function register (newComponents) {
-  Object.assign(components, originals) // reset
-  for (const [key, decorator] of Object.entries(newComponents)) {
-    if (key in originals) {
-      components[key] = decorator(originals[key])
-    } else {
-      console.log('[CovInce]', 'component not recognised:', key)
+export const useComponents = () => {
+  const decorators = React.useContext(ComponentDecoratorContext)
+  const components = React.useMemo(() => {
+    const _components = { ...originals }
+    for (const [key, decorator] of Object.entries(decorators)) {
+      if (key in originals) {
+        _components[key] = decorator(originals[key])
+      } else {
+        console.log('[CovInce]', 'component not recognised:', key)
+      }
     }
-  }
+    return _components
+  }, [decorators])
+  return components
 }
-
-export default components

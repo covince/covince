@@ -6,7 +6,7 @@ import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/b
 import { Heading } from './Typography'
 import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
 
-import components, { register } from '../components'
+import { ComponentDecoratorContext, useComponents } from '../components'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import useAreas from '../hooks/useAreas'
@@ -33,7 +33,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
     Select,
     Spinner,
     StickyMobileSection
-  } = components
+  } = useComponents()
 
   const unique_lineages = data.lineages
 
@@ -357,27 +357,15 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   )
 }
 
-const emptyComponents = {}
-// A "lock" to make sure components are registered before the UI is rendered
-const InitializeUI = ({ components = emptyComponents, ...props }) => {
-  const [registered, setRegistered] = React.useState(null)
-
-  React.useEffect(() => {
-    if (typeof components === 'object') {
-      register(components)
-    }
-    setRegistered(components)
-  }, [components])
-
-  if (registered === components) {
-    return (
-      <ConfigContext.Provider value={props.config}>
+const emptyDecorators = {}
+const InitializeUI = ({ decorators = emptyDecorators, ...props }) => {
+  return (
+    <ConfigContext.Provider value={props.config}>
+      <ComponentDecoratorContext.Provider value={decorators}>
         <UI {...props} />
-      </ConfigContext.Provider>
-    )
-  }
-
-  return null
+      </ComponentDecoratorContext.Provider>
+    </ConfigContext.Provider>
+  )
 }
 
 export default InitializeUI
