@@ -5,13 +5,13 @@ import useNomenclature from './useNomenclature'
 
 const collator = new Intl.Collator(undefined, { numeric: true })
 
-export default (uniqueLineages, { colors }, darkMode) => {
+export default (uniqueLineages = [], { colors }, darkMode) => {
   const [{ show }, updateQuery] = useQueryAsState()
   const { nomenclature, nomenclatureLookup } = useNomenclature()
 
   const queryLineages = useMemo(() =>
     new Set(show === undefined ? uniqueLineages : show.split(',').filter(_ => _.length))
-  , [show])
+  , [show, uniqueLineages])
 
   const activeLineages = useMemo(() => {
     return uniqueLineages.reduce((memo, lineage, index) => {

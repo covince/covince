@@ -9,8 +9,8 @@ import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
 import { ComponentDecoratorContext, useComponents } from '../components'
 
 import { useMobile } from '../hooks/useMediaQuery'
-import useAreas from '../hooks/useAreas'
-import useLineages from '../hooks/useLineages'
+import useChartData from '../hooks/useChartData'
+import useMapData from '../hooks/useMapData'
 import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
@@ -37,16 +37,16 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
 
   const unique_lineages = data.lineages
 
-  const [areaState, areaActions] = useAreas(api)
-  const [lineageState, lineageActions, results] = useLineages(api, config.map.settings, unique_lineages)
+  const [chartDataState, chartDataActions] = useChartData(api, unique_lineages)
+  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, unique_lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
   ] = useDates(results ? results.dates : [], config.timeline)
 
   const handleOnClick = useCallback((area_id) => {
-    areaActions.load(area_id)
-  }, [areaActions.load])
+    chartDataActions.load(area_id)
+  }, [chartDataActions.load])
 
   const parameter_options = config.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
@@ -57,20 +57,20 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || areaState.currentArea === null
-  ), [lineageState.lineage, areaState.currentArea])
+    mapDataState.lineage === null || chartDataState.area === null
+  ), [mapDataState.lineage, chartDataState.area])
 
   const locationFilter = useMemo(() => {
     const { ontology } = config
 
     const props = {
-      loading: isInitialLoad || areaState.status === 'LOADING' || locationSearch.isLoading,
-      onChange: areaActions.load,
-      value: areaState.currentArea,
+      loading: isInitialLoad || chartDataState.status === 'LOADING' || locationSearch.isLoading,
+      onChange: chartDataActions.load,
+      value: chartDataState.area,
       overview: ontology.overview
     }
 
-    if (areaState.currentArea === 'overview') {
+    if (chartDataState.area === 'overview') {
       return {
         ...props,
         category: ontology.overview.category,
@@ -89,12 +89,12 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
     return {
       ...props,
       category: ontology.area.category,
-      heading: areaLookupTable[areaState.currentArea],
-      subheading: areaState.currentArea,
-      showOverviewButton: areaState.loadingArea !== 'overview',
-      loadOverview: () => areaActions.load('overview')
+      heading: areaLookupTable[chartDataState.area],
+      subheading: chartDataState.area,
+      showOverviewButton: chartDataState.loadingArea !== 'overview',
+      loadOverview: () => chartDataActions.load('overview')
     }
-  }, [areaState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
+  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -122,7 +122,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   }
 
   const lineageFilter = {
-    ...useLineageFilter(unique_lineages, config, darkMode),
+    ...useLineageFilter(chartDataState.lineages, config, darkMode),
     isMobile
   }
 
@@ -143,23 +143,23 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   const { chartZoom, clearChartZoom, zoomEnabled, setZoomEnabled } = useChartZoom()
 
   const { activeLineages, sortedLineages } = lineageFilter
-  const selectedLineage = lineageState.loading.lineage || lineageState.lineage
+  const selectedLineage = mapDataState.loading.lineage || mapDataState.lineage
 
   const mapParameterConfig = useMemo(() => {
-    const param = config.parameters.find(_ => _.id === lineageState.colorBy)
+    const param = config.parameters.find(_ => _.id === mapDataState.colorBy)
     if (param) {
       return {
-        format: param.format || lineageState.colorBy === 'p' ? 'percentage' : undefined,
+        format: param.format || mapDataState.colorBy === 'p' ? 'percentage' : undefined,
         precision: param.precision
       }
     }
     return undefined
-  }, [lineageState.colorBy])
+  }, [mapDataState.colorBy])
 
   const fadeUncertaintyEnabled = useMemo(() => {
     const { fade_uncertainty = {} } = config.map
-    return lineageState.colorBy in fade_uncertainty ? fade_uncertainty[lineageState.colorBy] : undefined
-  }, [lineageState.colorBy])
+    return mapDataState.colorBy in fade_uncertainty ? fade_uncertainty[mapDataState.colorBy] : undefined
+  }, [mapDataState.colorBy])
 
   return (
     <>
@@ -193,7 +193,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
             <Heading>Map</Heading>
             { isMobile &&
               <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={areaState.status === 'LOADING'}>
+                <FadeTransition in={chartDataState.status === 'LOADING'}>
                   <Spinner className='h-4 w-4 mr-2 text-gray-500 dark:text-gray-200' />
                 </FadeTransition>
                 <PrimaryPillButton
@@ -207,7 +207,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
           </div>
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
-            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
+            { 'opacity-50 pointer-events-none': mapDataState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
               <label className='block font-medium mb-1'>
@@ -216,7 +216,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
               <Select
                 value={selectedLineage}
                 name='lineages'
-                onChange={e => lineageActions.setLineage(e.target.value)}
+                onChange={e => mapDataActions.setLineage(e.target.value)}
               >
                 {sortedLineages.map(({ lineage, altName }) =>
                   <option key={lineage} value={lineage}>
@@ -231,22 +231,22 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
                 Colour by
               </label>
               <Select
-                value={lineageState.loading.colorBy || lineageState.colorBy}
+                value={mapDataState.loading.colorBy || mapDataState.colorBy}
                 name='parameters'
-                onChange={e => lineageActions.colorBy(e.target.value)}
+                onChange={e => mapDataActions.colorBy(e.target.value)}
               >
                 {parameter_options}
               </Select>
             </div>
-            { lineageState.scale !== undefined &&
+            { mapDataState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
                   Colour Scale
                 </label>
                 <Select
-                  value={lineageState.scale || ''}
+                  value={mapDataState.scale || ''}
                   name='color_scale_type'
-                  onChange={e => lineageActions.setScale(e.target.value)}
+                  onChange={e => mapDataActions.setScale(e.target.value)}
                 >
                   <option value='linear'>Linear</option>
                   <option value='quadratic'>Quadratic</option>
@@ -256,7 +256,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
           <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
             <Chloropleth
               className='flex-grow'
-              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
+              color_scale_type={mapDataState.colorBy === 'R' ? 'R_scale' : mapDataState.scale}
               config={config.map.viewport}
               darkMode={darkMode}
               enable_fade_uncertainty={fadeUncertaintyEnabled}
@@ -267,10 +267,10 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               parameterConfig={mapParameterConfig}
-              selected_area={areaState.loadingArea || areaState.currentArea}
+              selected_area={chartDataState.loadingArea || chartDataState.area}
               values={mapValues}
             />
-            <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
+            <FadeTransition in={mapDataState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 dark:text-gray-200 w-6 h-6' />
               </div>
@@ -294,7 +294,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
           <LocalIncidence
             className={classNames(
               'transition-opacity flex-grow', {
-                'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+                'delay-1000 opacity-50 pointer-events-none': chartDataState.status === 'LOADING' && !isInitialLoad
               }
             )}
             activeLineages={activeLineages}
@@ -303,10 +303,10 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
             darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            name={areaLookupTable[areaState.currentArea]}
-            selected_area={areaState.currentArea}
+            name={areaLookupTable[chartDataState.area]}
+            selected_area={chartDataState.area}
             setDate={persistDate}
-            values={areaState.data}
+            values={chartDataState.data}
             zoomEnabled={isMobile ? zoomEnabled : true}
           />
           { !isMobile && lastModified &&

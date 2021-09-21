@@ -1,23 +1,25 @@
 import { useEffect, useReducer } from 'react'
 import useQueryAsState from './useQueryAsState'
 
-const useAreas = (api) => {
+const useChartData = (api, lineages) => {
   const [{ area }, updateQuery] = useQueryAsState({ area: 'overview' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':
         return {
           ...state,
-          loadingArea: action.payload,
+          loading: action.payload,
           status: 'LOADING'
         }
       case 'FETCHED': {
-        if (action.payload.area !== state.loadingArea) return state
+        if (action.payload.area !== state.loading.area ||
+          action.payload.lineages !== state.loading.lineages) return state
         return {
           ...state,
           status: 'READY',
-          loadingArea: null,
-          currentArea: action.payload.area,
+          loading: null,
+          area: action.payload.area,
+          lineages: action.payload.lineages,
           data: action.payload.data.map(x => {
             if (x.parameter === 'p') {
               return {
@@ -37,10 +39,10 @@ const useAreas = (api) => {
   }, { status: 'INIT' })
 
   useEffect(async () => {
-    dispatch({ type: 'LOADING', payload: area })
-    const data = await api.fetchChartData(area)
-    dispatch({ type: 'FETCHED', payload: { area, data } })
-  }, [area])
+    dispatch({ type: 'LOADING', payload: { area, lineages } })
+    const data = await api.fetchChartData(area, lineages)
+    dispatch({ type: 'FETCHED', payload: { area, lineages, data } })
+  }, [area, lineages])
 
   const actions = {
     load: (area) => updateQuery({ area })
@@ -49,4 +51,4 @@ const useAreas = (api) => {
   return [state, actions]
 }
 
-export default useAreas
+export default useChartData
