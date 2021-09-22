@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { screens } from 'tailwindcss/defaultTheme'
 
 const useMediaQuery = (mediaQuery) => {
@@ -6,14 +6,14 @@ const useMediaQuery = (mediaQuery) => {
     return false
   }
 
-  const media = window.matchMedia(mediaQuery)
+  const mediaRef = useRef(window.matchMedia(mediaQuery))
 
-  const [isMatching, setMatching] = useState(media.matches)
+  const [isMatching, setMatching] = useState(mediaRef.current.matches)
 
   useEffect(() => {
-    const listener = () => { setMatching(media.matches) }
-    media.addEventListener('change', listener)
-    return () => media.removeEventListener('change', listener)
+    const listener = () => { setMatching(mediaRef.current.matches) }
+    mediaRef.current.addEventListener('change', listener)
+    return () => mediaRef.current.removeEventListener('change', listener)
   }, [])
 
   return isMatching

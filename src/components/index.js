@@ -5,6 +5,7 @@ import Chloropleth from './Chloropleth'
 import DateFilter from './DateFilter'
 import FadeTransition from './FadeTransition'
 import FilterSection from './FilterSection'
+import MapView from './MapView'
 import LineageFilter from './LineageFilter'
 import LocalIncidence from './LocalIncidence'
 import LocationFilter from './LocationFilter'
@@ -18,6 +19,7 @@ const originals = {
   DateFilter,
   FadeTransition,
   FilterSection,
+  MapView,
   LineageFilter,
   LocalIncidence,
   LocationFilter,
