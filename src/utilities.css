@@ -44,7 +44,7 @@
 
   .primary-ring,
   .focus\:primary-ring:focus {
-    @apply border-primary ring ring-offset-0 ring-primary ring-opacity-40;
+    @apply focus:outline-none border-primary ring ring-offset-0 ring-primary ring-opacity-40;
     
     .dark & {
       /* border needs ! to work on buttons */
