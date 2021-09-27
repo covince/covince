@@ -26,7 +26,8 @@
     @apply h-1.5 w-1.5;
   }
 
-  .gutterless-scrollbars::-webkit-scrollbar-track {
+  .gutterless-scrollbars::-webkit-scrollbar-track,
+  .gutterless-scrollbars::-webkit-scrollbar-corner {
     background: transparent;
   }
 
