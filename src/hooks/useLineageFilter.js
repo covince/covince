@@ -25,7 +25,7 @@ export default (uniqueLineages = [], { colors }, darkMode) => {
       return memo
     }, {})
   }
-  , [queryLineages, darkMode])
+  , [queryLineages, darkMode, colors])
 
   const sortedLineages = useMemo(() => {
     const lineagesWithoutAltNames = Object.values(activeLineages).filter(_ => _.altName === undefined)
