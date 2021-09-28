@@ -55,10 +55,12 @@ const useLineages = (api, options, lineages) => {
   })
 
   useEffect(async () => {
-    dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
-    const data = await api.fetchMapData(lineage, colorBy)
-    dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
-  }, [lineage, colorBy])
+    if (lineage && colorBy) {
+      dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
+      const data = await api.fetchMapData(lineage, colorBy)
+      dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
+    }
+  }, [lineage, colorBy, lineages])
 
   const actions = {
     setLineage: lineage => updateQuery({ lineage }),
