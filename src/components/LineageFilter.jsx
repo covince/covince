@@ -84,7 +84,7 @@ const LineageFilter = (props) => {
       root: scrollContainer.current,
       threshold: 0.6
     })
-    sectionRefs.current.filter(s => s !== undefined).forEach(section => {
+    sectionRefs.current.filter(s => s).forEach(section => {
       observer.observe(section)
     })
 
