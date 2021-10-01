@@ -1,47 +1,51 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
-import Card from './Card'
+import Chart from './Chart'
 import Chloropleth from './Chloropleth'
 import DateFilter from './DateFilter'
-import FadeTransition from './FadeTransition'
 import FilterSection from './FilterSection'
 import MapView from './MapView'
 import LineageFilter from './LineageFilter'
 import LocalIncidence from './LocalIncidence'
 import LocationFilter from './LocationFilter'
-import Select from './Select'
-import Spinner from './Spinner'
 import StickyMobileSection from './StickyMobileSection'
 
 const originals = {
-  Card,
+  Chart,
   Chloropleth,
   DateFilter,
-  FadeTransition,
   FilterSection,
   MapView,
   LineageFilter,
   LocalIncidence,
   LocationFilter,
-  Select,
-  Spinner,
   StickyMobileSection
 }
 
-export const ComponentDecoratorContext = React.createContext({})
+export const InjectionContext = React.createContext({})
 
-export const useComponents = () => {
-  const decorators = React.useContext(ComponentDecoratorContext)
+export const useInjection = () => {
+  const { decorators = {}, props = {} } = React.useContext(InjectionContext)
+
+  const previousDecorators = useRef({})
+  const previousComponents = useRef({})
+
   const components = React.useMemo(() => {
     const _components = { ...originals }
     for (const [key, decorator] of Object.entries(decorators)) {
       if (key in originals) {
-        _components[key] = decorator(originals[key])
+        _components[key] =
+          previousDecorators.current[key] === decorator
+            ? previousComponents.current[key]
+            : decorator(originals[key])
+        previousComponents.current[key] = _components[key]
+        previousDecorators.current[key] = decorator
       } else {
         console.log('[CovInce]', 'component not recognised:', key)
       }
     }
     return _components
   }, [decorators])
-  return components
+
+  return [components, props]
 }

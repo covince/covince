@@ -6,7 +6,11 @@ import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/b
 import { Heading } from './Typography'
 import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
 
-import { ComponentDecoratorContext, useComponents } from '../components'
+import { InjectionContext, useInjection } from '../components'
+import Card from '../components/Card'
+import Select from '../components/Select'
+import Spinner from '../components/Spinner'
+import FadeTransition from '../components/FadeTransition'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import useChartData from '../hooks/useChartData'
@@ -21,20 +25,16 @@ import useLocationSearch from '../hooks/useLocationSearch'
 import { ConfigContext } from '../config'
 
 export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api, config }) => {
-  const {
-    Card,
+  const [{
     Chloropleth,
     DateFilter,
-    FadeTransition,
     FilterSection,
     LineageFilter,
     LocalIncidence,
     LocationFilter,
     MapView,
-    Select,
-    Spinner,
     StickyMobileSection
-  } = useComponents()
+  }, injectProps] = useInjection()
 
   const unique_lineages = data.lineages
 
@@ -93,9 +93,10 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
       heading: areaLookupTable[chartDataState.area],
       subheading: chartDataState.area,
       showOverviewButton: chartDataState.loadingArea !== 'overview',
-      loadOverview: () => chartDataActions.load('overview')
+      loadOverview: () => chartDataActions.load('overview'),
+      ...injectProps.LocationFilter
     }
-  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
+  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -119,12 +120,14 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
       const { value } = e.target
       const set_to = results.dates[value]
       persistDate(set_to)
-    }
+    },
+    ...injectProps.DateFilter
   }
 
   const lineageFilter = {
     ...useLineageFilter(chartDataState.lineages, config, darkMode),
-    isMobile
+    isMobile,
+    ...injectProps.LineageFilter
   }
 
   const formattedLastModified = useMemo(
@@ -177,7 +180,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
           />
         </div> }
       { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
+        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
@@ -209,6 +212,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
                 </div> }
             </div>
           }
+          {...injectProps.MapView}
         >
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
@@ -274,6 +278,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
               parameterConfig={mapParameterConfig}
               selected_area={chartDataState.loadingArea || chartDataState.area}
               values={mapValues}
+              {...injectProps.Chloropleth}
             />
             <FadeTransition in={mapDataState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
@@ -313,6 +318,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
             setDate={persistDate}
             values={chartDataState.data}
             zoomEnabled={isMobile ? zoomEnabled : true}
+            {...injectProps.LocalIncidence}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 dark:border-gray-500 rounded-tl-md h-6'>
@@ -322,7 +328,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
             </div> }
         </div>
         { mobileView === 'chart' && !locationSearch.isSearching &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages' {...injectProps.StickyMobileSection}>
             <LineageFilter {...lineageFilter} />
             <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
               <PrimaryPillButton onClick={() => setMobileView('map')} className='flex items-center justify-center'>
@@ -362,13 +368,13 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   )
 }
 
-const emptyDecorators = {}
-const InitializeUI = ({ decorators = emptyDecorators, ...props }) => {
+const emptyInjection = {}
+const InitializeUI = ({ injection = emptyInjection, ...props }) => {
   return (
     <ConfigContext.Provider value={props.config}>
-      <ComponentDecoratorContext.Provider value={decorators}>
+      <InjectionContext.Provider value={injection}>
         <UI {...props} />
-      </ComponentDecoratorContext.Provider>
+      </InjectionContext.Provider>
     </ConfigContext.Provider>
   )
 }
