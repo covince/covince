@@ -13,6 +13,7 @@ import useChartZoom from '../hooks/useChartZoom'
 import { useConfig } from '../config'
 
 const animationDuration = 500
+const fallbackColour = '#DDDDDD'
 
 const MainChart = React.memo((props) => {
   const {
@@ -141,7 +142,7 @@ const MainChart = React.memo((props) => {
 
   const areas = useMemo(() => {
     if (type === 'area') {
-      return lineages.map(({ lineage, colour }) => (
+      return lineages.map(({ lineage, colour = fallbackColour }) => (
         <Area
           key={lineage}
           activeDot={{ stroke: tailwindColors[stroke][400] }}
@@ -162,7 +163,7 @@ const MainChart = React.memo((props) => {
     }
     return lineages
       .filter(_ => _.average !== 0)
-      .map(({ lineage, colour }) => {
+      .map(({ lineage, colour = fallbackColour }) => {
         const key = `${lineage}_range`
         return (
           <Area
@@ -182,7 +183,7 @@ const MainChart = React.memo((props) => {
 
   const lines = useMemo(() => {
     if (type === 'area') return null
-    return lineages.map(({ lineage, colour }) =>
+    return lineages.map(({ lineage, colour = fallbackColour }) =>
       <Line
         key={lineage}
         activeDot={{ stroke: tailwindColors[stroke][400] }}
