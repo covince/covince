@@ -5,13 +5,13 @@ import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/b
 
 import { Heading } from './Typography'
 import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
+import Card from './Card'
+import Select from './Select'
+import Spinner from './Spinner'
+import FadeTransition from './FadeTransition'
+import LoadingOverlay from './LoadingOverlay'
 
 import { InjectionContext, useInjection } from '../components'
-import Card from '../components/Card'
-import Select from '../components/Select'
-import Spinner from '../components/Spinner'
-import FadeTransition from '../components/FadeTransition'
-
 import { useMobile } from '../hooks/useMediaQuery'
 import useChartData from '../hooks/useChartData'
 import useMapData from '../hooks/useMapData'
@@ -65,7 +65,9 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
     const { ontology } = config
 
     const props = {
-      loading: isInitialLoad || chartDataState.status === 'LOADING' || locationSearch.isLoading,
+      loading: isInitialLoad ||
+        (chartDataState.status === 'LOADING' && (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
+        locationSearch.isLoading,
       onChange: chartDataActions.load,
       value: chartDataState.area,
       overview: ontology.overview
@@ -262,7 +264,10 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
                 </Select>
               </div> }
           </form>
-          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
+          <LoadingOverlay
+            className='flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'
+            loading={mapDataState.status === 'LOADING' && !isInitialLoad}
+          >
             <Chloropleth
               className='flex-grow'
               color_scale_type={mapDataState.colorBy === 'R' ? 'R_scale' : mapDataState.scale}
@@ -280,13 +285,15 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
               values={mapValues}
               {...injectProps.Chloropleth}
             />
+            <div className='absolute inset-0 z-10 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
+          </LoadingOverlay>
+          {/* <div className='relative'>
             <FadeTransition in={mapDataState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 dark:text-gray-200 w-6 h-6' />
               </div>
             </FadeTransition>
-            <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
-          </div>
+          </div> */}
         </MapView>
         <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || (isMobile && locationSearch.isSearching) })}>
           { !isMobile &&
