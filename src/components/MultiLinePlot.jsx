@@ -103,7 +103,7 @@ const MainChart = React.memo((props) => {
 
   const [highlightedLineage, setHighlightedLineage] = useState(null)
   const tooltip = useMemo(() =>
-    tooltipEnabled
+    (tooltipEnabled && lineages.length > 0)
       ? <Tooltip
           content={ChartTooltip}
           cursor={{ stroke: tailwindColors[stroke][darkMode ? 300 : 400] }}

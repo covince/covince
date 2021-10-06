@@ -127,7 +127,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   }
 
   const lineageFilter = {
-    ...useLineageFilter(chartDataState.lineages, config, darkMode),
+    ...useLineageFilter(unique_lineages, chartDataState.lineages, config, darkMode),
     isMobile,
     ...injectProps.LineageFilter
   }

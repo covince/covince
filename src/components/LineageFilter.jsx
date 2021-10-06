@@ -14,6 +14,7 @@ const LineageFilter = (props) => {
     allSelected,
     className,
     emptyMessage,
+    fixedLayout,
     heading = defaultHeading,
     isMobile,
     sortedLineages,
@@ -22,8 +23,8 @@ const LineageFilter = (props) => {
   } = props
 
   const isScrolling = useMemo(() => {
-    return sortedLineages.length > (isMobile ? 9 : 10)
-  }, [sortedLineages, isMobile])
+    return fixedLayout || sortedLineages.length > (isMobile ? 9 : 10)
+  }, [fixedLayout, sortedLineages, isMobile])
 
   const sections = useMemo(() => {
     if (!isScrolling) {
@@ -51,12 +52,13 @@ const LineageFilter = (props) => {
     }
     const numLineages = sortedLineages.length
     const maxColumns = isScrolling ? 4 : 5
-    const numColumns = Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
+    const numColumns =
+      fixedLayout ? maxColumns : Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
     return {
       ...style,
       gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`
     }
-  }, [sortedLineages, isScrolling, isMobile])
+  }, [sortedLineages, fixedLayout, isScrolling, isMobile])
 
   const scrollContainer = useRef()
 
@@ -112,10 +114,13 @@ const LineageFilter = (props) => {
           />
         </div>
       </header>
-      <div className='md:flex md:space-x-3 md:mt-0.5'>
+      <div className='md:flex md:mt-0.5 space-x-1.5'>
         <form
           ref={scrollContainer}
-          className='overflow-auto hide-scrollbars flex-grow -mx-4 md:-mx-2 flex md:flex-col md:h-16'
+          className={classNames(
+            'overflow-auto hide-scrollbars flex-grow -mx-4 md:-mx-2 flex md:flex-col md:h-16',
+            { 'lg:mx-0': fixedLayout }
+          )}
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
           {sections.map((lineages, i) => (
@@ -129,7 +134,13 @@ const LineageFilter = (props) => {
                   {lineages.map(({ lineage, active, colour, altName }) => (
                     <Checkbox
                       key={lineage}
-                      className={classNames('w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2', { 'md:mb-1': isScrolling && nomenclature.length === 0 })}
+                      className={classNames(
+                        'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
+                        {
+                          'md:mb-1': isScrolling && nomenclature.length === 0,
+                          'lg:w-24 lg:mx-0.5': fixedLayout
+                        }
+                      )}
                       style={{ color: colour }}
                       id={`lineage_filter_${lineage}`}
                       checked={active}
@@ -149,7 +160,7 @@ const LineageFilter = (props) => {
                 </section>
           ))}
         </form>
-        {sections.length > 1 && (
+        {(sections.length > 1 || (!isMobile && fixedLayout)) && (
           isMobile
             ? <ol className='list-none p-1 flex justify-center space-x-2'>
               { sections.map((_, i) =>

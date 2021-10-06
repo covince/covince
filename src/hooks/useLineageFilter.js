@@ -5,16 +5,16 @@ import useNomenclature from './useNomenclature'
 
 const collator = new Intl.Collator(undefined, { numeric: true })
 
-export default (uniqueLineages = [], { colors }, darkMode) => {
+export default (uniqueLineages = [], loadedLineages = [], { colors }, darkMode) => {
   const [{ show }, updateQuery] = useQueryAsState()
   const { nomenclature, nomenclatureLookup } = useNomenclature()
 
   const queryLineages = useMemo(() =>
-    new Set(show === undefined ? uniqueLineages : show.split(',').filter(_ => _.length))
-  , [show, uniqueLineages])
+    new Set(show === undefined ? loadedLineages : show.split(',').filter(_ => _.length))
+  , [show, loadedLineages])
 
   const activeLineages = useMemo(() => {
-    return uniqueLineages.reduce((memo, lineage, index) => {
+    return loadedLineages.reduce((memo, lineage, index) => {
       const colour = colors[Array.isArray(colors) ? index : lineage]
       memo[lineage] = {
         lineage,
@@ -28,17 +28,21 @@ export default (uniqueLineages = [], { colors }, darkMode) => {
   , [queryLineages, darkMode, colors])
 
   const sortedLineages = useMemo(() => {
-    const lineagesWithoutAltNames = Object.values(activeLineages).filter(_ => _.altName === undefined)
+    const lineagesWithoutAltNames =
+      Object.values(activeLineages)
+        .filter(_ => uniqueLineages.includes(_.lineage) && _.altName === undefined)
     lineagesWithoutAltNames.sort((a, b) => collator.compare(a.lineage, b.lineage))
     return [
-      ...nomenclature.filter(({ lineage }) => lineage in activeLineages).map(({ lineage }) => activeLineages[lineage]),
+      ...nomenclature
+        .filter(({ lineage }) => uniqueLineages.includes(lineage) && lineage in activeLineages)
+        .map(({ lineage }) => activeLineages[lineage]),
       ...lineagesWithoutAltNames
     ]
-  }, [activeLineages])
+  }, [activeLineages, uniqueLineages])
 
   const allSelected = useMemo(
-    () => queryLineages.size === uniqueLineages.length,
-    [queryLineages, uniqueLineages]
+    () => queryLineages.size === loadedLineages.length,
+    [queryLineages, loadedLineages]
   )
 
   const toggleAll = useCallback(() => {
