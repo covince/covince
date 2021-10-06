@@ -6,6 +6,7 @@ import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
 
 import useNomenclature from '../hooks/useNomenclature'
+import { useScreen } from '../hooks/useMediaQuery'
 
 const defaultHeading = <DescriptiveHeading>Lineages</DescriptiveHeading>
 
@@ -32,7 +33,7 @@ const LineageFilter = (props) => {
     }
     const sectionSize = isMobile ? 9 : 8
     const _sections = []
-    const numSections = Math.ceil(sortedLineages.length / sectionSize)
+    const numSections = Math.ceil(sortedLineages.length / sectionSize) || 1
     for (let i = 0; i < numSections; i++) {
       const start = i * sectionSize
       _sections.push(sortedLineages.slice(start, start + sectionSize))
@@ -41,6 +42,7 @@ const LineageFilter = (props) => {
   }, [sortedLineages, isMobile])
 
   const { nomenclature } = useNomenclature()
+  const isLarge = useScreen('lg')
 
   const gridStyle = useMemo(() => {
     const style = {
@@ -53,12 +55,14 @@ const LineageFilter = (props) => {
     const numLineages = sortedLineages.length
     const maxColumns = isScrolling ? 4 : 5
     const numColumns =
-      fixedLayout ? maxColumns : Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
+      isLarge && fixedLayout
+        ? maxColumns
+        : Math.max(2, Math.min(Math.ceil(numLineages / 2), maxColumns))
     return {
       ...style,
       gridTemplateColumns: `repeat(${numColumns}, minmax(0, 1fr))`
     }
-  }, [sortedLineages, fixedLayout, isScrolling, isMobile])
+  }, [sortedLineages, fixedLayout, isScrolling, isMobile, isLarge])
 
   const scrollContainer = useRef()
 
@@ -124,40 +128,40 @@ const LineageFilter = (props) => {
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
           {sections.map((lineages, i) => (
-            lineages.length > 0
-              ? <section
-                  key={`lineages-${i}`}
-                  ref={el => { sectionRefs.current[i] = el }}
-                  className='w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5'
-                  style={gridStyle}
-                >
-                  {lineages.map(({ lineage, active, colour, altName }) => (
-                    <Checkbox
-                      key={lineage}
-                      className={classNames(
-                        'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
-                        {
-                          'md:mb-1': isScrolling && nomenclature.length === 0,
-                          'lg:w-24 lg:mx-0.5': fixedLayout
-                        }
-                      )}
-                      style={{ color: colour }}
-                      id={`lineage_filter_${lineage}`}
-                      checked={active}
-                      onChange={() => toggleLineage(lineage)}
-                    >
-                      {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
-                      <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{lineage}</span>
-                    </Checkbox>
-                  ))}
-                </section>
-              : <section
-                  key={`lineages-${i}`}
-                  ref={el => { sectionRefs.current[i] = el }}
-                  className='w-full h-full flex-shrink-0 flex items-center justify-center'
-                >
-                  {emptyMessage}
-                </section>
+            <section
+              key={`lineages-${i}`}
+              ref={el => { sectionRefs.current[i] = el }}
+              className='w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative'
+              style={gridStyle}
+            >
+              { lineages.length > 0
+                ? lineages.map(({ lineage, active, colour, altName }) => (
+                  <Checkbox
+                    key={lineage}
+                    className={classNames(
+                      'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
+                      {
+                        'md:mb-1': isScrolling && nomenclature.length === 0,
+                        'lg:w-24 lg:mx-0.5': fixedLayout
+                      }
+                    )}
+                    style={{ color: colour }}
+                    id={`lineage_filter_${lineage}`}
+                    checked={active}
+                    onChange={() => toggleLineage(lineage)}
+                  >
+                    {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
+                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{lineage}</span>
+                  </Checkbox>
+                ))
+                : (
+                  <>
+                    <div className={classNames({ 'lg:w-24 lg:mx-0.5': fixedLayout })} />
+                    <div className='absolute inset-0 flex items-center justify-center'>
+                      {emptyMessage}
+                    </div>
+                  </>) }
+            </section>
           ))}
         </form>
         {(sections.length > 1 || (!isMobile && fixedLayout)) && (

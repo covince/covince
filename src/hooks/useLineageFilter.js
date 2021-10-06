@@ -5,7 +5,7 @@ import useNomenclature from './useNomenclature'
 
 const collator = new Intl.Collator(undefined, { numeric: true })
 
-export default (uniqueLineages = [], loadedLineages = [], { colors }, darkMode) => {
+export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }, darkMode) => {
   const [{ show }, updateQuery] = useQueryAsState()
   const { nomenclature, nomenclatureLookup } = useNomenclature()
 
