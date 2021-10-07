@@ -372,7 +372,7 @@ const MultiLinePlot = props => {
   const eventHandlers = useMemo(() => {
     const clickHandlers = {
       onClick: item => {
-        if (item && !zoomArea.dragged) {
+        if (date && item && !zoomArea.dragged) { // do not set date if not visible on chart
           setDate(data[item.activeLabel].date)
         }
         if (zoomEnabled) {
