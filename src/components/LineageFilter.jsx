@@ -4,6 +4,7 @@ import { BsArrowUpShort, BsArrowDownShort } from 'react-icons/bs'
 
 import Checkbox from './Checkbox'
 import { DescriptiveHeading } from './Typography'
+import Button from './Button'
 
 import useNomenclature from '../hooks/useNomenclature'
 import { useScreen } from '../hooks/useMediaQuery'
@@ -123,7 +124,7 @@ const LineageFilter = (props) => {
           ref={scrollContainer}
           className={classNames(
             'overflow-auto hide-scrollbars flex-grow -mx-4 md:-mx-2 flex md:flex-col md:h-16',
-            { 'lg:mx-0': fixedLayout }
+            { 'lg:-mx-1': fixedLayout }
           )}
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
@@ -131,7 +132,10 @@ const LineageFilter = (props) => {
             <section
               key={`lineages-${i}`}
               ref={el => { sectionRefs.current[i] = el }}
-              className='w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative'
+              className={classNames(
+                'w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative',
+                { 'lg:px-1': fixedLayout }
+              )}
               style={gridStyle}
             >
               { lineages.length > 0
@@ -177,23 +181,23 @@ const LineageFilter = (props) => {
                 />
               )}
             </ol>
-            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-1'>
-            <button
+            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-0.5 space-y-0.5'>
+            <Button
               title='Previous lineages'
-              className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
+              className='w-6 h-6 !p-0 flex items-center text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(-1)}
               disabled={currentSection === 0}
             >
               <BsArrowUpShort className='fill-current w-6 h-6'/>
-            </button>
-            <button
+            </Button>
+            <Button
               title='Next lineages'
-              className='text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
+              className='w-6 h-6 !p-0 flex items-center text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(1)}
               disabled={currentSection === sections.length - 1}
             >
               <BsArrowDownShort className='fill-current w-6 h-6'/>
-            </button>
+            </Button>
           </form>
         )}
       </div>
