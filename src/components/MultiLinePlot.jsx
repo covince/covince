@@ -252,8 +252,6 @@ const MultiLinePlot = props => {
     zoomEnabled
   } = props
 
-  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
-
   const config = useConfig()
   const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
 
@@ -337,6 +335,8 @@ const MultiLinePlot = props => {
     margin: { top: 12, left: 0, right: 24 }
   }), [width, height])
 
+  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom(dates)
+
   const xAxisDomain = useMemo(() => {
     const minIndex = 0
     const maxIndex = data.length - 1
@@ -400,9 +400,10 @@ const MultiLinePlot = props => {
       },
       onMouseUp: (_, e) => {
         if (zoomArea.end !== zoomArea.start) {
-          const xMin = data[zoomArea.start].date
-          const xMax = data[zoomArea.end].date
-          setChartZoom(xMin, xMax)
+          const xStart = data[zoomArea.start].date
+          const xEnd = data[zoomArea.end].date
+          const args = xStart < xEnd ? [xStart, xEnd] : [xEnd, xStart]
+          setChartZoom(...args)
         }
         setZoomArea({ dragged: zoomArea.dragged })
       }
