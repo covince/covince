@@ -43,14 +43,8 @@
     @apply bg-gray-400;
   }
 
-  .primary-ring,
-  .focus\:primary-ring:focus {
+  .primary-ring {
     @apply focus:outline-none border-primary ring ring-offset-0 ring-primary ring-opacity-40;
-    
-    .dark & {
-      /* border needs ! to work on buttons */
-      @apply !border-dark-primary ring-dark-primary ring-opacity-40;
-    }
   }
 
   /* Debug */

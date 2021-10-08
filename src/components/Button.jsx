@@ -7,7 +7,7 @@ export const Button = React.forwardRef(({ as = 'button', ...props }, ref) => (
     ref,
     className: classnames(props.className,
       'bg-white dark:bg-gray-600 py-2 px-3 border rounded-md shadow-sm text-sm leading-5',
-      'focus:outline-none focus:primary-ring'
+      'focus:primary-ring'
     )
   })
 ))

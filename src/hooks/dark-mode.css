@@ -19,6 +19,11 @@
     @apply text-dark-subheading;
   }
 
+  .primary-ring,
+  .focus\:primary-ring:focus {
+    @apply border-dark-primary ring-dark-primary ring-opacity-40;
+  }
+
   .covince-checkbox {
     @apply bg-gray-500 border-gray-400;
   }
