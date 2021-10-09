@@ -76,7 +76,7 @@ const LineageFilter = (props) => {
   }, [])
 
   const sectionRefs = useRef([])
-  const [currentSection, setCurrentSection] = useState(0)
+  const [currentSection, setCurrentSection] = useState(null)
   useEffect(() => {
     const callback = entries => {
       entries.forEach(entry => {
@@ -100,6 +100,18 @@ const LineageFilter = (props) => {
     }
   }, [sections])
 
+  const scrollUpBtnRef = useRef(null)
+  const scrollDownBtnRef = useRef(null)
+
+  useEffect(() => {
+    if (isMobile) return
+    if (currentSection === 0) {
+      scrollDownBtnRef.current.focus()
+    } else if (currentSection === sections.length - 1) {
+      scrollUpBtnRef.current.focus()
+    }
+  }, [isMobile, currentSection])
+
   return (
     <div className={className}>
       <header className='flex justify-between space-x-6'>
@@ -119,7 +131,7 @@ const LineageFilter = (props) => {
           />
         </div>
       </header>
-      <div className='md:flex md:mt-0.5 space-x-1.5'>
+      <div className='md:flex md:mt-0.5'>
         <form
           ref={scrollContainer}
           className={classNames(
@@ -176,21 +188,23 @@ const LineageFilter = (props) => {
                   key={`section-indicator-${i}`}
                   className={classNames(
                     'rounded-full bg-gray-500 dark:bg-gray-300 w-2 h-2 transition-opacity',
-                    { 'opacity-50': i !== currentSection }
+                    { 'opacity-50': i !== currentSection || 0 }
                   )}
                 />
               )}
             </ol>
-            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-0.5 space-y-0.5'>
+            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-1 space-y-0.5'>
             <Button
+              ref={scrollUpBtnRef}
               title='Previous lineages'
               className='w-6 h-6 !p-0 flex items-center text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(-1)}
-              disabled={currentSection === 0}
+              disabled={currentSection === 0 || null}
             >
               <BsArrowUpShort className='fill-current w-6 h-6'/>
             </Button>
             <Button
+              ref={scrollDownBtnRef}
               title='Next lineages'
               className='w-6 h-6 !p-0 flex items-center text-gray-700 dark:text-gray-200 transition-opacity disabled:opacity-50'
               onClick={() => doScroll(1)}
