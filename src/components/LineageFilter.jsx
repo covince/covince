@@ -66,6 +66,7 @@ const LineageFilter = (props) => {
   }, [sortedLineages, fixedLayout, isScrolling, isMobile, isLarge])
 
   const scrollContainer = useRef()
+  const userScrolled = useRef(false)
 
   const doScroll = useCallback((direction) => {
     const { height } = scrollContainer.current.getBoundingClientRect()
@@ -73,6 +74,7 @@ const LineageFilter = (props) => {
       top: height * direction,
       behavior: 'smooth'
     })
+    userScrolled.current = true
   }, [])
 
   const sectionRefs = useRef([])
@@ -104,7 +106,9 @@ const LineageFilter = (props) => {
   const scrollDownBtnRef = useRef(null)
 
   useEffect(() => {
-    if (isMobile) return
+    if (isMobile || userScrolled.current === false) {
+      return
+    }
     if (currentSection === 0) {
       scrollDownBtnRef.current.focus()
     } else if (currentSection === sections.length - 1) {
