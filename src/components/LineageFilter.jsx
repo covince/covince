@@ -197,7 +197,12 @@ const LineageFilter = (props) => {
                 />
               )}
             </ol>
-            : <form onSubmit={e => e.preventDefault()} className='flex flex-col justify-center relative left-1 pb-1 space-y-0.5'>
+            : <form onSubmit={e => e.preventDefault()}
+              className={classNames(
+                'flex flex-col justify-center relative left-1 pb-1 space-y-0.5',
+                { 'md:ml-2 lg:ml-0': fixedLayout }
+              )}
+            >
             <Button
               ref={scrollUpBtnRef}
               title='Previous lineages'
