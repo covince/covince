@@ -46,6 +46,9 @@ const useLineages = (api, options, lineages) => {
           data: action.payload.data
         }
       }
+      case 'ERROR': {
+        throw action.payload
+      }
     }
   }, {
     status: 'INIT',
@@ -57,8 +60,12 @@ const useLineages = (api, options, lineages) => {
   useEffect(async () => {
     if (lineage && colorBy) {
       dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
-      const data = await api.fetchMapData(lineage, colorBy)
-      dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
+      try {
+        const data = await api.fetchMapData(lineage, colorBy)
+        dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
+      } catch (e) {
+        dispatch({ type: 'ERROR', payload: e })
+      }
     }
   }, [lineage, colorBy, lineages])
 

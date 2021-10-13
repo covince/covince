@@ -35,13 +35,20 @@ const useChartData = (api, lineages) => {
           })
         }
       }
+      case 'ERROR': {
+        throw action.payload
+      }
     }
   }, { status: 'INIT' })
 
   useEffect(async () => {
     dispatch({ type: 'LOADING', payload: { area, lineages } })
-    const data = await api.fetchChartData(area, lineages)
-    dispatch({ type: 'FETCHED', payload: { area, lineages, data } })
+    try {
+      const data = await api.fetchChartData(area, lineages)
+      dispatch({ type: 'FETCHED', payload: { area, lineages, data } })
+    } catch (e) {
+      dispatch({ type: 'ERROR', payload: e })
+    }
   }, [area, lineages])
 
   const actions = {
