@@ -1,13 +1,4 @@
-/* https://github.com/wellcometrust/fonts */
-/* @font-face {
-  font-family: "Wellcome Bold";
-  src: url("./assets/wellcome-bold-webfont.woff2") format("woff2"),
-       url("./assets/wellcome-bold-webfont.woff") format("woff");
-} */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './base.css';
 
 html, body {
 	@apply leading-6 text-base font-normal p-0 m-0 text-gray-800 bg-gray-100;	
@@ -42,5 +33,3 @@ html, body {
     @apply px-6;
   }
 }
-
-@import './utilities.css'
