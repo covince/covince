@@ -1,24 +1,25 @@
 import { useEffect, useReducer } from 'react'
-import axios from 'axios'
 import useQueryAsState from './useQueryAsState'
 
-const useAreas = (dataPath) => {
+const useChartData = (api, lineages) => {
   const [{ area }, updateQuery] = useQueryAsState({ area: 'overview' })
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':
         return {
           ...state,
-          loadingArea: action.payload,
+          loading: action.payload,
           status: 'LOADING'
         }
       case 'FETCHED': {
-        if (action.payload.area !== state.loadingArea) return state
+        if (action.payload.area !== state.loading.area ||
+          action.payload.lineages !== state.loading.lineages) return state
         return {
           ...state,
           status: 'READY',
-          loadingArea: null,
-          currentArea: action.payload.area,
+          loading: null,
+          area: action.payload.area,
+          lineages: action.payload.lineages,
           data: action.payload.data.map(x => {
             if (x.parameter === 'p') {
               return {
@@ -34,16 +35,21 @@ const useAreas = (dataPath) => {
           })
         }
       }
+      case 'ERROR': {
+        throw action.payload
+      }
     }
   }, { status: 'INIT' })
 
-  useEffect(() => {
-    dispatch({ type: 'LOADING', payload: area })
-    axios.get(`${dataPath}/area/${area}.json`)
-      .then(res => {
-        dispatch({ type: 'FETCHED', payload: { area, data: res.data.data } })
-      })
-  }, [area])
+  useEffect(async () => {
+    dispatch({ type: 'LOADING', payload: { area, lineages } })
+    try {
+      const data = await api.fetchChartData(area, lineages)
+      dispatch({ type: 'FETCHED', payload: { area, lineages, data } })
+    } catch (e) {
+      dispatch({ type: 'ERROR', payload: e })
+    }
+  }, [area, lineages])
 
   const actions = {
     load: (area) => updateQuery({ area })
@@ -52,4 +58,4 @@ const useAreas = (dataPath) => {
   return [state, actions]
 }
 
-export default useAreas
+export default useChartData

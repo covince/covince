@@ -19,11 +19,19 @@
     @apply text-dark-subheading;
   }
 
+  .primary-ring,
+  .focus\:primary-ring:focus {
+    @apply border-dark-primary ring-dark-primary ring-opacity-40;
+  }
+
   .covince-checkbox {
     @apply bg-gray-500 border-gray-400;
   }
   .covince-checkbox:checked {
     @apply bg-current border-current bg-none;
+  }
+  .covince-checkbox:disabled {
+    @apply bg-gray-400;
   }
 
   .shadow-sm { @apply shadow; }

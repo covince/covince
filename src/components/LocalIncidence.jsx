@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import Measure from 'react-measure'
 import classNames from 'classnames'
 
-import Chart from './Chart'
+import { useInjection } from '../components'
 
 function LocalIncidence (props) {
   const {
@@ -17,6 +17,8 @@ function LocalIncidence (props) {
     values,
     zoomEnabled
   } = props
+
+  const [{ Chart }, injectProps = {}] = useInjection()
 
   const area_data = useMemo(() => values || [], [values])
 
@@ -45,7 +47,6 @@ function LocalIncidence (props) {
               format={chart.format}
               heading={chart.heading}
               isMobile={isMobile}
-              lineageOrder={chart.lineage_order}
               numCharts={chartDefinitions.length}
               parameter={chart.parameter}
               setDate={setDate}
@@ -55,6 +56,7 @@ function LocalIncidence (props) {
               xAxis={chart.x_axis}
               yAxis={chart.y_axis}
               zoomEnabled={zoomEnabled}
+              {...injectProps.Chart}
             />
           )}
         </div>

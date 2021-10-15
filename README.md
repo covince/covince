@@ -36,7 +36,6 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `allow_stack [boolean]` (optional) enables stacking
 * `default_type ['line'|'area']`
 * `heading [string]`
-* `lineage_order [string[]]` order of lineages when chart is stacked
 * `parameter [string]` should match a parameter id
 * `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
 * `y_axis [object]` (optional)

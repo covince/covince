@@ -12,7 +12,7 @@ import Button from './Button'
 import TextInput from './TextInput'
 
 import { useMobile } from '../hooks/useMediaQuery'
-import getConfig from '../config'
+import { useConfig } from '../config'
 
 const HighlightMatch = ({ index, length, children }) => (
   <>
@@ -45,7 +45,7 @@ const Search = ({ onSelect, items, value, onChange, onClose }) => {
     if (e.code === 'Enter' && items.length === 1) _onSelect(items[0].id)
   }
 
-  const { ontology } = getConfig()
+  const { ontology } = useConfig()
   const { noun_plural, search_placeholder = noun_plural } = ontology.area
 
   const list = value.length

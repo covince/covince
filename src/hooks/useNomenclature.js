@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
-import getConfig from '../config'
+import { useConfig } from '../config'
 
 export default () => {
-  const { nomenclature } = getConfig()
+  const { nomenclature } = useConfig()
 
   const nomenclatureLookup = useMemo(() => {
     const lookup = {}

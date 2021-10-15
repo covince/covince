@@ -10,9 +10,10 @@ import { orderBy } from 'lodash'
 import ChartTooltip from './ChartTooltip'
 
 import useChartZoom from '../hooks/useChartZoom'
-import getConfig from '../config'
+import { useConfig } from '../config'
 
 const animationDuration = 500
+const fallbackColour = '#DDDDDD'
 
 const MainChart = React.memo((props) => {
   const {
@@ -102,7 +103,7 @@ const MainChart = React.memo((props) => {
 
   const [highlightedLineage, setHighlightedLineage] = useState(null)
   const tooltip = useMemo(() =>
-    tooltipEnabled
+    (tooltipEnabled && lineages.length > 0)
       ? <Tooltip
           content={ChartTooltip}
           cursor={{ stroke: tailwindColors[stroke][darkMode ? 300 : 400] }}
@@ -141,7 +142,7 @@ const MainChart = React.memo((props) => {
 
   const areas = useMemo(() => {
     if (type === 'area') {
-      return lineages.map(({ lineage, colour }) => (
+      return lineages.map(({ lineage, colour = fallbackColour }) => (
         <Area
           key={lineage}
           activeDot={{ stroke: tailwindColors[stroke][400] }}
@@ -162,7 +163,7 @@ const MainChart = React.memo((props) => {
     }
     return lineages
       .filter(_ => _.average !== 0)
-      .map(({ lineage, colour }) => {
+      .map(({ lineage, colour = fallbackColour }) => {
         const key = `${lineage}_range`
         return (
           <Area
@@ -182,7 +183,7 @@ const MainChart = React.memo((props) => {
 
   const lines = useMemo(() => {
     if (type === 'area') return null
-    return lineages.map(({ lineage, colour }) =>
+    return lineages.map(({ lineage, colour = fallbackColour }) =>
       <Line
         key={lineage}
         activeDot={{ stroke: tailwindColors[stroke][400] }}
@@ -239,7 +240,6 @@ const MultiLinePlot = props => {
     darkMode,
     date,
     height = 120,
-    lineageOrder = [],
     parameter,
     preset: deprecatedPreset,
     setDate,
@@ -252,9 +252,7 @@ const MultiLinePlot = props => {
     zoomEnabled
   } = props
 
-  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom()
-
-  const config = getConfig()
+  const config = useConfig()
   const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
 
   const preset = useMemo(() => {
@@ -299,23 +297,31 @@ const MultiLinePlot = props => {
 
     const dates = data.map(_ => _.date)
 
-    const lineages = {}
+    const lineages = []
     for (const lineage of Object.keys(lineageSum)) {
       const { active, colour } = activeLineages[lineage]
       if (active) {
-        lineages[lineage] = { lineage, colour, average: lineageSum[lineage] / dates.length }
+        lineages.push({ lineage, colour, average: lineageSum[lineage] / dates.length })
       }
     }
 
-    const ordered = lineageOrder.filter(l => l in lineages).map(l => lineages[l])
-    const unordered = Object.keys(lineages).filter(l => !(lineageOrder.includes(l))).map(l => lineages[l])
+    const ordered = orderBy(lineages, 'average', 'asc')
+    const sorted = []
+    // group colours together
+    while (ordered.length > 0) {
+      const [item] = ordered.splice(0, 1)
+      if (sorted.includes(item)) continue
+      sorted.push(item)
+      for (let i = 0; i < ordered.length; i++) {
+        const other = ordered[i]
+        if (item.colour === other.colour) {
+          sorted.push(other)
+        }
+      }
+    }
 
     return {
-      lineages: [
-        ...ordered,
-        ...orderBy(unordered, 'average', 'asc')
-      ],
-      // lineages,
+      lineages: sorted,
       data,
       dates
     }
@@ -328,6 +334,8 @@ const MultiLinePlot = props => {
     height,
     margin: { top: 12, left: 0, right: 24 }
   }), [width, height])
+
+  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom(dates)
 
   const xAxisDomain = useMemo(() => {
     const minIndex = 0
@@ -364,7 +372,7 @@ const MultiLinePlot = props => {
   const eventHandlers = useMemo(() => {
     const clickHandlers = {
       onClick: item => {
-        if (item && !zoomArea.dragged) {
+        if (date && item && !zoomArea.dragged) { // do not set date if not visible on chart
           setDate(data[item.activeLabel].date)
         }
         if (zoomEnabled) {
@@ -392,9 +400,10 @@ const MultiLinePlot = props => {
       },
       onMouseUp: (_, e) => {
         if (zoomArea.end !== zoomArea.start) {
-          const xMin = data[zoomArea.start].date
-          const xMax = data[zoomArea.end].date
-          setChartZoom(xMin, xMax)
+          const xStart = data[zoomArea.start].date
+          const xEnd = data[zoomArea.end].date
+          const args = xStart < xEnd ? [xStart, xEnd] : [xEnd, xStart]
+          setChartZoom(...args)
         }
         setZoomArea({ dragged: zoomArea.dragged })
       }

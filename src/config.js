@@ -1,3 +1,5 @@
+import { createContext, useContext } from 'react'
+
 import { merge } from 'lodash'
 
 // https://personal.sron.nl/~pault/
@@ -31,15 +33,8 @@ const defaults = {
   nomenclature: []
 }
 
-let config
-let previousConfig
-
-export const setConfig = (userConfig) => {
-  // relying on immutability
-  if (userConfig === previousConfig || userConfig === undefined) return
-  previousConfig = userConfig
-
-  config = {}
+export const createConfig = (userConfig) => {
+  const config = {}
   merge(config, defaults, userConfig)
 
   // normalise options
@@ -68,6 +63,9 @@ export const setConfig = (userConfig) => {
       }
     }
   }
+  return config
 }
 
-export default () => config
+export const ConfigContext = createContext(defaults)
+
+export const useConfig = () => useContext(ConfigContext)

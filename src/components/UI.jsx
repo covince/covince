@@ -3,47 +3,51 @@ import classNames from 'classnames'
 import format from 'date-fns/format'
 import { BsArrowRightShort, BsMap, BsArrowCounterclockwise } from 'react-icons/bs'
 
-import Chloropleth from './Chloropleth'
-import LocalIncidence from './LocalIncidence'
-import Card from './Card'
-import Select from './Select'
 import { Heading } from './Typography'
 import { Button, PrimaryPillButton, SecondaryPillButton } from './Button'
+import Card from './Card'
+import Select from './Select'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
-import DateFilter from './DateFilter'
-import LocationFilter from './LocationFilter'
-import FilterSection from './FilterSection'
-import StickyMobileSection from './StickyMobileSection'
-import LineageFilter from './LineageFilter'
+import LoadingOverlay from './LoadingOverlay'
 
+import { InjectionContext, useInjection } from '../components'
 import { useMobile } from '../hooks/useMediaQuery'
-import useAreas from '../hooks/useAreas'
-import useLineages from '../hooks/useLineages'
+import useChartData from '../hooks/useChartData'
+import useMapData from '../hooks/useMapData'
 import useAreaLookupTable from '../hooks/useAreaLookupTable'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
 import useChartZoom from '../hooks/useChartZoom'
-
-import getConfig from '../config'
 import useLocationSearch from '../hooks/useLocationSearch'
 
-const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkMode }) => {
-  const config = getConfig()
+import { ConfigContext } from '../config'
+
+export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api, config }) => {
+  const [{
+    Chloropleth,
+    DateFilter,
+    FilterSection,
+    LineageFilter,
+    LocalIncidence,
+    LocationFilter,
+    MapView,
+    StickyMobileSection
+  }, injectProps] = useInjection()
 
   const unique_lineages = data.lineages
 
-  const [areaState, areaActions] = useAreas(dataPath)
-  const [lineageState, lineageActions, results] = useLineages(dataPath, config.map.settings, unique_lineages)
+  const [chartDataState, chartDataActions] = useChartData(api, unique_lineages)
+  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, unique_lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
   ] = useDates(results ? results.dates : [], config.timeline)
 
   const handleOnClick = useCallback((area_id) => {
-    areaActions.load(area_id)
-  }, [areaActions.load])
+    chartDataActions.load(area_id)
+  }, [chartDataActions.load])
 
   const parameter_options = config.parameters.map((x) => <option key={x.id} value={x.id}>{x.display}</option>)
 
@@ -54,20 +58,22 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
   const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
-    lineageState.lineage === null || areaState.currentArea === null
-  ), [lineageState.lineage, areaState.currentArea])
+    mapDataState.lineage === null || chartDataState.area === null
+  ), [mapDataState.lineage, chartDataState.area])
 
   const locationFilter = useMemo(() => {
     const { ontology } = config
 
     const props = {
-      loading: isInitialLoad || areaState.status === 'LOADING' || locationSearch.isLoading,
-      onChange: areaActions.load,
-      value: areaState.currentArea,
+      loading: isInitialLoad ||
+        (chartDataState.status === 'LOADING' && (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
+        locationSearch.isLoading,
+      onChange: chartDataActions.load,
+      value: chartDataState.area,
       overview: ontology.overview
     }
 
-    if (areaState.currentArea === 'overview') {
+    if (chartDataState.area === 'overview') {
       return {
         ...props,
         category: ontology.overview.category,
@@ -86,12 +92,13 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
     return {
       ...props,
       category: ontology.area.category,
-      heading: areaLookupTable[areaState.currentArea],
-      subheading: areaState.currentArea,
-      showOverviewButton: areaState.loadingArea !== 'overview',
-      loadOverview: () => areaActions.load('overview')
+      heading: areaLookupTable[chartDataState.area],
+      subheading: chartDataState.area,
+      showOverviewButton: chartDataState.loadingArea !== 'overview',
+      loadOverview: () => chartDataActions.load('overview'),
+      ...injectProps.LocationFilter
     }
-  }, [areaState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading])
+  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -115,12 +122,14 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
       const { value } = e.target
       const set_to = results.dates[value]
       persistDate(set_to)
-    }
+    },
+    ...injectProps.DateFilter
   }
 
   const lineageFilter = {
-    ...useLineageFilter(unique_lineages, config, darkMode),
-    isMobile
+    ...useLineageFilter(unique_lineages, chartDataState.lineages, config, darkMode),
+    isMobile,
+    ...injectProps.LineageFilter
   }
 
   const formattedLastModified = useMemo(
@@ -140,23 +149,23 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
   const { chartZoom, clearChartZoom, zoomEnabled, setZoomEnabled } = useChartZoom()
 
   const { activeLineages, sortedLineages } = lineageFilter
-  const selectedLineage = lineageState.loading.lineage || lineageState.lineage
+  const selectedLineage = mapDataState.loading.lineage || mapDataState.lineage
 
   const mapParameterConfig = useMemo(() => {
-    const param = config.parameters.find(_ => _.id === lineageState.colorBy)
+    const param = config.parameters.find(_ => _.id === mapDataState.colorBy)
     if (param) {
       return {
-        format: param.format || lineageState.colorBy === 'p' ? 'percentage' : undefined,
+        format: param.format || mapDataState.colorBy === 'p' ? 'percentage' : undefined,
         precision: param.precision
       }
     }
     return undefined
-  }, [lineageState.colorBy])
+  }, [mapDataState.colorBy])
 
   const fadeUncertaintyEnabled = useMemo(() => {
     const { fade_uncertainty = {} } = config.map
-    return lineageState.colorBy in fade_uncertainty ? fade_uncertainty[lineageState.colorBy] : undefined
-  }, [lineageState.colorBy])
+    return mapDataState.colorBy in fade_uncertainty ? fade_uncertainty[mapDataState.colorBy] : undefined
+  }, [mapDataState.colorBy])
 
   return (
     <>
@@ -173,7 +182,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           />
         </div> }
       { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad}>
+        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
@@ -185,26 +194,31 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           </Card>
         </FilterSection> }
       <Card className='relative flex-grow flex flex-col md:grid md:grid-cols-2 md:grid-rows-1-full md:gap-6 pt-3 pb-0' extraPadding>
-        <div className={classNames('flex-grow flex flex-col', { hidden: mobileView === 'chart' })}>
-          <div className='flex justify-between items-center space-x-3 overflow-hidden'>
-            <Heading>Map</Heading>
-            { isMobile &&
-              <div className='flex items-center max-w-none min-w-0'>
-                <FadeTransition in={areaState.status === 'LOADING'}>
-                  <Spinner className='h-4 w-4 mr-2 text-gray-500 dark:text-gray-200' />
-                </FadeTransition>
-                <PrimaryPillButton
-                  className='flex items-center space-x-1 min-w-0 h-8 pr-2'
-                  onClick={() => setMobileView('chart')}
-                >
-                  <span className='truncate'>{locationFilter.heading}</span>
-                  <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
-                </PrimaryPillButton>
-              </div> }
-          </div>
+        <MapView
+          isHidden={mobileView === 'chart'}
+          heading={
+            <div className='flex justify-between items-center space-x-3 overflow-hidden'>
+              <Heading>Map</Heading>
+              { isMobile &&
+                <div className='flex items-center max-w-none min-w-0'>
+                  <FadeTransition in={chartDataState.status === 'LOADING'}>
+                    <Spinner className='h-4 w-4 mr-2 text-gray-500 dark:text-gray-200' />
+                  </FadeTransition>
+                  <PrimaryPillButton
+                    className='flex items-center space-x-1 min-w-0 h-8 pr-2'
+                    onClick={() => setMobileView('chart')}
+                  >
+                    <span className='truncate'>{locationFilter.heading}</span>
+                    <BsArrowRightShort className='w-6 h-6 flex-shrink-0' />
+                  </PrimaryPillButton>
+                </div> }
+            </div>
+          }
+          {...injectProps.MapView}
+        >
           <form className={classNames(
             'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
-            { 'opacity-50 pointer-events-none': lineageState.status === 'LOADING' && !isInitialLoad }
+            { 'opacity-50 pointer-events-none': mapDataState.status === 'LOADING' && !isInitialLoad }
           )}>
             <div>
               <label className='block font-medium mb-1'>
@@ -213,7 +227,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
               <Select
                 value={selectedLineage}
                 name='lineages'
-                onChange={e => lineageActions.setLineage(e.target.value)}
+                onChange={e => mapDataActions.setLineage(e.target.value)}
               >
                 {sortedLineages.map(({ lineage, altName }) =>
                   <option key={lineage} value={lineage}>
@@ -228,32 +242,35 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
                 Colour by
               </label>
               <Select
-                value={lineageState.loading.colorBy || lineageState.colorBy}
+                value={mapDataState.loading.colorBy || mapDataState.colorBy}
                 name='parameters'
-                onChange={e => lineageActions.colorBy(e.target.value)}
+                onChange={e => mapDataActions.colorBy(e.target.value)}
               >
                 {parameter_options}
               </Select>
             </div>
-            { lineageState.scale !== undefined &&
+            { mapDataState.scale !== undefined &&
               <div>
                 <label className='block font-medium mb-1'>
                   Colour Scale
                 </label>
                 <Select
-                  value={lineageState.scale || ''}
+                  value={mapDataState.scale || ''}
                   name='color_scale_type'
-                  onChange={e => lineageActions.setScale(e.target.value)}
+                  onChange={e => mapDataActions.setScale(e.target.value)}
                 >
                   <option value='linear'>Linear</option>
                   <option value='quadratic'>Quadratic</option>
                 </Select>
               </div> }
           </form>
-          <div className='relative flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'>
+          <LoadingOverlay
+            className='flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'
+            loading={mapDataState.status === 'LOADING' && !isInitialLoad}
+          >
             <Chloropleth
               className='flex-grow'
-              color_scale_type={lineageState.colorBy === 'R' ? 'R_scale' : lineageState.scale}
+              color_scale_type={mapDataState.colorBy === 'R' ? 'R_scale' : mapDataState.scale}
               config={config.map.viewport}
               darkMode={darkMode}
               enable_fade_uncertainty={fadeUncertaintyEnabled}
@@ -264,17 +281,20 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
               max_val={results ? results.max : 0}
               min_val={results ? results.min : 0}
               parameterConfig={mapParameterConfig}
-              selected_area={areaState.loadingArea || areaState.currentArea}
+              selected_area={chartDataState.loadingArea || chartDataState.area}
               values={mapValues}
+              {...injectProps.Chloropleth}
             />
-            <FadeTransition in={lineageState.status === 'LOADING' && !isInitialLoad}>
+            <div className='absolute inset-0 z-10 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
+          </LoadingOverlay>
+          {/* <div className='relative'>
+            <FadeTransition in={mapDataState.status === 'LOADING' && !isInitialLoad}>
               <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
                 <Spinner className='text-gray-500 dark:text-gray-200 w-6 h-6' />
               </div>
             </FadeTransition>
-            <div className='absolute inset-0 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
-          </div>
-        </div>
+          </div> */}
+        </MapView>
         <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || (isMobile && locationSearch.isSearching) })}>
           { !isMobile &&
             <FadeTransition in={!!chartZoom}>
@@ -291,7 +311,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
           <LocalIncidence
             className={classNames(
               'transition-opacity flex-grow', {
-                'delay-1000 opacity-50 pointer-events-none': areaState.status === 'LOADING' && !isInitialLoad
+                'delay-1000 opacity-50 pointer-events-none': chartDataState.status === 'LOADING' && !isInitialLoad
               }
             )}
             activeLineages={activeLineages}
@@ -300,11 +320,12 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            name={areaLookupTable[areaState.currentArea]}
-            selected_area={areaState.currentArea}
+            name={areaLookupTable[chartDataState.area]}
+            selected_area={chartDataState.area}
             setDate={persistDate}
-            values={areaState.data}
+            values={chartDataState.data}
             zoomEnabled={isMobile ? zoomEnabled : true}
+            {...injectProps.LocalIncidence}
           />
           { !isMobile && lastModified &&
             <div className='self-end mt-1 -mb-6 -mr-6 px-2 border-t border-l border-gray-200 dark:border-gray-500 rounded-tl-md h-6'>
@@ -314,7 +335,7 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
             </div> }
         </div>
         { mobileView === 'chart' && !locationSearch.isSearching &&
-          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages'>
+          <StickyMobileSection className='overflow-x-hidden -mx-3 px-4 py-3' title='Lineages' {...injectProps.StickyMobileSection}>
             <LineageFilter {...lineageFilter} />
             <div className='grid items-center gap-3 grid-flow-col box-content mt-1 auto-cols-fr'>
               <PrimaryPillButton onClick={() => setMobileView('map')} className='flex items-center justify-center'>
@@ -354,4 +375,15 @@ const UI = ({ lineColor = 'blueGray', tiles, data, dataPath, lastModified, darkM
   )
 }
 
-export default UI
+const emptyInjection = {}
+const InitializeUI = ({ injection = emptyInjection, ...props }) => {
+  return (
+    <ConfigContext.Provider value={props.config}>
+      <InjectionContext.Provider value={injection}>
+        <UI {...props} />
+      </InjectionContext.Provider>
+    </ConfigContext.Provider>
+  )
+}
+
+export default InitializeUI
