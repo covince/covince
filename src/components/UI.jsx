@@ -24,7 +24,16 @@ import useLocationSearch from '../hooks/useLocationSearch'
 
 import { ConfigContext } from '../config'
 
-export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api, config }) => {
+export const UI = ({
+  api,
+  data = { lineages: [] }, // legacy API, prefer to pass lineages directly
+  config,
+  darkMode,
+  lastModified,
+  lineages = data.lineages,
+  lineColor = 'blueGray',
+  tiles
+}) => {
   const [{
     Chloropleth,
     DateFilter,
@@ -36,10 +45,8 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
     StickyMobileSection
   }, injectProps] = useInjection()
 
-  const unique_lineages = data.lineages
-
-  const [chartDataState, chartDataActions] = useChartData(api, unique_lineages)
-  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, unique_lineages)
+  const [chartDataState, chartDataActions] = useChartData(api, lineages)
+  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
@@ -127,7 +134,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   }
 
   const lineageFilter = {
-    ...useLineageFilter(unique_lineages, chartDataState.lineages, config, darkMode),
+    ...useLineageFilter(lineages, chartDataState.lineages, config, darkMode),
     isMobile,
     ...injectProps.LineageFilter
   }
