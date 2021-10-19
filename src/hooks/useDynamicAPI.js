@@ -19,7 +19,12 @@ const indexMapResults = (index, results, key) => {
   }
 }
 
-export default ({ api_url, lineages, info }) => {
+const defaultConfidence = (count, total) => {
+  const _wilson = wilson(count, total)
+  return [_wilson.left, _wilson.right]
+}
+
+export default ({ api_url, lineages, info, confidence = defaultConfidence }) => {
   const [unaliasedToAliased, topology] = React.useMemo(() => {
     const memo = {}
     for (const l of lineages) {
@@ -60,7 +65,7 @@ export default ({ api_url, lineages, info }) => {
           if (key === 'total') continue
 
           const metadata = { date, location: ltla, lineage: unaliasedToAliased[key] || key }
-          const { left, right } = wilson(count, counts.total)
+          const [left, right] = confidence(count, counts.total)
           data.push(
             { ...metadata, parameter: 'lambda', mean: count, lower: null, upper: null },
             { ...metadata, parameter: 'p', mean: count / counts.total, lower: Math.abs(left), upper: Math.abs(right) }
@@ -117,7 +122,7 @@ export default ({ api_url, lineages, info }) => {
           const { total, value } = index[ltla][date]
           const count = total > 0 ? (value || 0) : null
           if (parameter === 'p') {
-            const { left, right } = count !== null ? wilson(count, total) : { left: null, right: null }
+            const [left = null, right = null] = count !== null ? confidence(count, total) : []
             mean.push(count / total)
             lower.push(Math.abs(left))
             upper.push(right)

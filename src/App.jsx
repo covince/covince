@@ -38,7 +38,7 @@ function App () {
         <AppContainer>
           <CovInce
             darkMode={isDark}
-            // api_url='/api'
+            // api_url='/api/raw'
           />
         </AppContainer>
       </Suspense>
