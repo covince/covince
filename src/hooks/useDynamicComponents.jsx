@@ -12,7 +12,6 @@ import FadeTransition from '../components/FadeTransition'
 import LineageTree from '../components/LineageTree'
 
 import useQueryAsState from './useQueryAsState'
-import useDynamicLineages from './useDynamicLineages'
 
 export const LineageLimit = ({ className, numberSelected, maxLineages }) => (
   <p className={classNames(className, 'whitespace-nowrap', { 'font-bold text-red-700 dark:text-red-300': numberSelected === maxLineages })}>
@@ -27,8 +26,7 @@ export const lineagePresets = [
   { value: 'who', label: 'WHO variants' }
 ]
 
-const InstantLineageTree = ({ onClose, ...props }) => {
-  const { lineageToColourIndex, submit } = useDynamicLineages()
+const InstantLineageTree = ({ onClose, lineageToColourIndex, submit, ...props }) => {
   const { numberSelected, maxLineages, preset, setPreset } = props
   return (
     <>
@@ -128,21 +126,47 @@ const LineageDateFilter = ({ dates = [] }) => {
   )
 }
 
-export default ({ showLineageView, setLineageView, isMobile, darkMode, info, lineageTree, lineages }) => {
+export default (props) => {
+  const {
+    darkMode,
+    info,
+    isMobile,
+    lineages,
+    lineageToColourIndex,
+    lineageTree,
+    setLineageView,
+    showLineageView,
+    submit
+  } = props
+
   const MapView = useCallback((MapView) => {
     if (isMobile) return MapView
-    const DecoratedMapView = ({ showLineageView, setLineageView, darkMode, heading, children, lineageTree }) => (
-      <MapView heading={showLineageView ? null : heading}>
-        { showLineageView
-          ? <InstantLineageTree
-              darkMode={darkMode}
-              maxLineages={info.maxLineages}
-              onClose={() => setLineageView(false)}
-              {...lineageTree}
-            />
-          : children }
-      </MapView>
-    )
+    const DecoratedMapView = (props) => {
+      const {
+        children,
+        darkMode,
+        heading,
+        lineageTree,
+        lineageToColourIndex,
+        setLineageView,
+        showLineageView,
+        submit
+      } = props
+      return (
+        <MapView heading={showLineageView ? null : heading}>
+          { showLineageView
+            ? <InstantLineageTree
+                darkMode={darkMode}
+                maxLineages={info.maxLineages}
+                onClose={() => setLineageView(false)}
+                lineageToColourIndex={lineageToColourIndex}
+                submit={submit}
+                {...lineageTree}
+              />
+            : children }
+        </MapView>
+      )
+    }
     return DecoratedMapView
   }, [isMobile])
 
@@ -150,8 +174,10 @@ export default ({ showLineageView, setLineageView, isMobile, darkMode, info, lin
     showLineageView,
     setLineageView,
     darkMode,
-    lineageTree
-  }), [showLineageView, darkMode, isMobile ? null : lineageTree])
+    lineageTree,
+    lineageToColourIndex,
+    submit
+  }), [showLineageView, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex])])
 
   const LineageFilter = useCallback((LineageFilter) => {
     const DecoratedLineageFilter =
@@ -215,11 +241,11 @@ export default ({ showLineageView, setLineageView, isMobile, darkMode, info, lin
     MapView
   }), [MapView, DateFilter])
 
-  const props = useMemo(() => ({
+  const componentProps = useMemo(() => ({
     MapView: mapViewProps,
     LineageFilter: lineageFilterProps,
     DateFilter: dateFilterProps
   }), [mapViewProps, lineageFilterProps, dateFilterProps])
 
-  return useMemo(() => ({ decorators, props }), [decorators, props])
+  return useMemo(() => ({ decorators, props: componentProps }), [decorators, componentProps])
 }

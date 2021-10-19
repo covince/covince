@@ -71,7 +71,15 @@ const mapStateToNodes = (nodes, state) => {
   return _nodes
 }
 
-export default ({ api_url, showLineageView, area, fromDate, toDate, lineageToColourIndex }) => {
+export default ({
+  api_url,
+  area,
+  colourPalette,
+  fromDate,
+  lineageToColourIndex,
+  showLineageView,
+  toDate
+}) => {
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'QUEUE_REFETCH':
@@ -165,6 +173,8 @@ export default ({ api_url, showLineageView, area, fromDate, toDate, lineageToCol
   }, [state.topology, state.preset])
 
   return useMemo(() => ({
+    colourPalette,
+
     // state
     ...state,
     isLoading: loadedProps === null,
@@ -176,5 +186,5 @@ export default ({ api_url, showLineageView, area, fromDate, toDate, lineageToCol
     setSearch: text => dispatch({ type: 'SEARCH', payload: text }),
     setPreset: preset => dispatch({ type: 'PRESET', payload: preset }),
     toggleOpen
-  }), [state, numberSelected, topology])
+  }), [state, numberSelected, topology, colourPalette])
 }

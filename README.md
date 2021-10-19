@@ -14,8 +14,11 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `chart_tooltip [object]`
   * `use_nomenclature [boolean]` defaults to true
 * `charts [array]` list of [chart](#chart) definitions
-* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
-* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
+* `colors [object|array]` (optional, static builds only) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
+* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format)
+* `dynamic_mode [object]` (required for dynamic builds)
+  * `initial_lineages [array|object]` list of lineages, or an object mapping lineages to a numerical index in the colour palette. Numbers must be 0-8 for the built-in palette.
+  * `colour_palette [array]` (optional) list of color definitions or ordered colours. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
   * [`settings [object]`](#map-settings) (optional)

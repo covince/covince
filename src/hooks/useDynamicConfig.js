@@ -1,7 +1,6 @@
 import { expandLineage, toAlias } from 'pango-utils'
 import { useMemo } from 'react'
 
-import { colourPalette } from './useDynamicLineages'
 import { createConfig } from '../config'
 
 export const whoVariants = {
@@ -22,7 +21,7 @@ const whoVariantEntries =
 
 const collator = new Intl.Collator(undefined, { numeric: true })
 
-const useDynamicConfig = ({ lineages, lineageToColourIndex, staticConfig }) => {
+const useDynamicConfig = ({ colourPalette, lineages, lineageToColourIndex, staticConfig }) => {
   const nomenclature = useMemo(() => {
     const whoIndex = {}
     const expanded = lineages.map(l => `${expandLineage(l)}.`)
@@ -49,6 +48,7 @@ const useDynamicConfig = ({ lineages, lineageToColourIndex, staticConfig }) => {
   return useMemo(() => {
     const _config = createConfig(staticConfig)
     _config.nomenclature = nomenclature
+    _config.chart_tooltip = { use_nomenclature: false }
 
     _config.colors = {}
     for (const [lineage, colourIndex] of Object.entries(lineageToColourIndex)) {

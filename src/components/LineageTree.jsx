@@ -8,8 +8,6 @@ import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
 
-import { colourPalette } from '../hooks/useDynamicLineages'
-
 const Branch = memo(({ node, ...props }) => {
   const {
     cycleColour,
@@ -109,6 +107,7 @@ const LineageTree = (props) => {
   const {
     action,
     className,
+    colourPalette,
     darkMode,
     lineageToColourIndex,
     maxLineages = colourPalette.length,

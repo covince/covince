@@ -42,7 +42,7 @@ const DynamicUI = ({
 
   const isMobile = useMobile()
 
-  const { lineages, lineageToColourIndex, submit } = useDynamicLineages()
+  const { colourPalette, lineages, lineageToColourIndex, submit } = useDynamicLineages(staticConfig)
   const api = useDynamicAPI({ api_url, lineages, info })
 
   const [{ lineageView, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0' })
@@ -52,6 +52,7 @@ const DynamicUI = ({
   const lineageTree = useLineageTree({
     api_url,
     area,
+    colourPalette,
     // compat with desktop links
     fromDate: xMin,
     toDate: xMax,
@@ -64,12 +65,14 @@ const DynamicUI = ({
     info,
     isMobile,
     lineages,
+    lineageToColourIndex,
     lineageTree,
     setLineageView,
-    showLineageView
+    showLineageView,
+    submit
   })
 
-  const config = useDynamicConfig({ lineages, lineageToColourIndex, staticConfig })
+  const config = useDynamicConfig({ colourPalette, lineages, lineageToColourIndex, staticConfig })
 
   return (
     <>

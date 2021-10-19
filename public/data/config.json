@@ -3,6 +3,18 @@
     "url": "./data/area-search.json",
     "mode": "padded-first-input-token"
   },
+  "dynamic_mode": {
+    "initial_lineages": {
+      "B": 2,
+      "B.1.617.2": 1,
+      "AY.4.2": 0
+    },
+    "colour_palette": [
+      "magenta",
+      "#0F0",
+      "cyan"
+    ]
+  },
   "parameters": [
     {
       "id": "lambda",

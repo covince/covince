@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react'
 import useQueryAsState from './useQueryAsState'
 
 // Tol Muted
-export const lightModeColours = [
+const lightModeColours = [
   { hex: '#CC6677', desc: 'rose' },
   { hex: '#332288', desc: 'indigo' },
   { hex: '#DDCC77', desc: 'sand' },
@@ -17,7 +17,7 @@ export const lightModeColours = [
 ]
 
 // Tol Light
-export const darkModeColours = [
+const darkModeColours = [
   { hex: '#FFAABB', desc: 'pink' },
   { hex: '#77AADD', desc: 'light blue' },
   { hex: '#EEDD88', desc: 'light yellow' },
@@ -30,14 +30,27 @@ export const darkModeColours = [
   // { hex: '#DDDDDD', desc: 'pale grey' }
 ]
 
-export const colourPalette =
+const defaultColourPalette =
   lightModeColours.map((_, i) => ({ light: _.hex, dark: darkModeColours[i].hex }))
 
-export default () => {
-  const [{ lineages, colours }, updateQuery] = useQueryAsState({
-    lineages: 'A,B,B.1.1.7,B.1.177,B.1.351,B.1.617.2',
-    colours: '7,3,1,0,4,6'
-  })
+const initialise = ({ dynamic_mode }) => {
+  if (dynamic_mode === undefined) {
+    throw new Error('[CovInce] `dynamic_mode` is required in config.')
+  }
+  const palette = dynamic_mode.colour_palette || defaultColourPalette
+  const lineages = dynamic_mode.initial_lineages
+  return {
+    initial: {
+      lineages: Object[Array.isArray(lineages) ? 'values' : 'keys'](lineages).join(','),
+      colours: Object[Array.isArray(lineages) ? 'keys' : 'values'](lineages).join(',')
+    },
+    colourPalette: palette.map(item => typeof item === 'string' ? { light: item, dark: item } : item)
+  }
+}
+
+export default (config) => {
+  const { initial, colourPalette } = useMemo(() => config ? initialise(config) : {}, [config])
+  const [{ lineages, colours }, updateQuery] = useQueryAsState(initial)
 
   const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
     const entries = Object.entries(lineageToColourIndexes)
@@ -63,8 +76,9 @@ export default () => {
   }, [parsedLineages, parsedColourIndexes])
 
   return {
-    lineages: parsedLineages,
+    colourPalette,
     colourIndexes: parsedColourIndexes,
+    lineages: parsedLineages,
     lineageToColourIndex,
     submit
   }
