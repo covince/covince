@@ -15,11 +15,6 @@ html, body {
   height: calc(100% - theme('spacing.header'))
 }
 
-/* Tailwind default is disabled, we want more space at smaller sizes */
-.container {
-  @apply max-w-7xl mx-auto;
-}
-
 @media (min-width: theme('screens.md')) {
   #root {
     height: auto;
@@ -27,9 +22,5 @@ html, body {
 
   #root > header + * {
     min-height: calc(100vh - theme('spacing.header-md'))
-  }
-  
-  .container {
-    @apply px-6;
   }
 }

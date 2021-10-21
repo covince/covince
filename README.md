@@ -58,8 +58,8 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `min_zoom [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom)
 * `default_lat [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
 * `default_lon [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
-* `default_zoom [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) 
-* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) 
+* `default_zoom [number|object]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) provide a number for all screen types, or an object with properties: `mobile`, `desktop`, `big`
+* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) [DEPRECATED - use `default_zoom.mobile`]
 * `bounds [object]` 
   * `min_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `max_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
