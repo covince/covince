@@ -46,8 +46,11 @@
       "min_zoom": 4,
       "default_lat": 52.561928,
       "default_lon": -1.464854,
-      "default_zoom": 5,
-      "default_zoom_mob": 4.5,
+      "default_zoom": {
+        "mobile": 4.5,
+        "desktop": 5,
+        "big": 5.5
+      },
       "bounds": {
         "min_longitude": -9,
         "max_longitude": 5,

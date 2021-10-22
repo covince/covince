@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer utilities {
+  /* Tailwind default is disabled, we want more space at smaller sizes */
+  .container {
+    @apply max-w-7xl mx-auto md:px-6;
+  }
+
+  .app-container {
+    @apply container;
+    @screen big {
+      max-width: 75%;
+    }
+  }
+
   .no-webkit-tap {
     -webkit-tap-highlight-color: transparent;
   }
