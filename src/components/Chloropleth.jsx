@@ -232,22 +232,21 @@ const Chloropleth = (props) => {
     for (const feature of geojson.features) {
       const { area_id } = feature.properties
       const areaValues = values[area_id] || {}
-      if (areaValues.mean === null) {
-        features.nulls.push(feature)
+      if (areaValues.mean !== undefined) {
+        features.nulls.push(feature) // white bg for alpha and smoother dark mode
         if (area_id === selected_area) features.selected.push(feature)
-      } else if (areaValues.mean !== undefined) {
         const { mean, lower, upper } = areaValues
-        const _feature = {
-          ...feature,
-          properties: {
-            ...feature.properties,
-            value: mean,
-            alpha: hasUncertainty ? 1 - (upper - lower) : 1
+        if (mean !== null) {
+          const _feature = {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              value: mean,
+              alpha: hasUncertainty ? 1 - (upper - lower) : 1
+            }
           }
+          features.active.push(_feature)
         }
-        features.active.push(_feature)
-        if (hasUncertainty) features.nulls.push(feature) // white bg for alpha
-        if (area_id === selected_area) features.selected.push(feature)
       } else {
         features.others.push(feature)
       }
