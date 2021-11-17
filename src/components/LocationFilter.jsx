@@ -1,104 +1,17 @@
-import './LocationFilter.css'
-
 import React, { useCallback, useEffect, useRef } from 'react'
 import { BsArrowUpShort, BsSearch } from 'react-icons/bs'
 import { HiX } from 'react-icons/hi'
-import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
 
 import { Heading, DescriptiveHeading } from './Typography'
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 import Button from './Button'
-import TextInput from './TextInput'
+import ComboBox from './ComboBox'
 
 import { useMobile } from '../hooks/useMediaQuery'
 import { useConfig } from '../config'
 
-const HighlightMatch = ({ index, length, children }) => (
-  <>
-    {children.slice(0, index)}
-    <span className='font-bold'>{children.slice(index, index + length)}</span>
-    {children.slice(index + length)}
-  </>
-)
-
-const Search = ({ onSelect, items, value, onChange, onClose }) => {
-  const isMobile = useMobile()
-
-  const _onChange = useCallback((e) => {
-    onChange(e.target.value)
-  }, [onChange])
-
-  const inputRef = useRef()
-  useEffect(() => {
-    if (inputRef.current) inputRef.current.focus()
-  }, [])
-
-  const _onSelect = value => {
-    inputRef.current.blur()
-    onClose()
-    onSelect(value)
-  }
-
-  const onKeyUp = (e) => {
-    if (e.code === 'Escape') onClose()
-    if (e.code === 'Enter' && items.length === 1) _onSelect(items[0].id)
-  }
-
-  const { ontology } = useConfig()
-  const { noun_plural, search_placeholder = noun_plural } = ontology.area
-
-  const list = value.length
-    ? (
-        items.length > 0
-          ? <ComboboxList className='w-full'>
-            {items.map(({ id, name, isNameMatch, matchIndex, terms }) => (
-              <ComboboxOption
-                key={id}
-                className='py-3 md:py-2 px-4 md:px-3 no-webkit-tap'
-                value={id}
-              >
-                <div className='truncate dark:text-white'>
-                  { isNameMatch
-                    ? <HighlightMatch index={matchIndex} length={value.length}>{name}</HighlightMatch>
-                    : name }
-                  &nbsp;<span className='font-medium text-xs tracking-wide text-subheading'>{id}</span>
-                </div>
-                { terms &&
-                  <ul className='covince-search-term-list text-subheading text-sm truncate'>
-                    {terms.map(({ term, matchIndex }) => <li key={term}><HighlightMatch index={matchIndex} length={value.length}>{term}</HighlightMatch></li>)}
-                  </ul> }
-              </ComboboxOption>
-            ))}
-          </ComboboxList>
-          : <span className='block py-3 md:py-2 px-4 md:px-3 text-sm'>
-        No matches
-      </span>
-      )
-    : null
-
-  return (
-    <Combobox aria-label="Areas" onSelect={_onSelect} onKeyUp={onKeyUp} openOnFocus={value.length > 0}>
-      <ComboboxInput
-        as={TextInput}
-        ref={inputRef}
-        type="text"
-        className='w-full'
-        value={value}
-        onChange={_onChange}
-        autocomplete={false}
-        placeholder={search_placeholder}
-      />
-      { !!value.length && (isMobile
-        ? <div className='mt-3 -mx-4'>{list}</div>
-        : <ComboboxPopover
-          className="rounded-md shadow-lg mt-2 mx-0 ring-1 ring-black dark:ring-gray-400 ring-opacity-5 py-1.5 z-20"
-        >
-          {list}
-        </ComboboxPopover>)}
-    </Combobox>
-  )
-}
+const MobilePopover = ({ children }) => <div className='mt-3 -mx-4'>{children}</div>
 
 const LocationFilter = (props) => {
   const {
@@ -120,6 +33,10 @@ const LocationFilter = (props) => {
     previousIsSearching.current = isSearching
   }, [isSearching])
 
+  const isMobile = useMobile()
+  const { ontology } = useConfig()
+  const { noun_plural, search_placeholder = noun_plural } = ontology.area
+
   return (
     <div className={className}>
       { isSearching
@@ -136,12 +53,15 @@ const LocationFilter = (props) => {
               <HiX className='h-4 w-4 fill-current text-gray-600 dark:text-gray-300' />
             </Button>
           </div>
-          <Search
-            onSelect={onChange}
+          <ComboBox
+            ariaLabel='Areas'
             items={filteredItems}
-            value={searchTerm}
             onChange={setSearchTerm}
             onClose={onSearchClose}
+            onSelect={onChange}
+            placeholder={search_placeholder}
+            popover={isMobile ? MobilePopover : undefined}
+            value={searchTerm}
           />
         </>
         : <>
