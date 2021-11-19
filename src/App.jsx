@@ -4,8 +4,8 @@ import NavBar from './components/NavBar'
 import Spinner from './components/Spinner'
 import AppContainer from './components/AppContainer'
 import Select from './components/Select'
-import CovInce from './Covince'
-// import CovInce from './DynamicCovInce'
+// import CovInce from './Covince'
+import CovInce from './DynamicCovInce'
 
 import useDarkMode from './hooks/useDarkMode'
 
@@ -38,7 +38,8 @@ function App () {
         <AppContainer>
           <CovInce
             darkMode={isDark}
-            // api_url='/api/raw'
+            api_url='/api/raw'
+            tiles_url='/tiles/NI.json'
           />
         </AppContainer>
       </Suspense>

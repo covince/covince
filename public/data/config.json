@@ -1,13 +1,17 @@
 {
   "area_search_terms": {
-    "url": "./data/area-search.json",
+    "url": "./data/ni-area-search.json",
     "mode": "padded-first-input-token"
   },
   "dynamic_mode": {
     "initial_lineages": {
-      "B": 2,
-      "B.1.617.2": 1,
-      "AY.4.2": 0
+      "A": 7,
+      "B": 3,
+      "B.1.1.7": 1,
+      "B.1.177": 0,
+      "B.1.351": 4,
+      "B.1.617.2": 6,
+      "AY.4.2": 5
     },
     "_colour_palette": [
       "magenta",
@@ -18,27 +22,20 @@
   "parameters": [
     {
       "id": "lambda",
-      "display": "Incidence",
-      "_precision": {
-        "mean": 2,
-        "range": 1
-      }
+      "display": "Genomes per week",
+      "precision": 1
     },
     {
       "id": "p",
       "display": "Proportion",
       "format": "percentage",
       "_precision": 0
-    },
-    {
-      "id": "R",
-      "display": "R"
     }
   ],
   "ontology": {
     "overview": {
       "category": "National Overview",
-      "heading": "England",
+      "heading": "Northern Ireland",
       "short_heading": "National"
     },
     "area": {
@@ -52,14 +49,15 @@
       "default_color_scale": {
         "p": "linear",
         "lambda": "quadratic"
-      }
+      },
+      "default_lineage": "AY.4.2"
     },
     "viewport": {
-      "min_zoom": 4,
-      "default_lat": 52.561928,
-      "default_lon": -1.464854,
-      "default_zoom": 5,
-      "default_zoom_mob": 4.5,
+      "min_zoom": 5,
+      "default_lat": 54.547094,
+      "default_lon": -6.667864,
+      "default_zoom": 6.5,
+      "default_zoom_mob": 6,
       "bounds": {
         "min_longitude": -9,
         "max_longitude": 5,
@@ -71,7 +69,7 @@
   "charts": [
     {
       "parameter": "lambda",
-      "heading": "Incidence",
+      "heading": "Genomes per week",
       "default_type": "line",
       "allow_stack": true
     },
@@ -80,28 +78,9 @@
       "heading": "Proportion",
       "default_type": "area",
       "allow_stack": true
-    },
-    {
-      "parameter": "R",
-      "heading": "R",
-      "default_type": "line",
-      "y_axis": {
-        "ticks": [
-          "0",
-          "1",
-          "2",
-          "3"
-        ],
-        "domain": [
-          0,
-          3
-        ],
-        "allow_data_overflow": true,
-        "reference_line": 1
-      }
     }
   ],
-  "nomenclature": [
+  "_nomenclature": [
     {
       "lineage": "B.1.1.7",
       "alt_name": "Alpha"
