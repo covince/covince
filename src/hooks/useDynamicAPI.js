@@ -24,7 +24,9 @@ const defaultConfidence = (count, total) => {
   return [_wilson.left, _wilson.right]
 }
 
-export default ({ api_url, lineages, info, confidence = defaultConfidence }) => {
+const defaultAvg = count => count / 2
+
+export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
   const [unaliasedToAliased, topology] = React.useMemo(() => {
     const memo = {}
     for (const l of lineages) {
@@ -52,7 +54,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence }) => 
 
       const lineageZeroes = Object.fromEntries(lineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
-      for (const { date, key, average: count } of json) {
+      for (const { date, key, count } of json) {
         if (date in index) {
           index[date][key] = count
           index[date].total += count
@@ -67,7 +69,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence }) => 
           const metadata = { date, location: ltla, lineage: unaliasedToAliased[key] || key }
           const [left, right] = confidence(count, counts.total)
           data.push(
-            { ...metadata, parameter: 'lambda', mean: count, lower: null, upper: null },
+            { ...metadata, parameter: 'lambda', mean: avg(count), lower: null, upper: null },
             { ...metadata, parameter: 'p', mean: count / counts.total, lower: Math.abs(left), upper: Math.abs(right) }
           )
         }
@@ -127,7 +129,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence }) => 
             lower.push(Math.abs(left))
             upper.push(right)
           } else {
-            mean.push(count)
+            mean.push(avg(count))
             lower.push(null)
             upper.push(null)
           }
