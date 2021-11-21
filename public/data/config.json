@@ -53,16 +53,16 @@
       "default_lineage": "AY.4.2"
     },
     "viewport": {
-      "min_zoom": 5,
-      "default_lat": 54.547094,
-      "default_lon": -6.667864,
+      "min_zoom": 5.5,
+      "default_lat": 54.592129,
+      "default_lon": -6.763254,
       "default_zoom": 6.5,
       "default_zoom_mob": 6,
       "bounds": {
-        "min_longitude": -9,
-        "max_longitude": 5,
-        "min_latitude": 48,
-        "max_latitude": 60
+        "min_longitude": -10,
+        "max_longitude": -4,
+        "min_latitude": 53,
+        "max_latitude": 56
       }
     }
   },
