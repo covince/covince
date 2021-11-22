@@ -5,16 +5,16 @@ import useAPI from '../api'
 
 const indexMapResults = (index, results, key) => {
   for (const row of results) {
-    const { ltla, date, sum } = row
-    if (ltla in index) {
-      const dates = index[ltla]
+    const { area, date, sum } = row
+    if (area in index) {
+      const dates = index[area]
       if (date in dates) {
         dates[date][key] = sum
       } else {
         dates[date] = { [key]: sum }
       }
     } else {
-      index[ltla] = { [date]: { [key]: sum } }
+      index[area] = { [date]: { [key]: sum } }
     }
   }
 }
@@ -39,7 +39,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
   const cachedTotals = React.useRef({ key: null, value: null })
 
   const impl = React.useMemo(() => ({
-    async fetchChartData (ltla) {
+    async fetchChartData (area) {
       const response = await fetch(`${api_url}/frequency`, {
         method: 'POST',
         headers: {
@@ -47,14 +47,15 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         },
         body: JSON.stringify({
           lineages: Object.keys(unaliasedToAliased),
-          ltla: ltla === 'overview' ? undefined : ltla
+          area: area === 'overview' ? undefined : area
         })
       })
       const json = await response.json()
 
       const lineageZeroes = Object.fromEntries(lineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
-      for (const { date, key, count } of json) {
+
+      for (const { date, key, period_count: count } of json) {
         if (date in index) {
           index[date][key] = count
           index[date].total += count
@@ -66,7 +67,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         for (const [key, count] of Object.entries(counts)) {
           if (key === 'total') continue
 
-          const metadata = { date, location: ltla, lineage: unaliasedToAliased[key] || key }
+          const metadata = { date, location: area, lineage: unaliasedToAliased[key] || key }
           const [left, right] = confidence(count, counts.total)
           data.push(
             { ...metadata, parameter: 'lambda', mean: avg(count), lower: null, upper: null },
@@ -108,20 +109,20 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       indexMapResults(index, lineageJson, 'value')
 
       const uniqueDates = info.dates
-      const uniqueLtlas = info.ltlas
+      const uniqueAreas = info.areas
       const values = { mean: [], lower: [], upper: [] }
-      for (const ltla of uniqueLtlas) {
+      for (const area of uniqueAreas) {
         const mean = []
         const lower = []
         const upper = []
         for (const date of uniqueDates) {
-          if (!(ltla in index) || !(date in index[ltla])) {
+          if (!(area in index) || !(date in index[area])) {
             mean.push(null)
             lower.push(null)
             upper.push(null)
             continue
           }
-          const { total, value } = index[ltla][date]
+          const { total, value } = index[area][date]
           const count = total > 0 ? (value || 0) : null
           if (parameter === 'p') {
             const [left = null, right = null] = count !== null ? confidence(count, total) : []
@@ -140,7 +141,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       }
       return {
         dates: uniqueDates,
-        areas: uniqueLtlas,
+        areas: uniqueAreas,
         values
       }
     }

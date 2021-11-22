@@ -19,6 +19,7 @@ const DynamicUI = ({
   tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
   config_url = './data/config.json',
   confidence,
+  avg,
   ...props
 }) => {
   const { darkMode } = props
@@ -44,7 +45,7 @@ const DynamicUI = ({
   const isMobile = useMobile()
 
   const { colourPalette, lineages, lineageToColourIndex, submit } = useDynamicLineages(staticConfig)
-  const api = useDynamicAPI({ api_url, lineages, info, confidence })
+  const api = useDynamicAPI({ api_url, lineages, info, confidence, avg })
 
   const [{ lineageView, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0' })
   const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
