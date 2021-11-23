@@ -38,7 +38,6 @@ function App () {
         <AppContainer>
           <CovInce
             darkMode={isDark}
-            api_url='/api/raw'
             tiles_url='/tiles/NI.json'
           />
         </AppContainer>
