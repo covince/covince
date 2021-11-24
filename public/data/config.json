@@ -44,6 +44,15 @@
       "search_placeholder": "local authority or postcode"
     }
   },
+  "timeline": {
+    "label": "Time period",
+    "date_format": {
+      "heading": "'Two weeks to 'd MMM yyyy",
+      "mobile_nav": "d MMMM y",
+      "chart_tooltip": "'2 weeks to 'd MMM yyyy"
+    },
+    "frame_length": 400
+  },
   "map": {
     "settings": {
       "default_color_scale": {
