@@ -39,12 +39,13 @@ export default defineConfig({
         proxyTimeout: 1000
       }
     }
-  }
-  // build: {
+  },
+  build: {
+    cssCodeSplit: false
   //   rollupOptions: {
   //     plugins: [
   //       analyze()
   //     ]
   //   }
-  // }
+  }
 })

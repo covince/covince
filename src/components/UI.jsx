@@ -189,7 +189,7 @@ export const UI = ({
           />
         </div> }
       { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
+        <FilterSection className='-mt-header-overlap max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>

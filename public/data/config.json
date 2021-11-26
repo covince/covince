@@ -28,7 +28,7 @@
       "id": "p",
       "display": "Proportion",
       "format": "percentage",
-      "_precision": 0
+      "precision": 2
     },
     {
       "id": "R",

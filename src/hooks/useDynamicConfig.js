@@ -12,7 +12,8 @@ export const whoVariants = {
   'B.1.526': 'Iota',
   'B.1.617.1': 'Kappa',
   'B.1.1.1.37': 'Lambda',
-  'B.1.621': 'Mu'
+  'B.1.621': 'Mu',
+  'B.1.1.529': 'Omicron'
 }
 
 const whoVariantEntries =
