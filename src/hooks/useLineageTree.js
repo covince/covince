@@ -15,15 +15,26 @@ const sortByCladeSize = (a, b) => {
   return 0
 }
 
+const constructLineage = name => {
+  let remaining = name
+  while (remaining.includes('.')) {
+    remaining = remaining.slice(0, remaining.lastIndexOf('.'))
+    if (remaining in toAlias) {
+      return name.replace(remaining, toAlias[remaining])
+    }
+  }
+  return name
+}
+
 const createNodeWithState = (node, state, parentWho) => {
   const { nodeIndex, preset, lineageToColourIndex } = state
   const {
-    lineage = node.name,
+    lineage = constructLineage(node.name),
     sum = 0,
     selected = lineage in lineageToColourIndex
   } = nodeIndex[node.name] || {}
   const alias = toAlias[node.name]
-  const who = whoVariants[lineage]
+  const who = whoVariants[node.name]
 
   let childrenWithState = []
   for (const child of node.children) {
@@ -63,8 +74,8 @@ const mapStateToNodes = (nodes, state) => {
   }
   if (state.preset === 'who') {
     return _nodes.sort((a, b) => {
-      if (whoVariantsOrder.indexOf(a.label) > whoVariantsOrder.indexOf(b.label)) return 1
-      if (whoVariantsOrder.indexOf(a.label) < whoVariantsOrder.indexOf(b.label)) return -1
+      if (whoVariantsOrder.indexOf(a.name) > whoVariantsOrder.indexOf(b.name)) return 1
+      if (whoVariantsOrder.indexOf(a.name) < whoVariantsOrder.indexOf(b.name)) return -1
       return 0
     })
   }
