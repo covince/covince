@@ -34,6 +34,9 @@ module.exports = {
       },
       gridTemplateRows: {
         '1-full': '100%'
+      },
+      screens: {
+        big: '2160px'
       }
     }
   },
