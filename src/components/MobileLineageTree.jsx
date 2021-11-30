@@ -27,7 +27,7 @@ const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
               maxLineages={props.maxLineages}
             />
             <Menu as='div' className='relative z-10'>
-              <Menu.Button as={Button} className='px-2 py-1'>
+              <Menu.Button as={Button} className='!p-2'>
                 <BsThreeDotsVertical className='w-6 h-6' />
               </Menu.Button>
               {/* Use the Transition component. */}
