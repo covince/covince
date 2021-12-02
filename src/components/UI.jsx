@@ -15,7 +15,7 @@ import { InjectionContext, useInjection } from '../components'
 import { useMobile } from '../hooks/useMediaQuery'
 import useChartData from '../hooks/useChartData'
 import useMapData from '../hooks/useMapData'
-import useAreaLookupTable from '../hooks/useAreaLookupTable'
+import useTileData from '../hooks/useTileData'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
@@ -61,8 +61,8 @@ export const UI = ({
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
-  const areaLookupTable = useAreaLookupTable(tiles, results, config.ontology)
-  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
+  const { normalisedTiles, tileIndex } = useTileData(tiles, results, config.ontology)
+  const locationSearch = useLocationSearch(tileIndex, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
     mapDataState.lineage === null || chartDataState.area === null
@@ -96,16 +96,20 @@ export const UI = ({
         )
       }
     }
+    const {
+      area_name = chartDataState.area,
+      area_description = chartDataState.area
+    } = tileIndex[chartDataState.area] || {}
     return {
       ...props,
       category: ontology.area.category,
-      heading: areaLookupTable[chartDataState.area],
-      subheading: chartDataState.area,
+      heading: area_name,
+      subheading: area_description,
       showOverviewButton: chartDataState.loadingArea !== 'overview',
       loadOverview: () => chartDataActions.load('overview'),
       ...injectProps.LocationFilter
     }
-  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
+  }, [chartDataState, isMobile, tileIndex.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -281,7 +285,7 @@ export const UI = ({
               config={config.map.viewport}
               darkMode={darkMode}
               enable_fade_uncertainty={fadeUncertaintyEnabled}
-              geojson={tiles}
+              geojson={normalisedTiles}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               lineColor={lineColor}
@@ -327,7 +331,7 @@ export const UI = ({
             darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            name={areaLookupTable[chartDataState.area]}
+            name={chartDataState.area in tileIndex ? tileIndex[chartDataState.area].area_name : undefined}
             selected_area={chartDataState.area}
             setDate={persistDate}
             values={chartDataState.data}
