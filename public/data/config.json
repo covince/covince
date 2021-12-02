@@ -52,6 +52,19 @@
       "default_color_scale": {
         "p": "linear",
         "lambda": "quadratic"
+      },
+      "color_map_domain": {
+        "p": {
+          "min": 0,
+          "max": 1
+        },
+        "lambda": {
+          "min": 0
+        },
+        "R": {
+          "min": 0,
+          "max": 4
+        }
       }
     },
     "viewport": {

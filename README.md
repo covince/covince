@@ -55,6 +55,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_lineage [string]` (optional) should match a lineage in lists, defaults to first lineage
 * `default_color_by [string]` (optional) should match a [parameter](#parameter) id, defaults to first parameter
 * `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` (optional) can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
+* `color_map_domain [{[parameter_id]: object}]` (optional) set the range of the colour map per parameter. Object should provide at least one of:
+  * min [number] (optional) minimum value of the color map
+  * max [number] (optional) maximum value of the color map
 
 ### Map viewport
 
