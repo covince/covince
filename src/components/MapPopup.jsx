@@ -3,7 +3,7 @@ import { Popup } from 'react-map-gl'
 
 const formatPct = (v, precision = 1) => { const _v = v * 100; return `${Number.isInteger(_v) ? _v : _v.toFixed(precision)}%` }
 const formatNumber = (v, precision = 2) => {
-  if (Number.isInteger(v)) return v
+  if (Number.isInteger(v)) return v.toLocaleString()
   const fixed = v.toFixed(precision)
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: precision })
 }
