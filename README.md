@@ -14,8 +14,11 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `chart_tooltip [object]`
   * `use_nomenclature [boolean]` defaults to true
 * `charts [array]` list of [chart](#chart) definitions
-* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
-* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
+* `colors [object|array]` (optional, static builds only) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
+* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format)
+* `dynamic_mode [object]` (required for dynamic builds)
+  * `initial_lineages [array|object]` list of lineages, or an object mapping lineages to a numerical index in the colour palette. Numbers must be 0-8 for the built-in palette.
+  * `colour_palette [array]` (optional) list of color definitions or ordered colours. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
   * [`settings [object]`](#map-settings) (optional)
@@ -52,6 +55,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_lineage [string]` (optional) should match a lineage in lists, defaults to first lineage
 * `default_color_by [string]` (optional) should match a [parameter](#parameter) id, defaults to first parameter
 * `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` (optional) can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
+* `color_map_domain [{[parameter_id]: object}]` (optional) set the range of the colour map per parameter. Object should provide at least one of:
+  * min [number] (optional) minimum value of the color map
+  * max [number] (optional) maximum value of the color map
 
 ### Map viewport
 

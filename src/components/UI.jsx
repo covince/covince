@@ -15,7 +15,7 @@ import { InjectionContext, useInjection } from '../components'
 import { useMobile } from '../hooks/useMediaQuery'
 import useChartData from '../hooks/useChartData'
 import useMapData from '../hooks/useMapData'
-import useAreaLookupTable from '../hooks/useAreaLookupTable'
+import useTileData from '../hooks/useTileData'
 import useDates from '../hooks/useDates'
 import useMobileView from '../hooks/useMobileView'
 import useLineageFilter from '../hooks/useLineageFilter'
@@ -24,7 +24,16 @@ import useLocationSearch from '../hooks/useLocationSearch'
 
 import { ConfigContext } from '../config'
 
-export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode, api, config }) => {
+export const UI = ({
+  api,
+  data = { lineages: [] }, // legacy API, prefer to pass lineages directly
+  config,
+  darkMode,
+  lastModified,
+  lineages = data.lineages,
+  lineColor = 'blueGray',
+  tiles
+}) => {
   const [{
     Chloropleth,
     DateFilter,
@@ -36,10 +45,8 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
     StickyMobileSection
   }, injectProps] = useInjection()
 
-  const unique_lineages = data.lineages
-
-  const [chartDataState, chartDataActions] = useChartData(api, unique_lineages)
-  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, unique_lineages)
+  const [chartDataState, chartDataActions] = useChartData(api, lineages)
+  const [mapDataState, mapDataActions, results] = useMapData(api, config.map.settings, lineages)
   const [
     { date, playing },
     { setDate, setPlaying, persistDate }
@@ -54,8 +61,8 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useMobileView(isMobile)
 
-  const areaLookupTable = useAreaLookupTable(tiles, results, config.ontology)
-  const locationSearch = useLocationSearch(areaLookupTable, config.area_search_terms)
+  const { normalisedTiles, tileIndex } = useTileData(tiles, results, config.ontology)
+  const locationSearch = useLocationSearch(tileIndex, config.area_search_terms)
 
   const isInitialLoad = useMemo(() => (
     mapDataState.lineage === null || chartDataState.area === null
@@ -89,16 +96,20 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
         )
       }
     }
+    const {
+      area_name = chartDataState.area,
+      area_description = chartDataState.area
+    } = tileIndex[chartDataState.area] || {}
     return {
       ...props,
       category: ontology.area.category,
-      heading: areaLookupTable[chartDataState.area],
-      subheading: chartDataState.area,
+      heading: area_name,
+      subheading: area_description,
       showOverviewButton: chartDataState.loadingArea !== 'overview',
       loadOverview: () => chartDataActions.load('overview'),
       ...injectProps.LocationFilter
     }
-  }, [chartDataState, isMobile, areaLookupTable.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
+  }, [chartDataState, isMobile, tileIndex.overview, isInitialLoad, locationSearch.isLoading, injectProps.LocationFilter])
 
   const { timeline } = config
   const formattedDate = useMemo(
@@ -107,6 +118,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   )
 
   const dateFilter = {
+    loading: isInitialLoad,
     label: config.timeline.label,
     dates: results ? results.dates : null,
     heading: formattedDate,
@@ -127,7 +139,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
   }
 
   const lineageFilter = {
-    ...useLineageFilter(unique_lineages, chartDataState.lineages, config, darkMode),
+    ...useLineageFilter(lineages, chartDataState.lineages, config, darkMode),
     isMobile,
     ...injectProps.LineageFilter
   }
@@ -182,7 +194,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
           />
         </div> }
       { !isMobile &&
-        <FilterSection className='-mt-18 max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
+        <FilterSection className='-mt-header-overlap max-w-full mx-auto' loading={isInitialLoad} {...injectProps.FilterSection}>
           <Card className='w-80 box-content flex-shrink-0'>
             <DateFilter {...dateFilter} />
           </Card>
@@ -274,7 +286,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
               config={config.map.viewport}
               darkMode={darkMode}
               enable_fade_uncertainty={fadeUncertaintyEnabled}
-              geojson={tiles}
+              geojson={normalisedTiles}
               handleOnClick={handleOnClick}
               isMobile={isMobile}
               lineColor={lineColor}
@@ -320,7 +332,7 @@ export const UI = ({ lineColor = 'blueGray', tiles, data, lastModified, darkMode
             darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            name={areaLookupTable[chartDataState.area]}
+            name={chartDataState.area in tileIndex ? tileIndex[chartDataState.area].area_name : undefined}
             selected_area={chartDataState.area}
             setDate={persistDate}
             values={chartDataState.data}
