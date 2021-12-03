@@ -118,6 +118,7 @@ export const UI = ({
   )
 
   const dateFilter = {
+    loading: isInitialLoad,
     label: config.timeline.label,
     dates: results ? results.dates : null,
     heading: formattedDate,
