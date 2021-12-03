@@ -1,6 +1,6 @@
 {
   "projectName": "covince",
-  "projectOwner": "theosanderson",
+  "projectOwner": "covince",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -37,7 +37,6 @@
         "code"
       ]
     }
-    
   ],
   "contributorsPerLine": 7
 }

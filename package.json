@@ -1,7 +1,7 @@
 {
   "name": "covince",
   "version": "0.5.1",
-  "homepage": "http://theosanderson.github.io/covince",
+  "homepage": "http://covince.github.io/covince",
   "private": true,
   "scripts": {
     "dev": "vite",
