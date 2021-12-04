@@ -1,20 +1,22 @@
 import React, { useCallback, useMemo, memo } from 'react'
 import { BsX } from 'react-icons/bs'
-import { HiChevronRight, HiChevronDown, HiOutlineColorSwatch } from 'react-icons/hi'
+import { HiChevronRight, HiChevronDown } from 'react-icons/hi'
 import classNames from 'classnames'
 
 import Button from './Button'
 import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
+import LineageMenu from './LineageMenu'
 
 const Branch = memo(({ node, ...props }) => {
   const {
-    cycleColour,
+    colourPalette,
     index,
     preset,
     search = '',
     selectDisabled,
+    setColour,
     toggleOpen,
     toggleSelect,
     values
@@ -66,39 +68,41 @@ const Branch = memo(({ node, ...props }) => {
         className={classNames('rounded py-1 pl-1.5 border border-transparent', { 'pr-1.5': checked })}
         style={checked ? { borderColor: colour } : null}
       >
-        <Checkbox
-          className='whitespace-nowrap'
-          style={{ color: colour }}
-          id={`lineage_selector_${node.name}`}
-          checked={checked}
-          onChange={() => toggleSelect(lineage)}
-          disabled={isDisabled}
-          title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
-        >
-          <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5')}>
-            {label}
-          </span>
-          { altName &&
-            <span className='ml-1 font-normal'>
-              / {altName}
-            </span> }
-            <span className='ml-2 italic font-normal text-xs tracking-wide text-subheading dark:text-dark-subheading'>
-              {!!sum && sum.toLocaleString()} {!!sumOfClade && `+ ${sumOfClade.toLocaleString()}`}
+        <span className='flex items-center'>
+          <Checkbox
+            className='whitespace-nowrap mr-1.5'
+            style={{ color: colour }}
+            id={`lineage_selector_${node.name}`}
+            checked={checked}
+            onChange={() => toggleSelect(lineage)}
+            disabled={isDisabled}
+            title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
+          >
+            <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
+              {label}
             </span>
-        </Checkbox>
+            { altName &&
+              <span className='ml-1 font-normal'>
+                / {altName}
+              </span> }
+            { (!!sum || !!sumOfClade) &&
+              <span className='ml-2 italic font-normal text-xs tracking-wide text-subheading dark:text-dark-subheading'>
+                {!!sum && sum.toLocaleString()} {!!sumOfClade && `+ ${sumOfClade.toLocaleString()}`}
+              </span> }
+          </Checkbox>
+          { checked &&
+            <LineageMenu
+              colour={colour}
+              lineage={lineage}
+              palette={colourPalette}
+              setColour={setColour}
+            /> }
+        </span>
         { isOpen &&
           <ul className='lg:ml-6'>
             {childBranches}
           </ul> }
       </span>
-      { checked &&
-        <button
-          title='Change colour'
-          className='mt-1 ml-1 lg:mr-0 focus:primary-ring rounded border border-transparent'
-          onClick={e => cycleColour(lineage, e.shiftKey ? -1 : 1)}
-        >
-          <HiOutlineColorSwatch className='w-5 h-5' style={{ color: colour }} />
-        </button> }
     </li>
   )
 })
@@ -157,24 +161,25 @@ const LineageTree = (props) => {
     submit(nextValues)
   }, [lineageToColourIndex])
 
-  const cycleColour = useCallback((nodeName, direction = 1) => {
-    let nextValue = parseInt(lineageToColourIndex[nodeName]) + direction
-    if (nextValue < 0) nextValue = colourPalette.length - 1
-    else if (nextValue >= colourPalette.length) nextValue = 0
+  const setColour = useCallback((lineage, colourIndex) => {
     submit({
       ...lineageToColourIndex,
-      [nodeName]: nextValue
+      [lineage]: colourIndex
     })
   }, [lineageToColourIndex])
+
+  const lightOrDarkPalette = useMemo(() =>
+    colourPalette.map(item => item[darkMode ? 'dark' : 'light'])
+  , [colourPalette, darkMode])
 
   const lineageToColour = useMemo(() => {
     return Object.fromEntries(
       Object.entries(lineageToColourIndex).map(
         ([lineage, colourIndex]) =>
-          [lineage, colourPalette[colourIndex][darkMode ? 'dark' : 'light']]
+          [lineage, lightOrDarkPalette[colourIndex]]
       )
     )
-  }, [lineageToColourIndex, darkMode])
+  }, [lineageToColourIndex, lightOrDarkPalette])
 
   return (
     <div className={classNames('flex flex-col', className)}>
@@ -204,13 +209,14 @@ const LineageTree = (props) => {
         <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
           {nodeIndex && topology.map(node =>
             <Branch
-              cycleColour={cycleColour}
+              colourPalette={lightOrDarkPalette}
               index={nodeIndex}
               key={node.name}
               node={node}
               preset={preset}
               search={search.toLowerCase()}
               selectDisabled={numberSelected >= maxLineages}
+              setColour={setColour}
               toggleOpen={toggleOpen}
               toggleSelect={toggleSelect}
               values={lineageToColour}

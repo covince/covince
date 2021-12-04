@@ -31,7 +31,7 @@ const darkModeColours = [
 ]
 
 const defaultColourPalette =
-  lightModeColours.map((_, i) => ({ light: _.hex, dark: darkModeColours[i].hex }))
+  lightModeColours.map((light, i) => ({ light: light.hex, dark: darkModeColours[i].hex }))
 
 const initialise = ({ dynamic_mode }) => {
   if (dynamic_mode === undefined) {
@@ -44,7 +44,11 @@ const initialise = ({ dynamic_mode }) => {
       lineages: Object[Array.isArray(lineages) ? 'values' : 'keys'](lineages).join(','),
       colours: Object[Array.isArray(lineages) ? 'keys' : 'values'](lineages).join(',')
     },
-    colourPalette: palette.map(item => typeof item === 'string' ? { light: item, dark: item } : item)
+    colourPalette: palette.map(item =>
+      typeof item === 'string'
+        ? { light: { hex: item }, dark: { hex: item } }
+        : item
+    )
   }
 }
 
@@ -54,14 +58,15 @@ export default (config) => {
 
   const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
     const entries = Object.entries(lineageToColourIndexes)
-    const lineages = entries.map(_ => _[0])
-    const colours = entries.map(_ => _[1])
-    updateQuery({
+    const nextLineages = entries.map(_ => _[0]).join(',')
+    const nextColours = entries.map(_ => _[1]).join(',')
+    const nextQuery = {
       ...extraQueryUpdates,
-      lineages: lineages.join(',') || '',
-      colours: colours.join(',') || '',
-      show: undefined
-    })
+      lineages: nextLineages || '',
+      colours: nextColours || ''
+    }
+    if (nextLineages !== lineages) nextQuery.show = undefined
+    updateQuery(nextQuery)
   }, [])
 
   const parsedLineages = useMemo(() => lineages.length ? lineages.split(',') : [], [lineages])
