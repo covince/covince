@@ -31,7 +31,7 @@ const darkModeColours = [
 ]
 
 const defaultColourPalette =
-  lightModeColours.map((light, i) => ({ light: light.hex, dark: darkModeColours[i].hex }))
+  lightModeColours.map((_, i) => ({ light: _.hex, dark: darkModeColours[i].hex }))
 
 const initialise = ({ dynamic_mode }) => {
   if (dynamic_mode === undefined) {
@@ -45,9 +45,7 @@ const initialise = ({ dynamic_mode }) => {
       colours: Object[Array.isArray(lineages) ? 'keys' : 'values'](lineages).join(',')
     },
     colourPalette: palette.map(item =>
-      typeof item === 'string'
-        ? { light: { hex: item }, dark: { hex: item } }
-        : item
+      typeof item === 'string' ? { light: item, dark: item } : item
     )
   }
 }
