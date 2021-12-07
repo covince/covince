@@ -25,7 +25,7 @@ const LineageMenu = ({ palette, lineage, colour, setColour }) => {
     <Popover as={React.Fragment}>
       <Popover.Button
         ref={setReferenceElement}
-        className='ml-1 py-1 md:py-0 px-1.5 md:px-0.5 border border-transparent font-medium text-gray-500 dark:text-gray-300 rounded-md focus:primary-ring'
+        className='py-0 px-1 md:px-0.5 border border-transparent font-medium text-gray-500 dark:text-gray-300 rounded focus:primary-ring'
       >
         <HiDotsHorizontal className='w-5 h-5' />
       </Popover.Button>
@@ -47,7 +47,7 @@ const LineageMenu = ({ palette, lineage, colour, setColour }) => {
                   // title={item.desc}
                   onClick={() => setColour(lineage, i)}
                   className={classNames(
-                    'block h-4 w-4 bg-current rounded ring-offset-2 dark:ring-offset-gray-600',
+                    'block h-4 w-4 bg-current rounded ring-offset-2 dark:ring-offset-gray-600 no-webkit-tap',
                     'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-dark-primary',
                     { 'ring-2 ring-current': item === colour }
                   )}

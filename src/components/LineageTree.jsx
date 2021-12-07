@@ -68,9 +68,9 @@ const Branch = memo(({ node, ...props }) => {
         className={classNames('rounded py-1 pl-1.5 border border-transparent', { 'pr-1.5': checked })}
         style={checked ? { borderColor: colour } : null}
       >
-        <span className='flex items-center'>
+        <span className='flex items-center space-x-2'>
           <Checkbox
-            className='whitespace-nowrap mr-1.5'
+            className='whitespace-nowrap'
             style={{ color: colour }}
             id={`lineage_selector_${node.name}`}
             checked={checked}
