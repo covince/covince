@@ -1,7 +1,6 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
-import { toAlias, buildFullTopology } from 'pango-utils'
+import { toAlias, buildFullTopology, whoVariants } from 'pango-utils'
 
-import { whoVariants } from '../hooks/useDynamicConfig'
 const whoVariantsOrder = Object.keys(whoVariants)
 
 const fetchLineages = async (api_url, { area = '', fromDate = '', toDate = '' } = {}) => {

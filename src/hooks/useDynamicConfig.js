@@ -1,24 +1,7 @@
-import { expandLineage, toAlias } from 'pango-utils'
+import { expandLineage, toAlias, whoVariants } from 'pango-utils'
 import { useMemo } from 'react'
 
 import { createConfig } from '../config'
-
-export const whoVariants = {
-  'B.1.1.7': 'Alpha',
-  'B.1.351': 'Beta',
-  'B.1.1.28.1': 'Gamma',
-  'B.1.617.2': 'Delta',
-  'B.1.429': 'Epsilon',
-  'B.1.427': 'Epsilon',
-  'B.1.1.28.2': 'Zeta',
-  'B.1.525': 'Eta',
-  'B.1.1.28.3': 'Theta',
-  'B.1.526': 'Iota',
-  'B.1.617.1': 'Kappa',
-  'B.1.1.1.37': 'Lambda',
-  'B.1.621': 'Mu',
-  'B.1.1.529': 'Omicron'
-}
 
 const whoVariantEntries =
   Object.entries(whoVariants)
