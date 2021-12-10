@@ -20,8 +20,8 @@ const indexMapResults = (index, results, key) => {
 }
 
 const defaultConfidence = (count, total) => {
-  const _wilson = wilson(count, total)
-  return [_wilson.left, _wilson.right]
+  const { left, right } = wilson(count, total)
+  return [Math.abs(left), Math.min(Math.abs(right), 1)]
 }
 
 const defaultAvg = count => count / 2
@@ -115,7 +115,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
           if (parameter === 'p') {
             const [left = null, right = null] = count !== null ? confidence(count, total) : []
             mean.push(count / total)
-            lower.push(Math.abs(left))
+            lower.push(left)
             upper.push(right)
           } else {
             mean.push(avg(count))
