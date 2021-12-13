@@ -7,7 +7,7 @@ const getDefaultScale = (default_color_scale, x) => {
     return default_color_scale
   }
   if (typeof default_color_scale === 'object') {
-    return default_color_scale[x]
+    return default_color_scale[x] || 'linear'
   }
   return 'linear'
 }
@@ -118,7 +118,6 @@ const useLineages = (api, options, lineages) => {
       }
       areaLookups.push({ area, lookup })
     }
-
     return { min, max, values: areaLookups, dates }
   }, [data])
 

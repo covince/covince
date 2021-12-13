@@ -20,6 +20,7 @@ const DynamicUI = ({
   config_url = './data/config.json',
   confidence,
   avg,
+  useAPIImpl = useDynamicAPI,
   ...props
 }) => {
   const { darkMode } = props
@@ -45,7 +46,7 @@ const DynamicUI = ({
   const isMobile = useMobile()
 
   const { colourPalette, lineages, lineageToColourIndex, submit } = useDynamicLineages(staticConfig)
-  const api = useDynamicAPI({ api_url, lineages, info, confidence, avg })
+  const api = useAPIImpl({ api_url, lineages, info, confidence, avg })
 
   const [{ lineageView, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0' })
   const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
