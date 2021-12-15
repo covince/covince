@@ -15,6 +15,12 @@ import { useConfig } from '../config'
 const animationDuration = 500
 const fallbackColour = '#DDDDDD'
 
+const tripleFigureLabel = {
+  1: 'K',
+  2: 'M',
+  3: 'B'
+}
+
 const MainChart = React.memo((props) => {
   const {
     activeLineages,
@@ -89,8 +95,11 @@ const MainChart = React.memo((props) => {
     }
     return {
       tickFormatter: value => {
-        if (value >= 10e3) {
-          return `${value.toString().slice(0, 2)}K`
+        const valueStr = value.toString()
+        if (valueStr.length > 4) {
+          const tripleFigureCount = Math.floor((valueStr.length - 1) / 3)
+          const prefix = (value / Math.pow(1000, tripleFigureCount))
+          return prefix.toString() + (tripleFigureLabel[tripleFigureCount] || '')
         }
         return value.toLocaleString()
       },
