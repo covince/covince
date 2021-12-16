@@ -8,6 +8,7 @@ function LocalIncidence (props) {
   const {
     activeLineages,
     chartDefinitions,
+    chartZoom,
     className,
     date,
     darkMode,
@@ -41,6 +42,7 @@ function LocalIncidence (props) {
               activeLineages={activeLineages}
               allowStack={chart.allow_stack}
               area_data={area_data}
+              chartZoom={chartZoom}
               darkMode={darkMode}
               date={date}
               defaultType={chart.default_type}

@@ -158,7 +158,8 @@ export const UI = ({
     return values
   }, [results, date])
 
-  const { chartZoom, clearChartZoom, zoomEnabled, setZoomEnabled } = useChartZoom()
+  const chartZoom = useChartZoom()
+  const { dateRange, clearChartZoom, zoomEnabled, setZoomEnabled } = chartZoom
 
   const { activeLineages, sortedLineages } = lineageFilter
   const selectedLineage = mapDataState.loading.lineage || mapDataState.lineage
@@ -299,17 +300,10 @@ export const UI = ({
             />
             <div className='absolute inset-0 z-10 shadow-inner pointer-events-none' style={{ borderRadius: 'inherit' }} />
           </LoadingOverlay>
-          {/* <div className='relative'>
-            <FadeTransition in={mapDataState.status === 'LOADING' && !isInitialLoad}>
-              <div className='bg-white bg-opacity-75 dark:bg-gray-700 dark:bg-opacity-75 absolute inset-0 grid place-content-center'>
-                <Spinner className='text-gray-500 dark:text-gray-200 w-6 h-6' />
-              </div>
-            </FadeTransition>
-          </div> */}
         </MapView>
         <div className={classNames('flex-grow flex flex-col relative', { hidden: mobileView === 'map' || (isMobile && locationSearch.isSearching) })}>
           { !isMobile &&
-            <FadeTransition in={!!chartZoom}>
+            <FadeTransition in={!!dateRange}>
               <div className='absolute left-0 right-0 -top-6 h-0 flex'>
                 <Button
                   onClick={clearChartZoom}
@@ -328,6 +322,7 @@ export const UI = ({
             )}
             activeLineages={activeLineages}
             chartDefinitions={config.charts}
+            chartZoom={chartZoom}
             date={date}
             darkMode={darkMode}
             isMobile={isMobile}
@@ -354,7 +349,7 @@ export const UI = ({
                 <BsMap className='h-5 w-5 mr-2 flex-shrink-0' />
                 View map
               </PrimaryPillButton>
-              { chartZoom
+              { dateRange
                 ? <SecondaryPillButton
                   onClick={clearChartZoom}
                   className='text-center'
