@@ -98,7 +98,11 @@ const MainChart = React.memo((props) => {
         if (valueStr.length > 4) {
           const tripleFigureCount = Math.floor((valueStr.length - 1) / 3)
           const prefix = (value / Math.pow(1000, tripleFigureCount))
-          return prefix.toString() + (tripleFigureLabel[tripleFigureCount] || '')
+          const prefixStr = prefix.toString()
+          return (
+            (prefixStr.length < 4 ? prefixStr : prefix.toPrecision(3)) +
+            (tripleFigureLabel[tripleFigureCount] || '')
+          )
         }
         return value.toLocaleString()
       },
