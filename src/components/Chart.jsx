@@ -22,7 +22,7 @@ const convertToTSV = (data) =>
 
 const ChartHeading = ({ isMobile, ...props }) =>
   isMobile
-    ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading whitespace-nowrap')} />
+    ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading')} />
     : <Heading {...props} />
 
 const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numCharts, ...props }) => {
@@ -58,18 +58,19 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
   const chart = (
     <>
       <header className='ml-12 mr-6 flex items-baseline'>
-        <ChartHeading isMobile={isMobile}>{heading}</ChartHeading>
+        <ChartHeading isMobile={isMobile} className='whitespace-nowrap mr-auto'>{heading}</ChartHeading>
         <a
-          className='ml-3 text-xs tracking-wider font-normal text-subheading underline hover:no-underline'
+          className='ml-3 text-xs tracking-wider font-normal text-subheading underline hover:no-underline whitespace-nowrap'
           href={downloadURL}
           download={`${heading}.csv`}
         >
-          to CSV
+          <span className='sr-only'>{heading}</span>
+          as CSV
         </a>
         { allowStack &&
           <Checkbox
             id={line_type_accessor}
-            className='text-primary ml-auto self-center md:self-end'
+            className='ml-3 text-primary self-center md:self-end'
             checked={query[line_type_accessor] === 'area'}
             label='Stack'
             onChange={handleGraphTypeChange}
@@ -99,7 +100,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
       }}
     >
       {({ measureRef }) => (
-        <div ref={measureRef}>
+        <div className='max-w-max' ref={measureRef}>
           {chart}
         </div>
       )}
