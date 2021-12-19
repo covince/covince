@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import Measure from 'react-measure'
+import { BsFileEarmarkText as DownloadIcon } from 'react-icons/bs'
 
 import MultiLinePlot from './MultiLinePlot'
 import { Heading } from './Typography'
@@ -57,25 +58,28 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
 
   const chart = (
     <>
-      <header className='ml-12 mr-6 flex items-baseline'>
+      <header className='ml-12 mr-6 flex items-center md:items-end'>
         <ChartHeading isMobile={isMobile} className='whitespace-nowrap mr-auto'>{heading}</ChartHeading>
-        <a
-          className='ml-3 text-xs tracking-wider font-normal text-subheading underline hover:no-underline whitespace-nowrap'
-          href={downloadURL}
-          download={`${heading}.csv`}
-        >
-          <span className='sr-only'>{heading}</span>
-          as CSV
-        </a>
-        { allowStack &&
-          <Checkbox
-            id={line_type_accessor}
-            className='ml-3 text-primary self-center md:self-end'
-            checked={query[line_type_accessor] === 'area'}
-            label='Stack'
-            onChange={handleGraphTypeChange}
-            toggle
-          /> }
+        <span className='divide-x-2 divide-dotted divide-gray-300 dark:divide-gray-400 inline-flex items-center'>
+          <a
+            className='mr-1.5 text-xs tracking-wider font-normal text-subheading md:opacity-70 hover:opacity-100 whitespace-nowrap'
+            href={downloadURL}
+            download={`${heading}.csv`}
+            title='Download as CSV'
+          >
+            <span className='sr-only'>{heading} as CSV</span>
+            <DownloadIcon className='h-5 w-5' />
+          </a>
+          { allowStack &&
+            <Checkbox
+              id={line_type_accessor}
+              className='pl-2 py-0.5 text-primary self-center md:self-end'
+              checked={query[line_type_accessor] === 'area'}
+              label='Stack'
+              onChange={handleGraphTypeChange}
+              toggle
+            /> }
+        </span>
       </header>
       <MultiLinePlot
         height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / numCharts), 168)}
