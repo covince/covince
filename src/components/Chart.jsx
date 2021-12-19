@@ -26,7 +26,18 @@ const ChartHeading = ({ isMobile, ...props }) =>
     ? <h2 {...props} className={classNames(props.className, 'font-bold text-heading')} />
     : <Heading {...props} />
 
-const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numCharts, ...props }) => {
+const Chart = (props) => {
+  const {
+    allowStack,
+    areaName,
+    defaultType,
+    heading,
+    isMobile,
+    numCharts,
+    parameter,
+    ...plot
+  } = props
+
   const line_type_accessor = `${parameter}_type`
   const [query, updateQuery] = useQueryAsState({ [line_type_accessor]: defaultType })
 
@@ -37,7 +48,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
   const [height, setHeight] = useState(0)
 
   const { area_data, activeLineages, chartZoom } = props
-  const downloadURL = useMemo(() => {
+  const [downloadURL, fileName] = useMemo(() => {
     const [minDate, maxDate] = chartZoom.dateRange || []
     const filteredData = area_data
       .filter(d => (
@@ -49,7 +60,10 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
 
     const tsv = convertToTSV(filteredData)
     const blob = new Blob([tsv], { type: 'text/csv' })
-    return window.URL.createObjectURL(blob)
+    return [
+      window.URL.createObjectURL(blob),
+      `${heading} in ${areaName}`.split(/[\s\W]+/).join('_') + '.csv'
+    ]
   }, [area_data, activeLineages, chartZoom])
 
   useEffect(() => {
@@ -64,7 +78,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
           <a
             className='mr-1.5 text-xs tracking-wider font-normal text-subheading md:opacity-70 hover:opacity-100 whitespace-nowrap'
             href={downloadURL}
-            download={`${heading}.csv`}
+            download={fileName}
             title='Download as CSV'
           >
             <span className='sr-only'>{heading} as CSV</span>
@@ -83,7 +97,7 @@ const Chart = ({ heading, defaultType, parameter, isMobile, allowStack, numChart
       </header>
       <MultiLinePlot
         height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / numCharts), 168)}
-        {...props}
+        {...plot}
         className='-mt-1 md:m-0'
         type={query[line_type_accessor]}
         parameter={parameter}

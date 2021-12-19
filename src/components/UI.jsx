@@ -68,6 +68,14 @@ export const UI = ({
     mapDataState.lineage === null || chartDataState.area === null
   ), [mapDataState.lineage, chartDataState.area])
 
+  const areaName = useMemo(() => (
+    chartDataState.area === 'overview'
+      ? config.ontology.overview.heading
+      : chartDataState.area in tileIndex
+        ? tileIndex[chartDataState.area].area_name
+        : undefined
+  ), [chartDataState.area])
+
   const locationFilter = useMemo(() => {
     const { ontology } = config
 
@@ -84,7 +92,7 @@ export const UI = ({
       return {
         ...props,
         category: ontology.overview.category,
-        heading: ontology.overview.heading,
+        heading: areaName,
         subheading: (
           <span className='flex items-center text-subheading'>
             Explore {ontology.area.noun_plural} {
@@ -97,13 +105,12 @@ export const UI = ({
       }
     }
     const {
-      area_name = chartDataState.area,
       area_description = chartDataState.area
     } = tileIndex[chartDataState.area] || {}
     return {
       ...props,
       category: ontology.area.category,
-      heading: area_name,
+      heading: areaName,
       subheading: area_description,
       showOverviewButton: chartDataState.loadingArea !== 'overview',
       loadOverview: () => chartDataActions.load('overview'),
@@ -321,13 +328,13 @@ export const UI = ({
               }
             )}
             activeLineages={activeLineages}
+            areaName={areaName}
             chartDefinitions={config.charts}
             chartZoom={chartZoom}
             date={date}
             darkMode={darkMode}
             isMobile={isMobile}
             lineColor={lineColor}
-            name={chartDataState.area in tileIndex ? tileIndex[chartDataState.area].area_name : undefined}
             selected_area={chartDataState.area}
             setDate={persistDate}
             values={chartDataState.data}

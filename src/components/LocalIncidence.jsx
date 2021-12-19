@@ -7,6 +7,7 @@ import { useInjection } from '../components'
 function LocalIncidence (props) {
   const {
     activeLineages,
+    areaName,
     chartDefinitions,
     chartZoom,
     className,
@@ -42,6 +43,7 @@ function LocalIncidence (props) {
               activeLineages={activeLineages}
               allowStack={chart.allow_stack}
               area_data={area_data}
+              areaName={areaName}
               chartZoom={chartZoom}
               darkMode={darkMode}
               date={date}
