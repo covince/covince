@@ -19,7 +19,7 @@ export const indexMapResults = (index, results, key, valueKey = 'sum') => {
   }
 }
 
-export const createMapArrays = ({ index, dates, areas, confidence, avg }) => {
+export const createMapArrays = ({ index, dates, areas, transform }) => {
   const values = { counts: [], mean: [], lower: [], upper: [] }
   for (const area of areas) {
     const counts = []
@@ -34,19 +34,12 @@ export const createMapArrays = ({ index, dates, areas, confidence, avg }) => {
         upper.push(null)
         continue
       }
-      const { total = 0, value } = index[area][date]
-      const count = value || 0
-      counts.push(count)
-      if (total > 0) {
-        const [left = null, right = null] = count !== null ? confidence(count, total) : []
-        mean.push(count / total)
-        lower.push(left)
-        upper.push(right)
-      } else {
-        mean.push(avg(count))
-        lower.push(null)
-        upper.push(null)
-      }
+      const entry = index[area][date]
+      const mapped = transform(entry)
+      counts.push(mapped.count)
+      mean.push(mapped.mean)
+      lower.push(mapped.lower)
+      upper.push(mapped.upper)
     }
     values.counts.push(counts)
     values.mean.push(mean)
@@ -115,7 +108,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
     },
     async fetchMapData (aliased, parameter) {
       const lineage = expandLineage(aliased)
-      const useCachedTotals = parameter !== 'p' || cachedTotals.current.key === lineages
+      const useCachedTotals = cachedTotals.current.key === lineage
       const [totalJson, lineageJson] = await Promise.all([
         useCachedTotals
           ? Promise.resolve(cachedTotals.current.value)
@@ -137,10 +130,18 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       const uniqueAreas = info.areas
       const values = createMapArrays({
         areas: uniqueAreas,
-        avg,
-        confidence,
         dates: uniqueDates,
-        index
+        index,
+        transform: parameter === 'p'
+          ? ({ value, total }) => {
+              const count = value || 0
+              const [left = null, right = null] = count !== null ? confidence(count, total) : []
+              return { count, mean: count / total, lower: left, upper: right }
+            }
+          : ({ value }) => {
+              const count = value || 0
+              return { count, mean: avg(count), lower: null, upper: null }
+            }
       })
 
       return {
