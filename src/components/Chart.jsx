@@ -72,7 +72,7 @@ const Chart = (props) => {
 
   const chart = (
     <>
-      <header className='ml-12 mr-6 flex items-center md:items-end'>
+      <header className='ml-12 mr-6 -mb-0.5 flex items-center md:items-end'>
         <ChartHeading isMobile={isMobile} className='whitespace-nowrap mr-auto'>{heading}</ChartHeading>
         <span className='divide-x-2 divide-dotted divide-gray-300 dark:divide-gray-400 inline-flex items-center'>
           <a
