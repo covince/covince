@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react'
 import useQueryAsState from './useQueryAsState'
 
-export default (dates = []) => {
+export default () => {
   const [{ xMin, xMax }, updateQuery] = useQueryAsState()
 
   const [zoomEnabled, setZoomEnabled] = useState(false)
 
-  const chartZoom = (xMin || xMax)
-    ? [xMin || dates[0], xMax || dates[dates.length - 1]]
+  const dateRange = (xMin || xMax)
+    ? xMin < xMax ? [xMin, xMax] : [xMax, xMin]
     : null
 
   useEffect(() => {
-    if (chartZoom) {
+    if (dateRange) {
       setZoomEnabled(false)
     }
-  }, [chartZoom])
+  }, [dateRange])
 
   return {
-    chartZoom,
+    dateRange,
     setChartZoom: (xMin, xMax) => updateQuery({ xMin, xMax }),
     clearChartZoom: () => updateQuery({ xMin: undefined, xMax: undefined }),
     zoomEnabled,
