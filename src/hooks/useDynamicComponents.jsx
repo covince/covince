@@ -102,7 +102,7 @@ const LineageDateFilter = ({ dates = [] }) => {
             className={classNames(xMin === defaultValues.xMin ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
             value={xMin}
             name='lineages from date'
-            onChange={e => updateQuery({ xMin: e.target.value })}
+            onChange={e => updateQuery({ xMin: e.target.value === defaultValues.xMin ? undefined : e.target.value })}
           >
             {fromOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </Select>
@@ -116,7 +116,7 @@ const LineageDateFilter = ({ dates = [] }) => {
             className={classNames(xMax === defaultValues.xMax ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
             value={xMax}
             name='lineages to date'
-            onChange={e => updateQuery({ xMax: e.target.value })}
+            onChange={e => updateQuery({ xMax: e.target.value === defaultValues.xMax ? undefined : e.target.value })}
           >
             {toOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </Select>
