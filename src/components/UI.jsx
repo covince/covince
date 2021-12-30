@@ -74,7 +74,7 @@ export const UI = ({
       : chartDataState.area in tileIndex
         ? tileIndex[chartDataState.area].area_name
         : undefined
-  ), [chartDataState.area])
+  ), [chartDataState.area, tileIndex])
 
   const locationFilter = useMemo(() => {
     const { ontology } = config
