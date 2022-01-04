@@ -81,7 +81,8 @@ export const UI = ({
 
     const props = {
       loading: isInitialLoad ||
-        (chartDataState.status === 'LOADING' && (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
+        (chartDataState.status === 'LOADING' &&
+          (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
         locationSearch.isLoading,
       onChange: chartDataActions.load,
       value: chartDataState.area,
@@ -196,7 +197,7 @@ export const UI = ({
       { mobileView === 'chart' &&
         <div className='bg-white dark:bg-gray-700 px-4 pt-3 relative z-10'>
           <LocationFilter
-            className='h-22'
+            className='h-20'
             {...locationFilter}
             {...locationSearch}
           />
@@ -217,13 +218,15 @@ export const UI = ({
         <MapView
           isHidden={mobileView === 'chart'}
           heading={
-            <div className='flex justify-between items-center space-x-3 overflow-hidden'>
+            <div className='h-8 md:h-auto flex justify-between items-center'>
               <Heading>Map</Heading>
-              { isMobile &&
+              { isMobile && !isInitialLoad &&
                 <div className='flex items-center max-w-none min-w-0'>
-                  <FadeTransition in={chartDataState.status === 'LOADING'}>
-                    <Spinner className='h-4 w-4 mr-2 text-gray-500 dark:text-gray-200' />
-                  </FadeTransition>
+                  <div className='w-12 flex justify-center'>
+                    <FadeTransition in={chartDataState.status === 'LOADING'}>
+                      <Spinner className='block h-4 w-4 text-gray-500 dark:text-gray-200' />
+                    </FadeTransition>
+                  </div>
                   <PrimaryPillButton
                     className='flex items-center space-x-1 min-w-0 h-8 pr-2'
                     onClick={() => setMobileView('chart')}
@@ -286,7 +289,7 @@ export const UI = ({
           </form>
           <LoadingOverlay
             className='flex-grow -mx-3 md:m-0 flex flex-col md:rounded-md overflow-hidden'
-            loading={mapDataState.status === 'LOADING' && !isInitialLoad}
+            loading={mapDataState.status === 'LOADING' && (isMobile || !isInitialLoad)}
           >
             <Chloropleth
               className='flex-grow'

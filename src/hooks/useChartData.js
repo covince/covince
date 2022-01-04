@@ -39,7 +39,7 @@ const useChartData = (api, lineages) => {
         throw action.payload
       }
     }
-  }, { status: 'INIT' })
+  }, { status: 'INIT', area: null }) // null denotes initial load
 
   useEffect(async () => {
     dispatch({ type: 'LOADING', payload: { area, lineages } })
