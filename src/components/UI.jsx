@@ -81,7 +81,8 @@ export const UI = ({
 
     const props = {
       loading: isInitialLoad ||
-        (chartDataState.status === 'LOADING' && (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
+        (chartDataState.status === 'LOADING' &&
+          (isMobile || chartDataState.loading.area !== chartDataState.area)) ||
         locationSearch.isLoading,
       onChange: chartDataActions.load,
       value: chartDataState.area,
@@ -112,7 +113,7 @@ export const UI = ({
       category: ontology.area.category,
       heading: areaName,
       subheading: area_description,
-      showOverviewButton: chartDataState.loadingArea !== 'overview',
+      showOverviewButton: chartDataState.loadingArea && chartDataState.loadingArea !== 'overview',
       loadOverview: () => chartDataActions.load('overview'),
       ...injectProps.LocationFilter
     }
@@ -196,7 +197,7 @@ export const UI = ({
       { mobileView === 'chart' &&
         <div className='bg-white dark:bg-gray-700 px-4 pt-3 relative z-10'>
           <LocationFilter
-            className='h-22'
+            className='h-20'
             {...locationFilter}
             {...locationSearch}
           />
