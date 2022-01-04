@@ -37,32 +37,34 @@ function LocalIncidence (props) {
     >
       {({ measureRef }) => (
         <div ref={measureRef} className={classNames('grid gap-2', className)}>
-          {chartDefinitions.map(chart =>
-            <Chart
-              key={chart.parameter}
-              activeLineages={activeLineages}
-              allowStack={chart.allow_stack}
-              area_data={area_data}
-              areaName={areaName}
-              chartZoom={chartZoom}
-              darkMode={darkMode}
-              date={date}
-              defaultType={chart.default_type}
-              format={chart.format}
-              heading={chart.heading}
-              isMobile={isMobile}
-              numCharts={chartDefinitions.length}
-              parameter={chart.parameter}
-              setDate={setDate}
-              stroke={lineColor}
-              tooltipEnabled={isMobile ? !zoomEnabled : true}
-              width={width}
-              xAxis={chart.x_axis}
-              yAxis={chart.y_axis}
-              zoomEnabled={zoomEnabled}
-              {...injectProps.Chart}
-            />
-          )}
+          {width
+            ? chartDefinitions.map(chart =>
+              <Chart
+                key={chart.parameter}
+                activeLineages={activeLineages}
+                allowStack={chart.allow_stack}
+                area_data={area_data}
+                areaName={areaName}
+                chartZoom={chartZoom}
+                darkMode={darkMode}
+                date={date}
+                defaultType={chart.default_type}
+                format={chart.format}
+                heading={chart.heading}
+                isMobile={isMobile}
+                numCharts={chartDefinitions.length}
+                parameter={chart.parameter}
+                setDate={setDate}
+                stroke={lineColor}
+                tooltipEnabled={isMobile ? !zoomEnabled : true}
+                width={width}
+                xAxis={chart.x_axis}
+                yAxis={chart.y_axis}
+                zoomEnabled={zoomEnabled}
+                {...injectProps.Chart}
+              />
+            )
+            : <p className='text-xs uppercase tracking-wider text-subheading text-center mt-6'>loading charts</p>}
         </div>
       )}
     </Measure>
