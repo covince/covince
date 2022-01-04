@@ -113,7 +113,7 @@ export const UI = ({
       category: ontology.area.category,
       heading: areaName,
       subheading: area_description,
-      showOverviewButton: chartDataState.loadingArea && chartDataState.loadingArea !== 'overview',
+      showOverviewButton: chartDataState.loadingArea !== 'overview',
       loadOverview: () => chartDataActions.load('overview'),
       ...injectProps.LocationFilter
     }
