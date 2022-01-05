@@ -39,7 +39,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 ### Chart settings
 
-* `csv_downloads [boolean]` defaults to true
+* `csv_download [boolean]` defaults to true
 * `tooltip [object]`
   * `use_nomenclature [boolean]` defaults to true
 
