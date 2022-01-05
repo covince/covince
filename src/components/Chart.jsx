@@ -8,6 +8,7 @@ import classNames from 'classnames'
 import Checkbox from './Checkbox'
 
 import useQueryAsState from '../hooks/useQueryAsState'
+import { useConfig } from '../config'
 
 const sortByDate = (a, b) =>
   a.date > b.date ? 1 : a.date < b.date ? -1 : 0
@@ -48,7 +49,13 @@ const Chart = (props) => {
   const [height, setHeight] = useState(0)
 
   const { area_data, activeLineages, chartZoom } = props
+
+  const config = useConfig()
+  const { csv_download } = config.chart.settings
+
   const [downloadURL, fileName] = useMemo(() => {
+    if (!csv_download) return []
+
     const [minDate, maxDate] = chartZoom.dateRange || []
     const filteredData = area_data
       .filter(d => (
@@ -66,6 +73,8 @@ const Chart = (props) => {
     ]
   }, [area_data, activeLineages, chartZoom])
 
+  const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
+
   useEffect(() => {
     return () => window.URL.revokeObjectURL(downloadURL)
   }, [downloadURL])
@@ -75,15 +84,16 @@ const Chart = (props) => {
       <header className='ml-12 mr-6 -mb-0.5 flex items-center md:items-end'>
         <ChartHeading isMobile={isMobile} className='whitespace-nowrap mr-auto'>{heading}</ChartHeading>
         <span className='divide-x-2 divide-dotted divide-gray-300 dark:divide-gray-400 inline-flex items-center'>
-          <a
-            className='mr-1.5 text-xs tracking-wider font-normal text-subheading md:opacity-70 hover:opacity-100 whitespace-nowrap'
-            href={downloadURL}
-            download={fileName}
-            title='Download as CSV'
-          >
-            <span className='sr-only'>{heading} as CSV</span>
-            <DownloadIcon className='h-5 w-5' />
-          </a>
+          { !!csv_download &&
+            <a
+              className='mr-1.5 text-xs tracking-wider font-normal text-subheading md:opacity-70 hover:opacity-100 whitespace-nowrap'
+              href={downloadURL}
+              download={fileName}
+              title='Download as CSV'
+            >
+              <span className='sr-only'>{heading} as CSV</span>
+              <DownloadIcon className='h-5 w-5' />
+            </a> }
           { allowStack &&
             <Checkbox
               id={line_type_accessor}
@@ -100,7 +110,7 @@ const Chart = (props) => {
         {...plot}
         className='-mt-1 md:m-0'
         type={query[line_type_accessor]}
-        parameter={parameter}
+        parameter={parameterConfig}
       />
     </>
   )
