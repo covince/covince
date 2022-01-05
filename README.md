@@ -11,9 +11,12 @@ Demo of the code in this repository (with old static data): http://covince.verce
 ### Top-level sections
 
 * [`area_search_terms`](#area-search-terms) (optional) enable additional search terms for areas
-* `chart_tooltip [object]`
+* `chart [object]`
+  * `definitions [array]` list of [chart](#chart) definitions
+  * [`settings [object]`](#chart-settings) (optional) 
+* `chart_tooltip [object]` _[DEPRECATED - use [`chart.settings`](#chart-settings).`tooltip`]_
   * `use_nomenclature [boolean]` defaults to true
-* `charts [array]` list of [chart](#chart) definitions
+* `charts [array]` list of [chart](#chart) definitions _[DEPRECATED - use `chart.definitions`]_
 * `colors [object|array]` (optional, static builds only) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format)
 * `dynamic_mode [object]` (required for dynamic builds)
@@ -34,13 +37,19 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `mode [string]` type of search to apply to additional terms:
   * `padded-first-input-token` pads the term to the length of the input and matches against the first token of the input padded to the original length
 
+### Chart settings
+
+* `csv_downloads [boolean]` defaults to true
+* `tooltip [object]`
+  * `use_nomenclature [boolean]` defaults to true
+
 ### Chart
 
 * `allow_stack [boolean]` (optional) enables stacking
 * `default_type ['line'|'area']`
 * `heading [string]`
 * `parameter [string]` should match a parameter id
-* `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
+* `preset ['percentage']` (optional) applies formatting rules _[DEPRECATED - use [`parameter`](#parameter).`format`]_
 * `y_axis [object]` (optional)
 
 ### Chart Y-Axis
@@ -65,7 +74,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_lat [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
 * `default_lon [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
 * `default_zoom [number|object]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) provide a number for all screen types, or an object with properties: `mobile`, `desktop`, `big`
-* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) [DEPRECATED - use `default_zoom.mobile`]
+* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) _[DEPRECATED - use `default_zoom.mobile`]_
 * `bounds [object]` 
   * `min_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `max_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)

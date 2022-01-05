@@ -46,7 +46,8 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
     } else {
       _payload.reverse()
     }
-    const { timeline, chart_tooltip } = config
+    const { timeline, chart } = config
+    const { tooltip } = chart.settings
     return (
       <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
         <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
@@ -75,7 +76,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
                 <td className='px-3'>
-                  {chart_tooltip.use_nomenclature
+                  {tooltip.use_nomenclature
                     ? nomenclatureLookup[item.name] || item.name
                     : item.name}
                 </td>

@@ -18,8 +18,14 @@ const defaultColours = [
 ]
 
 const defaults = {
-  chart_tooltip: {
-    use_nomenclature: true
+  chart: {
+    definitions: [],
+    settings: {
+      csv_download: true,
+      tooltip: {
+        use_nomenclature: true
+      }
+    }
   },
   datetime_format: 'd MMMM y, HH:mm',
   map: { settings: {} },
@@ -38,7 +44,7 @@ export const createConfig = (userConfig) => {
   merge(config, defaults, userConfig)
 
   // normalise options
-  const { map, timeline, colors, parameters } = config
+  const { map, timeline, colors, parameters, charts, chart_tooltip } = config
   if (typeof timeline.date_format === 'string') {
     timeline.date_format = {
       heading: timeline.date_format,
@@ -62,6 +68,14 @@ export const createConfig = (userConfig) => {
         range: parameter.precision
       }
     }
+  }
+  if (typeof chart_tooltip === 'object') {
+    config.chart.settings.tooltip = {
+      ...chart_tooltip
+    }
+  }
+  if (Array.isArray(charts)) {
+    config.chart.definitions = charts
   }
   return config
 }

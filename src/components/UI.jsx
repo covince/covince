@@ -332,7 +332,7 @@ export const UI = ({
             )}
             activeLineages={activeLineages}
             areaName={areaName}
-            chartDefinitions={config.charts}
+            chartDefinitions={config.chart.definitions}
             chartZoom={chartZoom}
             date={date}
             darkMode={darkMode}

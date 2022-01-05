@@ -84,39 +84,47 @@
       }
     }
   },
-  "charts": [
-    {
-      "parameter": "lambda",
-      "heading": "Incidence",
-      "default_type": "line",
-      "allow_stack": true
-    },
-    {
-      "parameter": "p",
-      "heading": "Proportion",
-      "default_type": "area",
-      "allow_stack": true
-    },
-    {
-      "parameter": "R",
-      "heading": "R",
-      "default_type": "line",
-      "y_axis": {
-        "ticks": [
-          "0",
-          "1",
-          "2",
-          "3"
-        ],
-        "domain": [
-          0,
-          3
-        ],
-        "allow_data_overflow": true,
-        "reference_line": 1
+  "chart": {
+    "definitions": [
+      {
+        "parameter": "lambda",
+        "heading": "Incidence",
+        "default_type": "line",
+        "allow_stack": true
+      },
+      {
+        "parameter": "p",
+        "heading": "Proportion",
+        "default_type": "area",
+        "allow_stack": true
+      },
+      {
+        "parameter": "R",
+        "heading": "R",
+        "default_type": "line",
+        "y_axis": {
+          "ticks": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "domain": [
+            0,
+            3
+          ],
+          "allow_data_overflow": true,
+          "reference_line": 1
+        }
+      }
+    ],
+    "settings": {
+      "csv_download": true,
+      "tooltip": {
+        "use_nomenclature": true
       }
     }
-  ],
+  },
   "nomenclature": [
     {
       "lineage": "B.1.1.7",

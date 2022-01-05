@@ -9,8 +9,6 @@ import { orderBy } from 'lodash'
 
 import ChartTooltip from './ChartTooltip'
 
-import { useConfig } from '../config'
-
 const animationDuration = 500
 const fallbackColour = '#DDDDDD'
 
@@ -265,21 +263,18 @@ const MultiLinePlot = props => {
     zoomEnabled
   } = props
 
-  const config = useConfig()
-  const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
-
   const preset = useMemo(() => {
-    if (parameterConfig && parameterConfig.format === 'percentage') return 'percentage'
+    if (parameter && parameter.format === 'percentage') return 'percentage'
 
     // back compat
     if (deprecatedPreset) return deprecatedPreset
-    if (parameter === 'p') return 'percentage'
+    if (parameter && parameter.id === 'p') return 'percentage'
 
     return null
   }, [parameter, deprecatedPreset])
 
   const precision = useMemo(() => {
-    return parameterConfig ? parameterConfig.precision : undefined
+    return parameter ? parameter.precision : undefined
   }, [parameter])
 
   const chart = useMemo(() => {
@@ -287,7 +282,7 @@ const MultiLinePlot = props => {
     const lineageSum = {}
 
     for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total') {
+      if (d.parameter === parameter.id && d.lineage !== 'total') {
         const next = {
           ...dataByDate[d.date],
           date: d.date,
