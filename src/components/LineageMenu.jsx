@@ -1,3 +1,5 @@
+import './LineageMenu.css'
+
 import React, { useState } from 'react'
 import { Popover } from '@headlessui/react'
 import { usePopper } from 'react-popper'
@@ -34,6 +36,7 @@ const LineageMenu = ({ palette, lineage, colour, setColour }) => {
         style={styles.popper}
         {...attributes.popper}
         className={`
+          covince-lineage-menu
           shadow-lg bg-white dark:bg-gray-600 rounded-md py-3 z-10 space-y-1.5
           ring-1 ring-black dark:ring-gray-500 ring-opacity-5 w-32 text-right
         `}
