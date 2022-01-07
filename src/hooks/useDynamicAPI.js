@@ -59,13 +59,14 @@ const defaultAvg = count => count / 2
 const queryStringify = query => new URLSearchParams(query).toString()
 
 export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
-  const [unaliasedToAliased, topology] = React.useMemo(() => {
+  const [unaliasedToAliased, expandedLineages, topology] = React.useMemo(() => {
     const memo = {}
     for (const l of lineages) {
       const expanded = expandLineage(l)
       memo[expanded] = l
     }
-    return [memo, topologise(Object.keys(memo))]
+    const expandedLineages = Object.keys(memo).sort()
+    return [memo, expandedLineages, topologise(expandedLineages)]
   }, [lineages])
 
   const cachedTotals = React.useRef({ key: null, value: [] })
@@ -73,7 +74,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
   const impl = React.useMemo(() => ({
     async fetchChartData (area) {
       const query = new URLSearchParams({
-        lineages: Object.keys(unaliasedToAliased).sort()
+        lineages: expandedLineages
       })
       if (area !== 'overview') {
         query.append('area', area)
@@ -81,7 +82,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
       const json = await response.json()
 
-      const lineageZeroes = Object.fromEntries(lineages.map(l => [l, 0]))
+      const lineageZeroes = Object.fromEntries(expandedLineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
 
       for (const { date, key, period_count: count } of json) {
