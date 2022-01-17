@@ -3,6 +3,18 @@
     "url": "./data/area-search.json",
     "mode": "padded-first-input-token"
   },
+  "dynamic_mode": {
+    "initial_lineages": {
+      "B": 2,
+      "B.1.617.2": 1,
+      "AY.4.2": 0
+    },
+    "_colour_palette": [
+      "magenta",
+      "#0F0",
+      "cyan"
+    ]
+  },
   "parameters": [
     {
       "id": "lambda",
@@ -16,7 +28,7 @@
       "id": "p",
       "display": "Proportion",
       "format": "percentage",
-      "_precision": 0
+      "precision": 2
     },
     {
       "id": "R",
@@ -40,6 +52,19 @@
       "default_color_scale": {
         "p": "linear",
         "lambda": "quadratic"
+      },
+      "color_map_domain": {
+        "p": {
+          "min": 0,
+          "max": 1
+        },
+        "lambda": {
+          "min": 0
+        },
+        "R": {
+          "min": 0,
+          "max": 4
+        }
       }
     },
     "viewport": {
@@ -59,39 +84,47 @@
       }
     }
   },
-  "charts": [
-    {
-      "parameter": "lambda",
-      "heading": "Incidence",
-      "default_type": "line",
-      "allow_stack": true
-    },
-    {
-      "parameter": "p",
-      "heading": "Proportion",
-      "default_type": "area",
-      "allow_stack": true
-    },
-    {
-      "parameter": "R",
-      "heading": "R",
-      "default_type": "line",
-      "y_axis": {
-        "ticks": [
-          "0",
-          "1",
-          "2",
-          "3"
-        ],
-        "domain": [
-          0,
-          3
-        ],
-        "allow_data_overflow": true,
-        "reference_line": 1
+  "chart": {
+    "definitions": [
+      {
+        "parameter": "lambda",
+        "heading": "Incidence",
+        "default_type": "line",
+        "allow_stack": true
+      },
+      {
+        "parameter": "p",
+        "heading": "Proportion",
+        "default_type": "area",
+        "allow_stack": true
+      },
+      {
+        "parameter": "R",
+        "heading": "R",
+        "default_type": "line",
+        "y_axis": {
+          "ticks": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "domain": [
+            0,
+            3
+          ],
+          "allow_data_overflow": true,
+          "reference_line": 1
+        }
+      }
+    ],
+    "settings": {
+      "csv_download": true,
+      "tooltip": {
+        "use_nomenclature": true
       }
     }
-  ],
+  },
   "nomenclature": [
     {
       "lineage": "B.1.1.7",

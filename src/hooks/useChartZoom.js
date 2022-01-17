@@ -1,26 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import useQueryAsState from './useQueryAsState'
 
-export default (dates = []) => {
+export default () => {
   const [{ xMin, xMax }, updateQuery] = useQueryAsState()
 
   const [zoomEnabled, setZoomEnabled] = useState(false)
 
-  const chartZoom = (xMin || xMax)
-    ? [xMin || dates[0], xMax || dates[dates.length - 1]]
-    : null
+  const dateRange = (xMin && xMax)
+    ? xMin < xMax ? [xMin, xMax] : [xMax, xMin]
+    : (xMin || xMax) ? [xMin, xMax] : null
 
   useEffect(() => {
-    if (chartZoom) {
+    if (dateRange) {
       setZoomEnabled(false)
     }
-  }, [chartZoom])
+  }, [dateRange])
 
-  return {
-    chartZoom,
-    setChartZoom: (xMin, xMax) => updateQuery({ xMin, xMax }),
-    clearChartZoom: () => updateQuery({ xMin: undefined, xMax: undefined }),
-    zoomEnabled,
-    setZoomEnabled
-  }
+  return useMemo(() => {
+    return {
+      dateRange,
+      setChartZoom: (xMin, xMax) => updateQuery({ xMin, xMax }),
+      clearChartZoom: () => updateQuery({ xMin: undefined, xMax: undefined }),
+      zoomEnabled,
+      setZoomEnabled
+    }
+  }, [xMin, xMax, zoomEnabled])
 }

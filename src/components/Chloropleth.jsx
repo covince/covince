@@ -29,7 +29,7 @@ const colourStops = [
 ].map(x => {
   const index = (x.index - 0.13) / (1 - 0.13)
   return { index, rgb: interpolateMagma(x.index) }
-}).slice(0) // Cut off the first bit of magma with black
+}).slice(1) // Cut off the first bit of magma with black
 
 const makeMagmaGradient = (transform) => {
   const stops = []
@@ -262,13 +262,13 @@ const Chloropleth = (props) => {
     const stops = color_scale_type === 'R_scale' ? RColourStops : colourStops
 
     const scale = []
-    const range = color_scale_type === 'quadratic'
-      ? Math.sqrt(max_val) - Math.sqrt(min_val)
-      : max_val - min_val
+    const min = color_scale_type === 'quadratic' ? Math.sqrt(min_val) : min_val
+    const max = color_scale_type === 'quadratic' ? Math.sqrt(max_val) : max_val
+    const range = max - min
 
     for (const { index, rgb } of stops) {
       scale.unshift(rgb)
-      scale.unshift(range * (1 - index))
+      scale.unshift(min + range * (1 - index))
     }
 
     return scale

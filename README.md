@@ -11,11 +11,17 @@ Demo of the code in this repository (with old static data): http://covince.verce
 ### Top-level sections
 
 * [`area_search_terms`](#area-search-terms) (optional) enable additional search terms for areas
-* `chart_tooltip [object]`
+* `chart [object]`
+  * `definitions [array]` list of [chart](#chart) definitions
+  * [`settings [object]`](#chart-settings) (optional) 
+* `chart_tooltip [object]` _[DEPRECATED - use [`chart.settings`](#chart-settings).`tooltip`]_
   * `use_nomenclature [boolean]` defaults to true
-* `charts [array]` list of [chart](#chart) definitions
-* `colors [object|array]` (optional) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
-* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format) 
+* `charts [array]` list of [chart](#chart) definitions _[DEPRECATED - use `chart.definitions`]_
+* `colors [object|array]` (optional, static builds only) lineages mapped to color definitions, or a list of ordered colors. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
+* `datetime_format [string]` for e.g. data updated date [reference](https://date-fns.org/docs/format)
+* `dynamic_mode [object]` (required for dynamic builds)
+  * `initial_lineages [array|object]` list of lineages, or an object mapping lineages to a numerical index in the colour palette. Numbers must be 0-8 for the built-in palette.
+  * `colour_palette [array]` (optional) list of color definitions or ordered colours. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
   * [`settings [object]`](#map-settings) (optional)
@@ -31,13 +37,19 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `mode [string]` type of search to apply to additional terms:
   * `padded-first-input-token` pads the term to the length of the input and matches against the first token of the input padded to the original length
 
+### Chart settings
+
+* `csv_download [boolean]` defaults to true
+* `tooltip [object]`
+  * `use_nomenclature [boolean]` defaults to true
+
 ### Chart
 
 * `allow_stack [boolean]` (optional) enables stacking
 * `default_type ['line'|'area']`
 * `heading [string]`
 * `parameter [string]` should match a parameter id
-* `preset ['percentage']` (optional) applies formatting rules [DEPRECATED - use [parameter](#parameter).format]
+* `preset ['percentage']` (optional) applies formatting rules _[DEPRECATED - use [`parameter`](#parameter).`format`]_
 * `y_axis [object]` (optional)
 
 ### Chart Y-Axis
@@ -52,6 +64,9 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_lineage [string]` (optional) should match a lineage in lists, defaults to first lineage
 * `default_color_by [string]` (optional) should match a [parameter](#parameter) id, defaults to first parameter
 * `default_color_scale ['linear'|'quadratic'|{[parameter_id]: 'linear'|'quadratic'}]` (optional) can be a string for all parameters, or an object for specific parameters. Omit parameters from the object to hide the scale control.
+* `color_map_domain [{[parameter_id]: object}]` (optional) set the range of the colour map per parameter. Object should provide at least one of:
+  * min [number] (optional) minimum value of the color map
+  * max [number] (optional) maximum value of the color map
 
 ### Map viewport
 
@@ -59,7 +74,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `default_lat [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
 * `default_lon [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat) 
 * `default_zoom [number|object]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) provide a number for all screen types, or an object with properties: `mobile`, `desktop`, `big`
-* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) [DEPRECATED - use `default_zoom.mobile`]
+* `default_zoom_mob [number]` Mobile option where proportions are different [reference](https://maplibre.org/maplibre-gl-js-docs/api/map/#map#setzoom) _[DEPRECATED - use `default_zoom.mobile`]_
 * `bounds [object]` 
   * `min_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
   * `max_longitude [number]` [reference](https://maplibre.org/maplibre-gl-js-docs/api/geography/#lnglat)
@@ -123,9 +138,9 @@ You will also see any lint errors in the console.
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/richardgoater"><img src="https://avatars.githubusercontent.com/u/1429721?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Richard Goater</b></sub></a><br /><a href="https://github.com/theosanderson/covince/commits?author=richardgoater" title="Code">💻</a></td>
-    <td align="center"><a href="http://theo.io/"><img src="https://avatars.githubusercontent.com/u/19732295?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Theo Sanderson</b></sub></a><br /><a href="https://github.com/theosanderson/covince/commits?author=theosanderson" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/sagar87"><img src="https://avatars.githubusercontent.com/u/7542594?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Harald Vöhringer</b></sub></a><br /><a href="https://github.com/theosanderson/covince/commits?author=sagar87" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/richardgoater"><img src="https://avatars.githubusercontent.com/u/1429721?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Richard Goater</b></sub></a><br /><a href="https://github.com/covince/covince/commits?author=richardgoater" title="Code">💻</a></td>
+    <td align="center"><a href="http://theo.io/"><img src="https://avatars.githubusercontent.com/u/19732295?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Theo Sanderson</b></sub></a><br /><a href="https://github.com/covince/covince/commits?author=theosanderson" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/sagar87"><img src="https://avatars.githubusercontent.com/u/7542594?v=4?s=200" width="200px;" alt=""/><br /><sub><b>Harald Vöhringer</b></sub></a><br /><a href="https://github.com/covince/covince/commits?author=sagar87" title="Code">💻</a></td>
   </tr>
 </table>
 

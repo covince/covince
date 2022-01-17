@@ -9,17 +9,20 @@ import { orderBy } from 'lodash'
 
 import ChartTooltip from './ChartTooltip'
 
-import useChartZoom from '../hooks/useChartZoom'
-import { useConfig } from '../config'
-
 const animationDuration = 500
 const fallbackColour = '#DDDDDD'
+
+const tripleFigureLabel = {
+  1: 'K',
+  2: 'M',
+  3: 'B'
+}
 
 const MainChart = React.memo((props) => {
   const {
     activeLineages,
     chart,
-    chartZoom,
+    dateRange,
     darkMode,
     precision,
     preset,
@@ -41,7 +44,7 @@ const MainChart = React.memo((props) => {
     if (preset === 'percentage' && type === 'area' && lineages.length === Object.keys(activeLineages).length) {
       return [0, 100]
     }
-    if (chartZoom && data.length) {
+    if (dateRange && data.length) {
       if (type === 'area') {
         const [minIndex, maxIndex] = xAxisProps.domain
         const range = data.slice(minIndex, maxIndex + 1)
@@ -75,7 +78,7 @@ const MainChart = React.memo((props) => {
       if (fullScale) {
         return {
           tickFormatter: value => `${Math.min(parseFloat(value), 100)}%`,
-          ticks: chartZoom ? undefined : [0, 25, 50, 75, 100]
+          ticks: dateRange ? undefined : [0, 25, 50, 75, 100]
         }
       }
       return {
@@ -89,14 +92,21 @@ const MainChart = React.memo((props) => {
     }
     return {
       tickFormatter: value => {
-        if (value >= 10e3) {
-          return `${value.toString().slice(0, 2)}K`
+        const valueStr = value.toString()
+        if (valueStr.length > 4) {
+          const tripleFigureCount = Math.floor((valueStr.length - 1) / 3)
+          const prefix = (value / Math.pow(1000, tripleFigureCount))
+          const prefixStr = prefix.toString()
+          return (
+            (prefixStr.length < 4 ? prefixStr : prefix.toPrecision(3)) +
+            (tripleFigureLabel[tripleFigureCount] || '')
+          )
         }
         return value.toLocaleString()
       },
-      ticks: chartZoom ? undefined : yAxisConfig.ticks
+      ticks: dateRange ? undefined : yAxisConfig.ticks
     }
-  }, [preset, lineages, activeLineages, yAxisConfig, chartZoom])
+  }, [preset, lineages, activeLineages, yAxisConfig, dateRange])
 
   const grid =
     <CartesianGrid stroke={tailwindColors[stroke][darkMode ? 500 : 300]} />
@@ -130,7 +140,7 @@ const MainChart = React.memo((props) => {
   const yAxis =
     <YAxis
       type='number'
-      allowDataOverflow={chartZoom || yAxisConfig.allow_data_overflow || false}
+      allowDataOverflow={dateRange || yAxisConfig.allow_data_overflow || false}
       domain={yAxisDomain}
       width={48}
       stroke='currentcolor'
@@ -236,6 +246,7 @@ const MultiLinePlot = props => {
   const {
     activeLineages,
     area_data,
+    chartZoom,
     className,
     darkMode,
     date,
@@ -252,21 +263,18 @@ const MultiLinePlot = props => {
     zoomEnabled
   } = props
 
-  const config = useConfig()
-  const parameterConfig = useMemo(() => config.parameters.find(_ => _.id === parameter), [parameter])
-
   const preset = useMemo(() => {
-    if (parameterConfig && parameterConfig.format === 'percentage') return 'percentage'
+    if (parameter && parameter.format === 'percentage') return 'percentage'
 
     // back compat
     if (deprecatedPreset) return deprecatedPreset
-    if (parameter === 'p') return 'percentage'
+    if (parameter && parameter.id === 'p') return 'percentage'
 
     return null
   }, [parameter, deprecatedPreset])
 
   const precision = useMemo(() => {
-    return parameterConfig ? parameterConfig.precision : undefined
+    return parameter ? parameter.precision : undefined
   }, [parameter])
 
   const chart = useMemo(() => {
@@ -274,7 +282,7 @@ const MultiLinePlot = props => {
     const lineageSum = {}
 
     for (const d of area_data) {
-      if (d.parameter === parameter && d.lineage !== 'total') {
+      if (d.parameter === parameter.id && d.lineage !== 'total') {
         const next = {
           ...dataByDate[d.date],
           date: d.date,
@@ -335,25 +343,25 @@ const MultiLinePlot = props => {
     margin: { top: 12, left: 0, right: 24 }
   }), [width, height])
 
-  const { chartZoom, setChartZoom, clearChartZoom } = useChartZoom(dates)
+  const { dateRange, setChartZoom, clearChartZoom } = chartZoom
 
   const xAxisDomain = useMemo(() => {
     const minIndex = 0
     const maxIndex = data.length - 1
-    if (chartZoom && dates.length) {
-      const [minDate, maxDate] = chartZoom
-      const min = Math.max(dates.indexOf(minDate), minIndex)
-      let max = dates.indexOf(maxDate)
+    if (dateRange && dates.length) {
+      const [minDate, maxDate] = dateRange
+      const min = minDate ? Math.max(dates.indexOf(minDate), minIndex) : minIndex
+      let max = maxDate ? dates.indexOf(maxDate) : maxIndex
       if (max === -1) max = maxIndex
       return min < max ? [min, max] : [max, min]
     }
     return [minIndex, maxIndex]
-  }, [chartZoom, dates])
+  }, [dateRange, dates])
 
   const xAxisProps = useMemo(() => {
     const indices = Object.keys(dates)
     let ticks = indices
-    if (chartZoom) {
+    if (dateRange) {
       const [minIndex, maxIndex] = xAxisDomain
       ticks = indices.slice(minIndex, maxIndex + 1)
     }
@@ -436,7 +444,7 @@ const MultiLinePlot = props => {
           ...eventHandlers,
           activeLineages,
           chart,
-          chartZoom,
+          dateRange,
           cursor,
           darkMode,
           precision,

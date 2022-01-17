@@ -7,7 +7,7 @@ const getDefaultScale = (default_color_scale, x) => {
     return default_color_scale
   }
   if (typeof default_color_scale === 'object') {
-    return default_color_scale[x]
+    return default_color_scale[x] || 'linear'
   }
   return 'linear'
 }
@@ -82,14 +82,24 @@ const useLineages = (api, options, lineages) => {
 
     const { dates, areas, values } = data
     const mean = Array.isArray(values) ? values : values.mean
-    let max = 0
+
+    let min = Number.MAX_SAFE_INTEGER
+    let max = Number.MIN_SAFE_INTEGER
     for (let i = 0; i < areas.length; i++) {
       if (areas[i] === 'overview') continue
+      min = Math.min(min, ...mean[i])
       max = Math.max(max, ...mean[i])
     }
-    // TODO: generalise/remove this
-    if (current.colorBy === 'R') max = 4
-    if (current.colorBy === 'lambda') max = Math.min(max, 1000)
+    if (options.color_map_domain) {
+      const domain = options.color_map_domain[colorBy]
+      if (domain) {
+        min = domain.min || min
+        max = domain.max || max
+      }
+    } else {
+      // back compat
+      min = 0
+    }
 
     const areaLookups = []
 
@@ -108,8 +118,7 @@ const useLineages = (api, options, lineages) => {
       }
       areaLookups.push({ area, lookup })
     }
-
-    return { min: 0, max, values: areaLookups, dates }
+    return { min, max, values: areaLookups, dates }
   }, [data])
 
   const state = useMemo(() => {

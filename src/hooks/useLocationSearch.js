@@ -1,7 +1,7 @@
 import { useMemo, useReducer } from 'react'
 import { useQuery } from 'react-query'
 
-export default (lookupTable, searchTermConfig = {}) => {
+export default (tileIndex, searchTermConfig = {}) => {
   const [state, dispatch] = useReducer((state, action) => {
     if (action.type === 'IS_SEARCHING') {
       return {
@@ -39,23 +39,23 @@ export default (lookupTable, searchTermConfig = {}) => {
 
   const termsToMatch = useMemo(() => {
     const terms = []
-    if (lookupTable) {
-      for (const key of Object.keys(lookupTable)) {
+    if (tileIndex) {
+      for (const key of Object.keys(tileIndex)) {
         if (key !== 'overview') {
-          terms.push({ term: lookupTable[key].toLowerCase(), id: key })
+          terms.push({ term: tileIndex[key].area_name.toLowerCase(), id: key })
         }
       }
     }
     if (searchTerms) {
       for (const key of Object.keys(searchTerms)) {
         const id = searchTerms[key]
-        if (id in lookupTable) {
+        if (id in tileIndex) {
           terms.push({ term: key.toLowerCase(), id, mode: searchTermConfig.mode })
         }
       }
     }
     return terms
-  }, [searchTerms, lookupTable])
+  }, [searchTerms, tileIndex])
 
   const { searchTerm } = state
   const filteredItems = useMemo(() => {
@@ -91,7 +91,7 @@ export default (lookupTable, searchTermConfig = {}) => {
     const matchesById = {}
     for (const { term, id, matchIndex } of matchingTerms) {
       const searchTerm = searchTermLookup[term]
-      const isNameMatch = term === lookupTable[id].toLowerCase()
+      const isNameMatch = term === tileIndex[id].area_name.toLowerCase()
       if (id in matchesById) {
         if (isNameMatch) {
           matchesById[id] = {
@@ -104,7 +104,8 @@ export default (lookupTable, searchTermConfig = {}) => {
         }
       } else {
         matchesById[id] = {
-          name: lookupTable[id],
+          name: tileIndex[id].area_name,
+          description: tileIndex[id].area_description,
           isNameMatch,
           matchIndex: isNameMatch ? matchIndex : undefined,
           terms: isNameMatch ? [] : [{ term: searchTerm, matchIndex }]

@@ -2,7 +2,11 @@ import React from 'react'
 import { Popup } from 'react-map-gl'
 
 const formatPct = (v, precision = 1) => { const _v = v * 100; return `${Number.isInteger(_v) ? _v : _v.toFixed(precision)}%` }
-const formatNumber = (v, precision = 2) => `${Number.isInteger(v) ? v : v.toFixed(precision)}`
+const formatNumber = (v, precision = 2) => {
+  if (Number.isInteger(v)) return v.toLocaleString()
+  const fixed = v.toFixed(precision)
+  return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: precision })
+}
 
 const MapPopup = ({ value, format, precision = {}, lat, long, onClick, label }) => {
   const formatValue = React.useMemo(() => format === 'percentage' ? formatPct : formatNumber, [format])

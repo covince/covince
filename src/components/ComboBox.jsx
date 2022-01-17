@@ -45,7 +45,7 @@ const ComboBox = ({ onSelect, items, value, onChange, onClose, placeholder, aria
   const list = value.length
     ? (items.length > 0
         ? <ComboboxList className='w-full'>
-            {items.map(({ id, name, isNameMatch, matchIndex, terms }) => (
+            {items.map(({ id, name, description, isNameMatch, matchIndex, terms }) => (
               <ComboboxOption
                 key={id}
                 className='py-3 md:py-2 px-4 md:px-3 no-webkit-tap'
@@ -55,7 +55,7 @@ const ComboBox = ({ onSelect, items, value, onChange, onClose, placeholder, aria
                   { isNameMatch
                     ? <HighlightMatch index={matchIndex} length={value.length}>{name}</HighlightMatch>
                     : name }
-                  &nbsp;<span className='font-medium text-xs tracking-wide text-subheading'>{id}</span>
+                  &nbsp;<span className='font-medium text-xs tracking-wide text-subheading'>{description}</span>
                 </div>
                 { terms &&
                   <ul className='covince-search-term-list text-subheading text-sm truncate'>
