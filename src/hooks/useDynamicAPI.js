@@ -4,7 +4,18 @@ import { expandLineage, topologise } from 'pango-utils'
 import useAPI from '../api'
 
 export const indexMapResults = (index, results, key, valueKey = 'sum') => {
-  for (const row of results) {
+  let _results = []
+  if (!Array.isArray(results)) {
+    for (const [date, data] of Object.entries(results)) {
+      for (const [area, count] of Object.entries(data)) {
+        _results.push({ date, area, [valueKey]: count })
+      }
+    }
+  } else {
+    _results = results
+  }
+
+  for (const row of _results) {
     const { area, date, [valueKey]: value } = row
     if (area in index) {
       const dates = index[area]
@@ -80,7 +91,17 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         query.append('area', area)
       }
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
-      const json = await response.json()
+      let json = await response.json()
+
+      if (!Array.isArray(json)) {
+        const flattenedJson = []
+        for (const [date, data] of Object.entries(json)) {
+          for (const [key, period_count] of Object.entries(data)) {
+            flattenedJson.push({ date, key, period_count })
+          }
+        }
+        json = flattenedJson
+      }
 
       const lineageZeroes = Object.fromEntries(expandedLineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
@@ -127,7 +148,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       indexMapResults(index, totalJson, 'total')
       indexMapResults(index, lineageJson, 'value')
 
-      const uniqueDates = info.dates
+      const uniqueDates = info.dates.sort()
       const uniqueAreas = info.areas
       const values = createMapArrays({
         areas: uniqueAreas,
