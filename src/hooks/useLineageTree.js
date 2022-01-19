@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
-import { toAlias, buildFullTopology, whoVariants } from 'pango-utils'
+import { toAlias, buildFullTopology, whoVariants, expandLineage } from 'pango-utils'
 
 const whoVariantsOrder = Object.keys(whoVariants)
 
@@ -155,7 +155,15 @@ export default ({
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
-      const lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
+      let lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
+      if (!Array.isArray(lineageData)) {
+        lineageData = Object.entries(lineageData)
+          .map(([lineage, sum]) => ({
+            lineage,
+            sum,
+            pango_clade: `${expandLineage(lineage)}.`
+          }))
+      }
       const index = Object.fromEntries(
         lineageData.map(l => {
           const expanded = l.pango_clade.slice(0, -1)

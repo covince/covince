@@ -4,15 +4,14 @@ import { expandLineage, topologise } from 'pango-utils'
 import useAPI from '../api'
 
 export const indexMapResults = (index, results, key, valueKey = 'sum') => {
-  let _results = []
+  let _results = results
   if (!Array.isArray(results)) {
+    _results = []
     for (const [date, data] of Object.entries(results)) {
       for (const [area, count] of Object.entries(data)) {
         _results.push({ date, area, [valueKey]: count })
       }
     }
-  } else {
-    _results = results
   }
 
   for (const row of _results) {
