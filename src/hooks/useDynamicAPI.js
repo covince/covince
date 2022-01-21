@@ -83,6 +83,10 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
 
   const impl = React.useMemo(() => ({
     async fetchChartData (area) {
+      if (lineages.length === 0) {
+        return []
+      }
+
       const query = new URLSearchParams({
         lineages: expandedLineages
       })
