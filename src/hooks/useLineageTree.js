@@ -1,5 +1,7 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
-import { toAlias, buildFullTopology, whoVariants, expandLineage } from 'pango-utils'
+
+import { buildFullTopology, whoVariants, expandLineage } from '../pango'
+import useReverseAliasLookup from './useReverseAliasLookup'
 
 const whoVariantsOrder = Object.keys(whoVariants)
 
@@ -14,7 +16,7 @@ const sortByCladeSize = (a, b) => {
   return 0
 }
 
-const constructLineage = name => {
+const constructLineage = (name, toAlias) => {
   let remaining = name
   while (remaining.includes('.')) {
     remaining = remaining.slice(0, remaining.lastIndexOf('.'))
@@ -26,13 +28,13 @@ const constructLineage = name => {
 }
 
 const createNodeWithState = (node, state, parentWho) => {
-  const { nodeIndex, preset, lineageToColourIndex } = state
+  const { nodeIndex, preset, selectedLineages } = state
   const {
-    lineage = constructLineage(node.name),
+    lineage = constructLineage(node.name, state.toAlias),
     sum = 0,
-    selected = lineage in lineageToColourIndex
+    selected = selectedLineages.includes(lineage)
   } = nodeIndex[node.name] || {}
-  const alias = toAlias[node.name]
+  const alias = state.toAlias[node.name]
   const who = whoVariants[node.name]
 
   let childrenWithState = []
@@ -183,12 +185,18 @@ export default ({
     dispatch({ type: 'TOGGLE_OPEN', payload: { nodeName, isOpen } })
   }, [dispatch])
 
-  const numberSelected = useMemo(() => Object.keys(lineageToColourIndex).length, [lineageToColourIndex])
+  const selectedLineages = useMemo(
+    () => Object.keys(lineageToColourIndex).map(k => k.split('+')[0]),
+    [lineageToColourIndex]
+  )
+  const numberSelected = selectedLineages.length
+
+  const toAlias = useReverseAliasLookup()
 
   const topology = useMemo(() => {
     const { topology, ...rest } = state
-    return mapStateToNodes(topology, { ...rest, lineageToColourIndex })
-  }, [state.topology, state.preset])
+    return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias })
+  }, [state.topology, state.preset, toAlias])
 
   return useMemo(() => ({
     colourPalette,

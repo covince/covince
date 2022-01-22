@@ -30,9 +30,10 @@ const Branch = memo(({ node, ...props }) => {
   } = node
   const {
     lineage = node.name,
-    checked = (lineage in values),
     isOpen = node.childIsSelected
   } = index[node.name] || {}
+
+  const checked = lineage in values
 
   let childBranches = []
   for (const child of node.children) {
@@ -53,6 +54,16 @@ const Branch = memo(({ node, ...props }) => {
   }
 
   const colour = values[lineage] || null
+
+  const selectedMuts = Object.keys(values).filter(k => k === k.startsWith(`${lineage}+`))[0]
+  const initalMuts = selectedMuts ? selectedMuts.slice(selectedMuts.indexOf('+')) : ''
+  const [mutations, setMutations] = React.useState(initalMuts)
+
+  const submitMutations = (e) => {
+    e.preventDefault()
+    toggleSelect(selectedMuts, `${lineage}+${mutations}`)
+  }
+
   const isDisabled = selectDisabled && !checked
 
   const Chevron = isOpen ? HiChevronDown : HiChevronRight
@@ -99,13 +110,35 @@ const Branch = memo(({ node, ...props }) => {
             /> }
         </span>
         { isOpen &&
+          <ul>
+            <li>
+              {/* <h3 className='text-xs uppercase tracking-wide'>Mutations</h3> */}
+              { (checked || mutations.length > 0) &&
+                <form onSubmit={submitMutations}>
+                  <Input value={mutations} onChange={e => setMutations(e.target.value)} />
+                  <Button>Submit</Button>
+                </form> }
+            </li>
+            <li>
+              {/* <h3 className='text-xs uppercase tracking-wide'>Sublineages</h3> */}
           <ul className='lg:ml-6'>
             {childBranches}
+              </ul>
+            </li>
           </ul> }
       </span>
     </li>
   )
 })
+
+const getNextColour = (colours, palette) => {
+  const unique = new Set(colours)
+  for (let i = 0; i < palette.length; i++) {
+    if (unique.has(i.toString())) continue
+    return i.toString()
+  }
+  return colours.length % palette.length
+}
 
 const LineageTree = (props) => {
   const {
@@ -141,22 +174,15 @@ const LineageTree = (props) => {
     })
   }, [scrollRef])
 
-  const nextColourIndex = useMemo(() => {
-    const colours = Object.values(lineageToColourIndex)
-    const unique = new Set(colours)
-    for (let i = 0; i < colourPalette.length; i++) {
-      if (unique.has(i.toString())) continue
-      return i.toString()
-    }
-    return colours.length % colourPalette.length
-  }, [lineageToColourIndex])
-
-  const toggleSelect = useCallback((nodeName) => {
+  const toggleSelect = useCallback((...lineages) => {
     const nextValues = { ...lineageToColourIndex }
-    if (nodeName in nextValues) {
-      delete nextValues[nodeName]
-    } else {
-      nextValues[nodeName] = nextColourIndex
+    for (const l of lineages) {
+      if (typeof l !== 'string' || l.length === 0) continue
+      if (l in nextValues) {
+        delete nextValues[l]
+      } else {
+        nextValues[l] = getNextColour(Object.values(nextValues), colourPalette)
+      }
     }
     submit(nextValues)
   }, [lineageToColourIndex])

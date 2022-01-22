@@ -1,6 +1,7 @@
-import { expandLineage, toAlias, whoVariants } from 'pango-utils'
 import { useMemo } from 'react'
+import { expandLineage, whoVariants } from '../pango'
 
+import useReverseAliasLookup from './useReverseAliasLookup'
 import { createConfig } from '../config'
 
 const whoVariantEntries =
@@ -10,6 +11,8 @@ const whoVariantEntries =
 const collator = new Intl.Collator(undefined, { numeric: true })
 
 const useDynamicConfig = ({ colourPalette, lineages, lineageToColourIndex, staticConfig }) => {
+  const toAlias = useReverseAliasLookup()
+
   const nomenclature = useMemo(() => {
     const whoIndex = {}
     const expanded = lineages.map(l => `${expandLineage(l)}.`)
