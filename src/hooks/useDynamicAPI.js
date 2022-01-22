@@ -76,7 +76,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       memo[expanded] = l
     }
     const expandedLineages = Object.keys(memo).sort()
-    return [memo, expandedLineages, topologise(expandedLineages)]
+    return [memo, expandedLineages, topologise(expandedLineages.filter(_ => !_.includes('+')))]
   }, [lineages])
 
   const cachedTotals = React.useRef({ key: null, value: [] })
@@ -141,7 +141,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
             .then(_ => _.json()),
         fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
           lineage,
-          excluding: Object.keys(unaliasedToAliased).filter(l => l.startsWith(`${lineage}.`)).sort()
+          excluding: Object.keys(unaliasedToAliased).filter(l => !l.includes('+') && l.startsWith(`${lineage}.`)).sort()
         })}`).then(_ => _.json())
       ])
       if (!useCachedTotals) {
