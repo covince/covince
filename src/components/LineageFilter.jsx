@@ -150,28 +150,29 @@ const LineageFilter = (props) => {
               ref={el => { sectionRefs.current[i] = el }}
               className={classNames(
                 'w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative',
-                { 'lg:px-1': fixedLayout }
+                { 'lg:px-1 lg:w-104': fixedLayout }
               )}
               style={gridStyle}
             >
               { lineages.length > 0
-                ? lineages.map(({ lineage, active, colour, altName }) => (
+                ? lineages.map(({ lineage, active, colour, altName, label = lineage, title }) => (
                   <Checkbox
                     key={lineage}
                     className={classNames(
                       'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
                       {
                         'md:mb-1': isScrolling && nomenclature.length === 0,
-                        'lg:w-24 lg:mx-0.5': fixedLayout
+                        'lg:mx-0.5': fixedLayout
                       }
                     )}
-                    style={{ color: colour }}
+                    title={title}
+                    style={{ color: colour, maxWidth: (!isMobile && !isLarge) ? '7rem' : undefined }}
                     id={`lineage_filter_${lineage}`}
                     checked={active}
                     onChange={() => toggleLineage(lineage)}
                   >
                     {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
-                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{lineage}</span>
+                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{label}</span>
                   </Checkbox>
                 ))
                 : (

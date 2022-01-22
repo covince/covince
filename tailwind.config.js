@@ -30,7 +30,8 @@ module.exports = {
       spacing: {
         header: defaultTheme.spacing[16],
         'header-md': `calc(${defaultTheme.spacing[28]} + ${defaultTheme.spacing[2]})`,
-        'header-overlap': '4.5rem' // 3 x 1.5rem / spacing.6 = "18"
+        'header-overlap': '4.5rem', // 3 x 1.5rem / spacing.6 = "18"
+        104: '26rem'
       },
       gridTemplateRows: {
         '1-full': '100%'

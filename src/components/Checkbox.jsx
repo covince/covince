@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { FaCheck as CheckMark } from 'react-icons/fa'
 
 const Checkbox = ({ id, name, children, label = children, checked, onChange, className, style, disabled, title }) => (
-  <div className={classNames('flex items-center', className)} style={style}>
+  <div className={classNames('flex items-center', className)} style={style} title={title}>
     <div className="flex items-center justify-center h-5 relative">
       <input
         checked={checked}
@@ -12,13 +12,12 @@ const Checkbox = ({ id, name, children, label = children, checked, onChange, cla
         id={id}
         name={name}
         onChange={onChange}
-        title={title}
         type="checkbox"
       />
       { checked && <CheckMark className='absolute h-2.5 w-2.5 stroke-current text-white pointer-events-none dark:text-gray-800' /> }
     </div>
     { label &&
-      <label className='pl-2 text-sm font-medium text-gray-700 dark:text-gray-200 leading-none' htmlFor={id}>
+      <label className='pl-2 text-sm font-medium text-gray-700 dark:text-gray-200 leading-none min-w-0 truncate' htmlFor={id}>
         {label}
       </label> }
   </div>
