@@ -16,27 +16,36 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
   const activeLineages = useMemo(() => {
     return loadedLineages.reduce((memo, lineage, index) => {
       const colour = colors[Array.isArray(colors) ? index : lineage]
+      const mutsIndex = lineage.indexOf('+')
       memo[lineage] = {
         lineage,
         colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
         active: queryLineages.has(lineage),
-        altName: nomenclatureLookup[lineage]
+        altName: mutsIndex !== -1 ? lineage.slice(0, mutsIndex) : nomenclatureLookup[lineage],
+        label: mutsIndex !== -1 ? lineage.slice(mutsIndex) : undefined,
+        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === lineage)
       }
       return memo
     }, {})
-  }
-  , [queryLineages, darkMode, colors])
+  }, [queryLineages, darkMode, colors])
 
   const sortedLineages = useMemo(() => {
-    const lineagesWithoutAltNames =
-      Object.values(activeLineages)
-        .filter(_ => uniqueLineages.includes(_.lineage) && _.altName === undefined)
-    lineagesWithoutAltNames.sort((a, b) => collator.compare(a.lineage, b.lineage))
+    const lineagesWithNomenclature = []
+    const lineagesWithoutNomenclature = []
+    for (const item of Object.values(activeLineages)) {
+      if (uniqueLineages.includes(item.lineage)) {
+        (item.lineage in nomenclatureLookup ? lineagesWithNomenclature : lineagesWithoutNomenclature).push(item)
+      }
+    }
+    lineagesWithNomenclature.sort((a, b) => {
+      if (a.nomenclatureIndex > b.nomenclatureIndex) return 1
+      if (a.nomenclatureIndex < b.nomenclatureIndex) return -1
+      return 0
+    })
+    lineagesWithoutNomenclature.sort((a, b) => collator.compare(a.lineage, b.lineage))
     return [
-      ...nomenclature
-        .filter(({ lineage }) => uniqueLineages.includes(lineage) && lineage in activeLineages)
-        .map(({ lineage }) => activeLineages[lineage]),
-      ...lineagesWithoutAltNames
+      ...lineagesWithNomenclature,
+      ...lineagesWithoutNomenclature
     ]
   }, [activeLineages, uniqueLineages])
 

@@ -34,7 +34,7 @@ const useDynamicConfig = ({ colourPalette, lineages, lineageToColourIndex, stati
       ...Object.entries(whoIndex).map(([lineage, alt_name]) => ({ lineage, alt_name })),
       ...pangoItems
     ]
-  }, [lineages])
+  }, [lineages, toAlias])
 
   return useMemo(() => {
     const _config = createConfig(staticConfig)
