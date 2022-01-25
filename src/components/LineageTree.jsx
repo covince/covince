@@ -8,6 +8,7 @@ import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
 import LineageMenu from './LineageMenu'
+import MutationForm from './MutationForm'
 
 const Branch = memo(({ node, ...props }) => {
   const {
@@ -23,13 +24,12 @@ const Branch = memo(({ node, ...props }) => {
   } = props
 
   const {
-    label,
     altName,
+    lineage,
     sum,
     sumOfClade
   } = node
   const {
-    lineage = node.name,
     isOpen = node.childIsSelected
   } = index[node.name] || {}
 
@@ -55,13 +55,16 @@ const Branch = memo(({ node, ...props }) => {
 
   const colour = values[lineage] || null
 
-  const selectedMuts = Object.keys(values).filter(k => k === k.startsWith(`${lineage}+`))[0]
-  const initalMuts = selectedMuts ? selectedMuts.slice(selectedMuts.indexOf('+')) : ''
+  const selectedMuts = Object.keys(values).find(k => k.startsWith(`${lineage}+`))
+  const initalMuts = selectedMuts ? selectedMuts.slice(selectedMuts.indexOf('+') + 1) : ''
   const [mutations, setMutations] = React.useState(initalMuts)
+  const mutsColour = values[selectedMuts]
 
   const submitMutations = (e) => {
     e.preventDefault()
-    toggleSelect(selectedMuts, `${lineage}+${mutations}`)
+    if (mutations.length) {
+      toggleSelect(selectedMuts, `${lineage}+${mutations}`)
+    }
   }
 
   const isDisabled = selectDisabled && !checked
@@ -70,7 +73,7 @@ const Branch = memo(({ node, ...props }) => {
   return (
     <li className='flex items-start mt-1.5'>
       <span className='mt-1 w-5 h-5 mr-2 text-gray-400 dark:text-gray-300' onClick={e => e.stopPropagation()}>
-        { childBranches.length > 0 &&
+        { (childBranches.length > 0 || checked) &&
           <Button className='!p-0' onClick={() => toggleOpen(node.name, isOpen)}>
             <Chevron className='w-5 h-5' />
           </Button> }
@@ -85,12 +88,12 @@ const Branch = memo(({ node, ...props }) => {
             style={{ color: colour }}
             id={`lineage_selector_${node.name}`}
             checked={checked}
-            onChange={() => toggleSelect(lineage)}
+            onChange={() => toggleSelect(lineage, selectedMuts)}
             disabled={isDisabled}
             title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
           >
             <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
-              {label}
+              {lineage}
             </span>
             { altName &&
               <span className='ml-1 font-normal'>
@@ -109,27 +112,50 @@ const Branch = memo(({ node, ...props }) => {
               setColour={setColour}
             /> }
         </span>
-        { isOpen &&
-          <ul>
-            <li>
-              {/* <h3 className='text-xs uppercase tracking-wide'>Mutations</h3> */}
-              { (checked || mutations.length > 0) &&
-                <form onSubmit={submitMutations}>
-                  <Input value={mutations} onChange={e => setMutations(e.target.value)} />
-                  <Button>Submit</Button>
-                </form> }
-            </li>
-            <li>
-              {/* <h3 className='text-xs uppercase tracking-wide'>Sublineages</h3> */}
-          <ul className='lg:ml-6'>
-            {childBranches}
-              </ul>
-            </li>
-          </ul> }
+        <ul className='lg:ml-6'>
+          { checked &&
+            <li className='mt-1.5 flex items-center h-5'>
+              { selectedMuts
+                ? <>
+                  <Checkbox
+                    className='whitespace-nowrap ml-9 mr-2'
+                    style={{ color: mutsColour }}
+                    id={`lineage_selector_${selectedMuts}`}
+                    checked={checked}
+                    onChange={() => toggleSelect(selectedMuts)}
+                    disabled={isDisabled}
+                    title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
+                  >
+                    <span className='font-normal'>+</span>
+                    <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
+                      {mutations}
+                    </span>
+                  </Checkbox>
+                  <LineageMenu
+                    colour={mutsColour}
+                    lineage={selectedMuts}
+                    palette={colourPalette}
+                    setColour={setColour}
+                  />
+                </>
+                : <MutationForm
+                    mutations={mutations}
+                    setMutations={setMutations}
+                    onSubmit={submitMutations}
+                    disabled={isDisabled}
+                  /> }
+            </li> }
+            { isOpen &&
+              <li>
+                <ul>{childBranches}</ul>
+              </li> }
+        </ul>
       </span>
     </li>
   )
 })
+
+Branch.displayName = 'Branch'
 
 const getNextColour = (colours, palette) => {
   const unique = new Set(colours)

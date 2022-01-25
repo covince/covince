@@ -59,7 +59,7 @@ const createNodeWithState = (node, state, parentWho) => {
     altName: who || alias,
     childIsSelected,
     children: preset === 'selected' && (selected && !childIsSelected) ? [] : childrenWithState,
-    label: lineage,
+    lineage,
     name: node.name,
     searchText: [node.name, lineage, who || parentWho, alias].join('|').toLowerCase(),
     selected,
@@ -154,16 +154,18 @@ export default ({
 
   useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [area, fromDate, toDate])
 
+  const toAlias = useReverseAliasLookup()
+
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
       let lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
       if (!Array.isArray(lineageData)) {
         lineageData = Object.entries(lineageData)
-          .map(([lineage, sum]) => ({
-            lineage,
-            sum,
-            pango_clade: `${expandLineage(lineage)}.`
+          .map(([pango_clade, sum]) => ({
+            pango_clade,
+            sum
+            // lineage: ?
           }))
       }
       const index = Object.fromEntries(
@@ -190,8 +192,6 @@ export default ({
     [lineageToColourIndex]
   )
   const numberSelected = selectedLineages.length
-
-  const toAlias = useReverseAliasLookup()
 
   const topology = useMemo(() => {
     const { topology, ...rest } = state

@@ -155,7 +155,7 @@ const LineageFilter = (props) => {
               style={gridStyle}
             >
               { lineages.length > 0
-                ? lineages.map(({ lineage, active, colour, altName, label = lineage, title }) => (
+                ? lineages.map(({ lineage, active, colour, altName, label = lineage, title = lineage }) => (
                   <Checkbox
                     key={lineage}
                     className={classNames(
