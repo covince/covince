@@ -6,7 +6,7 @@ import { usePopper } from 'react-popper'
 import { HiDotsHorizontal } from 'react-icons/hi'
 import classNames from 'classnames'
 
-const LineageMenu = ({ palette, lineage, colour, setColour }) => {
+const LineageMenu = ({ palette, lineage, colour, setColour, children, className }) => {
   const [referenceElement, setReferenceElement] = useState()
   const [popperElement, setPopperElement] = useState()
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
@@ -35,13 +35,14 @@ const LineageMenu = ({ palette, lineage, colour, setColour }) => {
         ref={setPopperElement}
         style={styles.popper}
         {...attributes.popper}
-        className={`
-          covince-lineage-menu
-          shadow-lg bg-white dark:bg-gray-600 rounded-md py-3 z-10 space-y-1.5
-          ring-1 ring-black dark:ring-gray-500 ring-opacity-5 w-32 text-right
-        `}
+        className={classNames(
+          'shadow-lg bg-white dark:bg-gray-600 rounded-md z-10',
+          'ring-1 ring-black dark:ring-gray-500 ring-opacity-5',
+          className
+        )}
       >
-        <div className='px-3 space-y-3'>
+        {children}
+        <div className='p-3 space-y-3 w-32'>
           <h4 className='font-bold text-xs tracking-wide text-subheading'>Colour palette</h4>
           <ul className='grid grid-cols-3 gap-3 place-items-center'>
             {palette.map((item, i) => (

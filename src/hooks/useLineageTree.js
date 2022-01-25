@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
 
-import { buildFullTopology, whoVariants, expandLineage } from '../pango'
+import { buildFullTopology, whoVariants } from '../pango'
 import useReverseAliasLookup from './useReverseAliasLookup'
 
 const whoVariantsOrder = Object.keys(whoVariants)

@@ -73,7 +73,7 @@ const Branch = memo(({ node, ...props }) => {
   return (
     <li className='flex items-start mt-1.5'>
       <span className='mt-1 w-5 h-5 mr-2 text-gray-400 dark:text-gray-300' onClick={e => e.stopPropagation()}>
-        { (childBranches.length > 0 || checked) &&
+        { childBranches.length > 0 &&
           <Button className='!p-0' onClick={() => toggleOpen(node.name, isOpen)}>
             <Chevron className='w-5 h-5' />
           </Button> }
@@ -106,49 +106,51 @@ const Branch = memo(({ node, ...props }) => {
           </Checkbox>
           { checked &&
             <LineageMenu
+              className='flex items-start divide-x divide-gray-100'
               colour={colour}
               lineage={lineage}
               palette={colourPalette}
               setColour={setColour}
-            /> }
+            >
+              <div className='p-3 space-y-2'>
+                <h4 className='font-bold text-xs tracking-wide text-subheading'>Mutation query</h4>
+                <form onSubmit={submitMutations} className='space-y-1.5'>
+                  <Input value={mutations} onChange={e => setMutations(e.target.value)} />
+                  <footer>
+                    <Button className='!py-1 px-2'>Apply</Button>
+                  </footer>
+                </form>
+              </div>
+            </LineageMenu> }
         </span>
         <ul className='lg:ml-6'>
-          { checked &&
+          { selectedMuts &&
             <li className='mt-1.5 flex items-center h-5'>
-              { selectedMuts
-                ? <>
-                  <Checkbox
-                    className='whitespace-nowrap ml-9 mr-2'
-                    style={{ color: mutsColour }}
-                    id={`lineage_selector_${selectedMuts}`}
-                    checked={checked}
-                    onChange={() => toggleSelect(selectedMuts)}
-                    disabled={isDisabled}
-                    title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
-                  >
-                    <span className='font-normal'>+</span>
-                    <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
-                      {mutations}
-                    </span>
-                  </Checkbox>
-                  <LineageMenu
-                    colour={mutsColour}
-                    lineage={selectedMuts}
-                    palette={colourPalette}
-                    setColour={setColour}
-                  />
-                </>
-                : <MutationForm
-                    mutations={mutations}
-                    setMutations={setMutations}
-                    onSubmit={submitMutations}
-                    disabled={isDisabled}
-                  /> }
+              <Checkbox
+                className='whitespace-nowrap ml-9 mr-2'
+                style={{ color: mutsColour }}
+                id={`lineage_selector_${selectedMuts}`}
+                checked={checked}
+                onChange={() => toggleSelect(selectedMuts)}
+                disabled={isDisabled}
+                title={isDisabled ? 'Limit reached - deselect other lineages first' : undefined}
+              >
+                <span className='font-normal'>+</span>
+                <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
+                  {mutations}
+                </span>
+              </Checkbox>
+              <LineageMenu
+                colour={mutsColour}
+                lineage={selectedMuts}
+                palette={colourPalette}
+                setColour={setColour}
+              />
             </li> }
-            { isOpen &&
-              <li>
-                <ul>{childBranches}</ul>
-              </li> }
+          { isOpen &&
+            <li>
+              <ul>{childBranches}</ul>
+            </li> }
         </ul>
       </span>
     </li>
