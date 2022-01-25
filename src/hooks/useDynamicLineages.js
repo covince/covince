@@ -55,15 +55,14 @@ export default (config) => {
   const [{ lineages, colours }, updateQuery] = useQueryAsState(initial)
 
   const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
-    const entries = Object.entries(lineageToColourIndexes)
-    const nextLineages = entries.map(_ => _[0]).join(',')
-    const nextColours = entries.map(_ => _[1]).join(',')
+    const nextLineages = Object.keys(lineageToColourIndexes)
+    const nextColours = Object.values(lineageToColourIndexes)
     const nextQuery = {
       ...extraQueryUpdates,
-      lineages: nextLineages || '',
-      colours: nextColours || ''
+      lineages: nextLineages.join(',') || '',
+      colours: nextColours.join(',') || '',
+      show: undefined
     }
-    if (nextLineages !== lineages) nextQuery.show = undefined
     updateQuery(nextQuery)
   }, [])
 

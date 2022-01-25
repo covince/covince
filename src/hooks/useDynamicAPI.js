@@ -68,6 +68,16 @@ const defaultAvg = count => count / 2
 
 const queryStringify = query => new URLSearchParams(query).toString()
 
+const getChildLineages = (topology, lineage) => {
+  for (const node of topology) {
+    if (node.name === lineage) return node.children.map(c => c.name)
+    if (lineage.startsWith(`${node.name}.`)) {
+      return getChildLineages(node.children, lineage)
+    }
+  }
+  return []
+}
+
 export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
   const [unaliasedToAliased, expandedLineages, topology] = React.useMemo(() => {
     const memo = {}
@@ -131,19 +141,29 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       }
       return data
     },
-    async fetchMapData (aliased, parameter) {
+    async fetchMapData (aliased = '', parameter) {
       const lineage = expandLineage(aliased)
-      const useCachedTotals = cachedTotals.current.key === lineage
-      const [totalJson, lineageJson] = await Promise.all([
-        useCachedTotals
-          ? Promise.resolve(cachedTotals.current.value)
-          : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: topology.map(_ => _.name).sort() })}`)
-            .then(_ => _.json()),
-        fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
-          lineage,
-          excluding: Object.keys(unaliasedToAliased).filter(l => !l.includes('+') && l.startsWith(`${lineage}.`)).sort()
-        })}`).then(_ => _.json())
-      ])
+      const useCachedTotals = cachedTotals.current.key === lineages
+      const lineageWithoutMut =
+        lineage.includes('+')
+          ? lineage.slice(0, lineage.indexOf('+'))
+          : lineage
+      const [totalJson, lineageJson] =
+        lineages.length === 0
+          ? [{}, {}]
+          : await Promise.all([
+            useCachedTotals
+              ? Promise.resolve(cachedTotals.current.value)
+              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: topology.map(_ => _.name).sort() })}`)
+                .then(_ => _.json()),
+            fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
+              lineage,
+              excluding: [
+                ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
+                ...getChildLineages(topology, lineageWithoutMut)
+              ]
+            })}`).then(_ => _.json())
+          ])
       if (!useCachedTotals) {
         cachedTotals.current = { key: lineages, value: totalJson }
       }

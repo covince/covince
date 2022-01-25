@@ -13,7 +13,7 @@ const getDefaultScale = (default_color_scale, x) => {
 }
 
 const useLineages = (api, options, lineages) => {
-  const [{ lineage, colorBy, scale }, updateQuery] = useQueryAsState({ lineage: options.default_lineage || lineages[0], colorBy: options.default_color_by })
+  const [{ lineage, colorBy, scale, lineageView }, updateQuery] = useQueryAsState({ lineage: options.default_lineage || lineages[0], colorBy: options.default_color_by })
   const [{ current, status, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'LOADING':
@@ -52,22 +52,27 @@ const useLineages = (api, options, lineages) => {
     }
   }, {
     status: 'INIT',
-    current: { lineage: null, colorBy: null },
+    current: { lineage: lineageView ? '' : null, colorBy: null },
     loading: { lineage: null, colorBy: null },
     data: null
   })
 
   useEffect(async () => {
-    if (lineage && colorBy) {
-      dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
-      try {
-        const data = await api.fetchMapData(lineage, colorBy)
-        dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
-      } catch (e) {
-        dispatch({ type: 'ERROR', payload: e })
-      }
+    if (lineageView) {
+      return
     }
-  }, [lineage, colorBy, lineages])
+    if (lineages.length && !lineages.includes(lineage)) {
+      updateQuery({ lineage: lineages[0] })
+      return
+    }
+    dispatch({ type: 'LOADING', payload: { lineage, colorBy } })
+    try {
+      const data = await api.fetchMapData(lineage, colorBy)
+      dispatch({ type: 'FETCHED', payload: { data, lineage, colorBy } })
+    } catch (e) {
+      dispatch({ type: 'ERROR', payload: e })
+    }
+  }, [lineage, colorBy, lineages, lineageView])
 
   const actions = {
     setLineage: lineage => updateQuery({ lineage }),

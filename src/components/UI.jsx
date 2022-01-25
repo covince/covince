@@ -248,7 +248,7 @@ export const UI = ({
                 Lineage
               </label>
               <Select
-                value={selectedLineage}
+                value={selectedLineage || ''}
                 name='lineages'
                 onChange={e => mapDataActions.setLineage(e.target.value)}
               >

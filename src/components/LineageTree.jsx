@@ -56,14 +56,19 @@ const Branch = memo(({ node, ...props }) => {
   const colour = values[lineage] || null
 
   const selectedMuts = Object.keys(values).find(k => k.startsWith(`${lineage}+`))
-  const initalMuts = selectedMuts ? selectedMuts.slice(selectedMuts.indexOf('+') + 1) : ''
-  const [mutations, setMutations] = React.useState(initalMuts)
+  const initialMuts = selectedMuts ? selectedMuts.slice(selectedMuts.indexOf('+') + 1) : ''
+  const [mutations, setMutations] = React.useState(initialMuts)
   const mutsColour = values[selectedMuts]
 
   const submitMutations = (e) => {
     e.preventDefault()
     if (mutations.length) {
-      toggleSelect(selectedMuts, `${lineage}+${mutations}`)
+      const muts = mutations.split('+').slice(0, 2).map(_ => _.trim()).join('+')
+      if (muts === initialMuts) {
+        toggleSelect(selectedMuts)
+      } else {
+        toggleSelect(selectedMuts, `${lineage}+${muts}`)
+      }
     }
   }
 
