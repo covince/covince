@@ -106,7 +106,7 @@ const Branch = memo(({ node, ...props }) => {
           </Checkbox>
           { checked &&
             <LineageMenu
-              className='flex items-start divide-x divide-gray-100'
+              className='flex items-start divide-x divide-gray-100 dark:divide-gray-500'
               colour={colour}
               lineage={lineage}
               palette={colourPalette}
@@ -114,10 +114,10 @@ const Branch = memo(({ node, ...props }) => {
             >
               <div className='p-3 space-y-2'>
                 <h4 className='font-bold text-xs tracking-wide text-subheading'>Mutation query</h4>
-                <form onSubmit={submitMutations} className='space-y-1.5'>
-                  <Input value={mutations} onChange={e => setMutations(e.target.value)} />
+                <form onSubmit={submitMutations} className='space-y-1.5 dark:text-white'>
+                  <Input className='dark:bg-gray-500 dark:border-gray-400' value={mutations} onChange={e => setMutations(e.target.value)} />
                   <footer>
-                    <Button className='!py-1 px-2'>Apply</Button>
+                    <Button className='!py-1 px-2 dark:bg-gray-500 dark:border-gray-400 dark:text-white'>Apply</Button>
                   </footer>
                 </form>
               </div>
