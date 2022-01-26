@@ -150,7 +150,7 @@ const LineageFilter = (props) => {
               ref={el => { sectionRefs.current[i] = el }}
               className={classNames(
                 'w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative',
-                { 'lg:px-1 lg:w-104': fixedLayout }
+                { 'lg:px-1 md:w-104': fixedLayout }
               )}
               style={gridStyle}
             >
@@ -166,7 +166,7 @@ const LineageFilter = (props) => {
                       }
                     )}
                     title={title}
-                    style={{ color: colour, maxWidth: (!isMobile && !isLarge) ? '7rem' : undefined }}
+                    style={{ color: colour }}
                     id={`lineage_filter_${lineage}`}
                     checked={active}
                     onChange={() => toggleLineage(lineage)}
@@ -175,13 +175,12 @@ const LineageFilter = (props) => {
                     <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{label}</span>
                   </Checkbox>
                 ))
-                : (
-                  <>
+                : <>
                     <div className={classNames({ 'lg:w-24 lg:mx-0.5': fixedLayout })} />
                     <div className='absolute inset-0 flex items-center justify-center'>
                       {emptyMessage}
                     </div>
-                  </>) }
+                  </> }
             </section>
           ))}
         </form>
