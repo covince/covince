@@ -96,13 +96,19 @@ export default ({
     switch (action.type) {
       case 'QUEUE_REFETCH':
         return { ...state, loadedProps: null }
+      case 'LOADING':
+        return { ...state, loading: action.payload.props }
       case 'FETCHED': {
-        const nodeIndex = action.payload.index
+        const { props, index } = action.payload
+        if (Object.entries(state.loading).some(([k, v]) => props[k] !== v)) {
+          return state
+        }
         return {
           ...state,
-          nodeIndex,
+          nodeIndex: index,
+          loading: null,
           loadedProps: action.payload.props,
-          topology: buildFullTopology(Object.keys(nodeIndex))
+          topology: buildFullTopology(Object.keys(index))
         }
       }
       case 'ERROR': {
@@ -159,6 +165,7 @@ export default ({
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
+      dispatch({ type: 'LOADING', payload: { props: { area, fromDate, toDate } } })
       let lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
       if (!Array.isArray(lineageData)) {
         lineageData = Object.entries(lineageData)
