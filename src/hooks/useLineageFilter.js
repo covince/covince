@@ -17,13 +17,18 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
     return loadedLineages.reduce((memo, lineage, index) => {
       const colour = colors[Array.isArray(colors) ? index : lineage]
       const mutsIndex = lineage.indexOf('+')
+      const hasMuts = mutsIndex !== -1
+      const pango = hasMuts ? lineage.slice(0, mutsIndex) : lineage
+      const altName = nomenclatureLookup[lineage]
       memo[lineage] = {
         lineage,
+        altName,
         colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
         active: queryLineages.has(lineage),
-        altName: mutsIndex !== -1 ? lineage.slice(0, mutsIndex) : nomenclatureLookup[lineage],
-        label: mutsIndex !== -1 ? lineage.slice(mutsIndex) : undefined,
-        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === lineage)
+        label: altName ? `${altName} (${lineage})` : lineage,
+        primaryText: hasMuts ? pango : altName,
+        secondaryText: hasMuts ? lineage.slice(mutsIndex) : lineage,
+        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === pango)
       }
       return memo
     }, {})
@@ -34,7 +39,9 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
     const lineagesWithoutNomenclature = []
     for (const item of Object.values(activeLineages)) {
       if (uniqueLineages.includes(item.lineage)) {
-        (item.lineage in nomenclatureLookup ? lineagesWithNomenclature : lineagesWithoutNomenclature).push(item)
+        (item.nomenclatureIndex !== -1
+          ? lineagesWithNomenclature
+          : lineagesWithoutNomenclature).push(item)
       }
     }
     lineagesWithNomenclature.sort((a, b) => {

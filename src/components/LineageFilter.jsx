@@ -155,7 +155,7 @@ const LineageFilter = (props) => {
               style={gridStyle}
             >
               { lineages.length > 0
-                ? lineages.map(({ lineage, active, colour, altName, label = lineage, title = lineage }) => (
+                ? lineages.map(({ lineage, active, colour, title = lineage, primaryText, secondaryText = lineage }) => (
                   <Checkbox
                     key={lineage}
                     className={classNames(
@@ -171,8 +171,8 @@ const LineageFilter = (props) => {
                     checked={active}
                     onChange={() => toggleLineage(lineage)}
                   >
-                    {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
-                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{label}</span>
+                    {primaryText ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{primaryText}</span> : null}
+                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': primaryText })}>{secondaryText}</span>
                   </Checkbox>
                 ))
                 : <>

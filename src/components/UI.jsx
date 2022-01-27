@@ -252,10 +252,9 @@ export const UI = ({
                 name='lineages'
                 onChange={e => mapDataActions.setLineage(e.target.value)}
               >
-                {sortedLineages.map(({ lineage, altName }) =>
+                {sortedLineages.map(({ lineage, label }) =>
                   <option key={lineage} value={lineage}>
-                    {altName}
-                    {altName ? ` (${lineage})` : lineage}
+                    {label}
                   </option>
                 )}
               </Select>
