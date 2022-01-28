@@ -167,6 +167,8 @@ export default ({
     try {
       dispatch({ type: 'LOADING', payload: { props: { area, fromDate, toDate } } })
       let lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
+
+      // handle backend v2 response
       if (!Array.isArray(lineageData)) {
         lineageData = Object.entries(lineageData)
           .map(([pango_clade, sum]) => ({
@@ -175,6 +177,7 @@ export default ({
             // lineage: ?
           }))
       }
+
       const index = Object.fromEntries(
         lineageData.map(l => {
           const expanded = l.pango_clade.slice(0, -1)
@@ -195,7 +198,7 @@ export default ({
   }, [dispatch])
 
   const selectedLineages = useMemo(
-    () => Object.keys(lineageToColourIndex).map(k => k.split('+')[0]),
+    () => Object.keys(lineageToColourIndex).filter(k => !k.includes('+')),
     [lineageToColourIndex]
   )
   const numberSelected = selectedLineages.length

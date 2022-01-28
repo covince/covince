@@ -33,7 +33,9 @@ const DynamicUI = ({
 
   const getInfo = async () => {
     const response = await fetch(`${api_url}/info`)
-    return response.json()
+    const info = await response.json()
+    info.dates.sort()
+    return info
   }
   const { data: info } = useQuery('info', getInfo, { suspense: true })
 

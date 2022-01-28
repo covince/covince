@@ -9,6 +9,7 @@ import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
 import LineageMenu, { ColourPalette } from './LineageMenu'
 import MutationForm from './MutationForm'
+import useMutations from '../hooks/useMutations'
 
 const LineageCheckbox = props => {
   const {
@@ -47,9 +48,12 @@ const LineageCheckbox = props => {
 
 const Branch = memo(({ node, ...props }) => {
   const {
+    applyMutations,
     colourPalette,
     index,
+    lineageToMutations,
     preset,
+    removeMutations,
     search = '',
     selectDisabled,
     setColour,
@@ -90,14 +94,17 @@ const Branch = memo(({ node, ...props }) => {
 
   const colour = values[lineage] || null
 
-  const lineageWithMuts = Object.keys(values).find(k => k.startsWith(`${lineage}+`))
+  const muts = lineageToMutations[lineage]
+  const lineageWithMuts = `${lineage}+${muts}`
+  const mutsChecked = lineageWithMuts in values
   const mutsColour = values[lineageWithMuts]
-  const isolatedMuts = lineageWithMuts ? lineageWithMuts.slice(lineageWithMuts.indexOf('+') + 1) : ''
 
   const submitMutations = (value) => {
     if (value.length) {
-      const muts = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
-      toggleSelect(lineageWithMuts, `${lineage}+${muts}`)
+      const cleanValue = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
+      if (cleanValue !== muts) {
+        applyMutations(lineage, cleanValue, muts ? lineageWithMuts : undefined)
+      }
     }
   }
 
@@ -134,7 +141,7 @@ const Branch = memo(({ node, ...props }) => {
         }
         menu={
           checked &&
-          <LineageMenu>
+          <LineageMenu placement='bottom-end' offset={[4, 8]}>
             <ColourPalette
               colour={colour}
               lineage={lineage}
@@ -143,14 +150,14 @@ const Branch = memo(({ node, ...props }) => {
             />
           </LineageMenu>
         }
-        onChange={() => toggleSelect(lineage, lineageWithMuts)}
+        onChange={() => toggleSelect(muts ? lineageWithMuts : undefined, lineage)}
       >
         <ul>
           { checked &&
             <li className='ml-7 lg:ml-5 flex mt-1.5'>
-              { lineageWithMuts
+              { muts
                 ? <LineageCheckbox
-                    checked={!!lineageWithMuts}
+                    checked={mutsChecked}
                     colour={mutsColour}
                     disabled={isDisabled}
                     id={`lineage_selector_${lineageWithMuts}`}
@@ -158,16 +165,20 @@ const Branch = memo(({ node, ...props }) => {
                       <>
                         <span className='font-normal'>+</span>
                         <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
-                          {isolatedMuts}
+                          {muts}
                         </span>
                       </>
                     }
                     menu={
-                      !!lineageWithMuts &&
+                      mutsChecked &&
                       <LineageMenu
                         className='flex items-start divide-x divide-gray-100 dark:divide-gray-500'
                       >
-                        <MutationForm initialValue={isolatedMuts} onSubmit={submitMutations} />
+                        <MutationForm
+                          initialValue={muts}
+                          onSubmit={submitMutations}
+                          onRemove={() => removeMutations(lineage, muts)}
+                        />
                         <ColourPalette
                           colour={mutsColour}
                           lineage={lineageWithMuts}
@@ -182,16 +193,17 @@ const Branch = memo(({ node, ...props }) => {
                     className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
                     buttonLabel={
                       <span className='text-xs tracking-wide text-subheading flex items-center'>
-                        <span className='pl-0.5'>add mutations</span>
+                        <span className='pl-0.5'>mutations</span>
                         <HiPlus className='h-5 w-5 ml-0.5 -mr-0.5 text-gray-500 dark:text-gray-400'/>
                       </span>
                     }
                   >
                     <MutationForm onSubmit={submitMutations} />
-                    {/* <div className='p-3 text-xs tracking-wide space-y-1.5'>
-                      <h4 className='font-bold text-subheading'>Guidance</h4>
-                      <p>Lorem ipsum</p>
-                    </div> */}
+                    <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
+                      {/* <h4 className='font-bold text-subheading'>Guidance</h4> */}
+                      <p>Add up to two mutations separated by a &ldquo;+&rdquo; character.</p>
+                      <p>Two mutations are considered a boolean AND.</p>
+                    </div>
                   </LineageMenu> }
             </li> }
           { isOpen &&
@@ -212,7 +224,7 @@ const getNextColour = (colours, palette) => {
     if (unique.has(i.toString())) continue
     return i.toString()
   }
-  return colours.length % palette.length
+  return (colours.length % palette.length).toString()
 }
 
 const LineageTree = (props) => {
@@ -232,6 +244,8 @@ const LineageTree = (props) => {
     isLoading, nodeIndex, topology, toggleOpen
   } = props
 
+  const { lineageToMutations, getMutationQueryUpdate } = useMutations()
+
   const inputRef = React.useRef()
   const scrollRef = React.useRef()
   React.useEffect(() => {
@@ -249,7 +263,7 @@ const LineageTree = (props) => {
     })
   }, [scrollRef])
 
-  const toggleSelect = useCallback((...lineages) => {
+  const getLineageQueryUpdate = useCallback((...lineages) => {
     const nextValues = { ...lineageToColourIndex }
     for (const l of lineages) {
       if (typeof l !== 'string' || l.length === 0) continue
@@ -259,15 +273,36 @@ const LineageTree = (props) => {
         nextValues[l] = getNextColour(Object.values(nextValues), colourPalette)
       }
     }
-    submit(nextValues)
+    return nextValues
+  }, [lineageToColourIndex])
+
+  const toggleSelect = useCallback((...lineages) => {
+    submit(getLineageQueryUpdate(...lineages))
   }, [lineageToColourIndex])
 
   const setColour = useCallback((lineage, colourIndex) => {
-    submit({
+    const update = {
       ...lineageToColourIndex,
-      [lineage]: colourIndex
-    })
+      [lineage]: colourIndex.toString()
+    }
+    console.log(
+      lineageToColourIndex,
+      update
+    )
+    submit(update)
   }, [lineageToColourIndex])
+
+  const applyMutations = useCallback((lineage, muts, replacing) => {
+    const mutationUpdate = getMutationQueryUpdate(lineage, muts)
+    const lineageUpdate = getLineageQueryUpdate(replacing, `${lineage}+${muts}`)
+    submit(lineageUpdate, mutationUpdate)
+  }, [getMutationQueryUpdate, getLineageQueryUpdate])
+
+  const removeMutations = useCallback((lineage, muts) => {
+    const mutationUpdate = getMutationQueryUpdate(lineage, muts, false)
+    const lineageUpdate = getLineageQueryUpdate(`${lineage}+${muts}`)
+    submit(lineageUpdate, mutationUpdate)
+  }, [[getMutationQueryUpdate, getLineageQueryUpdate]])
 
   const lightOrDarkPalette = useMemo(() =>
     colourPalette.map(item => item[darkMode ? 'dark' : 'light'])
@@ -310,11 +345,14 @@ const LineageTree = (props) => {
         <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
           {nodeIndex && topology.map(node =>
             <Branch
+              applyMutations={applyMutations}
               colourPalette={lightOrDarkPalette}
               index={nodeIndex}
               key={node.name}
+              lineageToMutations={lineageToMutations}
               node={node}
               preset={preset}
+              removeMutations={removeMutations}
               search={search.toLowerCase()}
               selectDisabled={numberSelected >= maxLineages}
               setColour={setColour}

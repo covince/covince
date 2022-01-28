@@ -5,6 +5,7 @@ import useAPI from '../api'
 
 export const indexMapResults = (index, results, key, valueKey = 'sum') => {
   let _results = results
+  // handle backend v2 response
   if (!Array.isArray(results)) {
     _results = []
     for (const [date, data] of Object.entries(results)) {
@@ -106,6 +107,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
       let json = await response.json()
 
+      // handle backend v2 response
       if (!Array.isArray(json)) {
         const flattenedJson = []
         for (const [date, data] of Object.entries(json)) {
@@ -171,7 +173,7 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       indexMapResults(index, totalJson, 'total')
       indexMapResults(index, lineageJson, 'value')
 
-      const uniqueDates = info.dates.sort()
+      const uniqueDates = info.dates
       const uniqueAreas = info.areas
       const values = createMapArrays({
         areas: uniqueAreas,
