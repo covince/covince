@@ -35,7 +35,7 @@ const MutationForm = ({ initialValue = '', onSubmit, onRemove }) => {
           { onRemove &&
             <button
               onClick={handleRemove}
-              className='p-1 text-sm leading-none text-subheading rounded focus:primary-ring'>
+              className='p-1 text-sm leading-none text-subheading rounded border border-transparent focus:primary-ring'>
                 Remove
             </button> }
         </footer>

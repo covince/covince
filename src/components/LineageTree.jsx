@@ -194,7 +194,7 @@ const Branch = memo(({ node, ...props }) => {
                     buttonLabel={
                       <span className='text-xs tracking-wide text-subheading flex items-center'>
                         <span className='pl-0.5'>mutations</span>
-                        <HiPlus className='h-5 w-5 ml-0.5 -mr-0.5 text-gray-500 dark:text-gray-400'/>
+                        <HiPlus className='h-5 w-5 p-px ml-0.5 -mr-0.5 text-gray-500 dark:text-gray-400'/>
                       </span>
                     }
                   >
