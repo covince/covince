@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, memo } from 'react'
 import { BsX } from 'react-icons/bs'
-import { HiChevronRight, HiChevronDown, HiPlus } from 'react-icons/hi'
+import { HiChevronRight, HiChevronDown } from 'react-icons/hi'
 import classNames from 'classnames'
 
 import Button from './Button'
@@ -45,6 +45,14 @@ const LineageCheckbox = props => {
     </span>
   )
 }
+
+const MutationsHelp = () => (
+  <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
+    {/* <h4 className='font-bold text-subheading'>Guidance</h4> */}
+    <p>Add up to two mutations separated by a &ldquo;+&rdquo; character.</p>
+    <p>Two mutations are considered a boolean AND.</p>
+  </div>
+)
 
 const Branch = memo(({ node, ...props }) => {
   const {
@@ -140,71 +148,60 @@ const Branch = memo(({ node, ...props }) => {
           </>
         }
         menu={
-          checked &&
-          <LineageMenu placement='bottom-end' offset={[4, 8]}>
-            <ColourPalette
-              colour={colour}
-              lineage={lineage}
-              palette={colourPalette}
-              setColour={setColour}
-            />
-          </LineageMenu>
+          (checked || !muts) &&
+            <LineageMenu
+              className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
+            >
+              { !muts && <MutationForm onSubmit={submitMutations} /> }
+              { checked
+                ? <ColourPalette
+                  colour={colour}
+                  lineage={lineage}
+                  palette={colourPalette}
+                  setColour={setColour}
+                />
+                : <MutationsHelp /> }
+            </LineageMenu>
         }
-        onChange={() => toggleSelect(muts ? lineageWithMuts : undefined, lineage)}
+        onChange={() => toggleSelect(lineage)}
       >
         <ul>
-          { checked &&
+          { muts &&
             <li className='ml-7 lg:ml-5 flex mt-1.5'>
-              { muts
-                ? <LineageCheckbox
-                    checked={mutsChecked}
-                    colour={mutsColour}
-                    disabled={isDisabled}
-                    id={`lineage_selector_${lineageWithMuts}`}
-                    label={
-                      <>
-                        <span className='font-normal'>+</span>
-                        <span className={classNames('text-gray-700 dark:text-gray-100 lg:ml-0.5 leading-5')}>
-                          {muts}
-                        </span>
-                      </>
-                    }
-                    menu={
-                      mutsChecked &&
-                      <LineageMenu
-                        className='flex items-start divide-x divide-gray-100 dark:divide-gray-500'
-                      >
-                        <MutationForm
-                          initialValue={muts}
-                          onSubmit={submitMutations}
-                          onRemove={() => removeMutations(lineage, muts)}
-                        />
-                        <ColourPalette
-                          colour={mutsColour}
-                          lineage={lineageWithMuts}
-                          palette={colourPalette}
-                          setColour={setColour}
-                        />
-                      </LineageMenu>
-                    }
-                    onChange={() => toggleSelect(lineageWithMuts)}
-                  />
-                : <LineageMenu
+              <LineageCheckbox
+                checked={mutsChecked}
+                colour={mutsColour}
+                disabled={isDisabled}
+                id={`lineage_selector_${lineageWithMuts}`}
+                label={
+                  <>
+                    <span className='text-gray-700 dark:text-gray-100'>{lineage}</span>
+                    <span className={classNames('font-normal leading-5')}>
+                      +{muts}
+                    </span>
+                  </>
+                }
+                menu={
+                  <LineageMenu
                     className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
-                    buttonLabel={
-                      <span className='text-xs tracking-wide text-subheading flex items-center'>
-                        <span className='pl-0.5'>mutations</span>
-                        <HiPlus className='h-5 w-5 p-px ml-0.5 -mr-0.5 text-gray-500 dark:text-gray-400'/>
-                      </span>
-                    }
                   >
-                    <MutationForm onSubmit={submitMutations} />
-                    <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
-                      {/* <h4 className='font-bold text-subheading'>Guidance</h4> */}
-                      <p>Add up to two mutations separated by a &ldquo;+&rdquo; character.</p>
-                      <p>Two mutations are considered a boolean AND.</p>
-                    </div>
-                  </LineageMenu> }
+                    <MutationForm
+                      initialValue={muts}
+                      onSubmit={submitMutations}
+                      onRemove={() => removeMutations(lineage, muts)}
+                    />
+                    { mutsChecked
+                      ? <ColourPalette
+                        colour={mutsColour}
+                        lineage={lineageWithMuts}
+                        palette={colourPalette}
+                        setColour={setColour}
+                      />
+                      : <MutationsHelp /> }
+                  </LineageMenu>
+                }
+                onChange={() => toggleSelect(lineageWithMuts)}
+              />
             </li> }
           { isOpen &&
             <li>
@@ -285,10 +282,6 @@ const LineageTree = (props) => {
       ...lineageToColourIndex,
       [lineage]: colourIndex.toString()
     }
-    console.log(
-      lineageToColourIndex,
-      update
-    )
     submit(update)
   }, [lineageToColourIndex])
 

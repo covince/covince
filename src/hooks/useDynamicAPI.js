@@ -150,20 +150,29 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         lineage.includes('+')
           ? lineage.slice(0, lineage.indexOf('+'))
           : lineage
+      const rootLineages = topology.map(_ => _.name)
       const [totalJson, lineageJson] =
         lineages.length === 0
           ? [{}, {}]
           : await Promise.all([
             useCachedTotals
               ? Promise.resolve(cachedTotals.current.value)
-              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: topology.map(_ => _.name).sort() })}`)
-                .then(_ => _.json()),
+              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({
+                lineages: [
+                  ...rootLineages,
+                  ...expandedLineages.filter(l => l.includes('+') && !rootLineages.some(r => l.startsWith(r)))
+                ]
+              })}`).then(_ => _.json()),
             fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
               lineage,
-              excluding: [
-                ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
-                ...getChildLineages(topology, lineageWithoutMut)
-              ]
+              excluding: lineage.includes('+')
+                ? topologise(
+                    expandedLineages.filter(l => l !== lineage && l !== lineageWithoutMut && `${l}.`.startsWith(`${lineageWithoutMut}.`))
+                  ).map(_ => _.name)
+                : [
+                  ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
+                  ...getChildLineages(topology, lineageWithoutMut)
+                ]
             })}`).then(_ => _.json())
           ])
       if (!useCachedTotals) {

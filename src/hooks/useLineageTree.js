@@ -49,7 +49,7 @@ const createNodeWithState = (node, state, parentWho) => {
   }
 
   let sumOfClade = 0
-  let childIsSelected = false
+  let childIsSelected = selectedLineages.some(l => l.startsWith(`${lineage}+`))
   for (const child of childrenWithState) {
     sumOfClade += child.sumOfClade + child.sum
     childIsSelected = childIsSelected || child.childIsSelected || child.selected
@@ -198,7 +198,7 @@ export default ({
   }, [dispatch])
 
   const selectedLineages = useMemo(
-    () => Object.keys(lineageToColourIndex).filter(k => !k.includes('+')),
+    () => Object.keys(lineageToColourIndex),
     [lineageToColourIndex]
   )
   const numberSelected = selectedLineages.length

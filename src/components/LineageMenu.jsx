@@ -75,6 +75,7 @@ const LineageMenu = props => {
           'ring-1 ring-black dark:ring-gray-500 ring-opacity-5',
           className
         )}
+        onSubmit={() => { if (referenceElement) { referenceElement.click() } }}
       >
         {children}
       </Popover.Panel>
