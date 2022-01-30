@@ -177,7 +177,7 @@ const Branch = memo(({ node, ...props }) => {
                   <>
                     <span className='text-gray-700 dark:text-gray-100'>{lineage}</span>
                     <span className={classNames('font-normal leading-5')}>
-                      +{muts}
+                      &nbsp;+{muts}
                     </span>
                   </>
                 }
