@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import Button from './Button'
 import Input from './TextInput'
 
-const MutationForm = ({ initialValue = '', onSubmit, onRemove }) => {
+const MutationForm = ({ label = 'Mutation query', initialValue = '', onSubmit, onRemove }) => {
   const inputRef = React.useRef()
   useEffect(() => {
     if (inputRef.current) {
@@ -27,7 +27,7 @@ const MutationForm = ({ initialValue = '', onSubmit, onRemove }) => {
     <div className='p-3 space-y-2'>
       <form onSubmit={handleSubmit} className='space-y-1.5 dark:text-white'>
         <label>
-          <span className='block font-bold text-xs tracking-wide text-subheading mb-1.5'>Mutation query</span>
+          <span className='block font-bold text-xs tracking-wide text-subheading mb-2'>{label}</span>
           <Input ref={inputRef} className='dark:bg-gray-500 dark:border-gray-400' value={mutations} onChange={e => setMutations(e.target.value)} />
         </label>
         <footer className='flex justify-between items-center'>

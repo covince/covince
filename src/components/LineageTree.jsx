@@ -153,7 +153,7 @@ const Branch = memo(({ node, ...props }) => {
             <LineageMenu
               className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
             >
-              { !muts && <MutationForm onSubmit={submitMutations} /> }
+              { !muts && <MutationForm label="Add mutation query" onSubmit={submitMutations} /> }
               { checked
                 ? <ColourPalette
                   colour={colour}
@@ -180,6 +180,7 @@ const Branch = memo(({ node, ...props }) => {
                     className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
                   >
                     <MutationForm
+                      label="Edit mutation query"
                       initialValue={muts}
                       onSubmit={submitMutations}
                       onRemove={() => removeMutations(lineage, muts)}
