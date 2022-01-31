@@ -49,7 +49,7 @@ const useLineages = (api, options, lineages) => {
     }
   }, {
     status: 'QUEUED',
-    current: { lineage: lineageView ? '' : null, colorBy: null, lineagesKey: null },
+    current: { lineage: null, colorBy: null, lineagesKey: null },
     loading: null,
     data: null
   })
@@ -71,7 +71,8 @@ const useLineages = (api, options, lineages) => {
   useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [lineage, colorBy, lineagesKey])
 
   useEffect(async () => {
-    if (lineageView || status !== 'QUEUED') {
+    // does not skip on initial load
+    if ((current.lineage !== null && lineageView) || status !== 'QUEUED') {
       return
     }
     if (lineages.length && !lineages.includes(lineage)) {
