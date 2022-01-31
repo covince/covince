@@ -39,9 +39,10 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 ### Chart settings
 
-* `csv_download [boolean]` defaults to true
-* `tooltip [object]`
+* `csv_download [boolean]` (optional) defaults to true
+* `tooltip [object]` (optional)
   * `use_nomenclature [boolean]` defaults to true
+* `group_stacked_colors [boolean]` (optional) reorder stacked areas to group colours together, defaults to true
 
 ### Chart
 

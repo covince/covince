@@ -51,7 +51,7 @@ const Chart = (props) => {
   const { area_data, activeLineages, chartZoom } = props
 
   const config = useConfig()
-  const { csv_download } = config.chart.settings
+  const { csv_download, group_stacked_colors } = config.chart.settings
 
   const [downloadURL, fileName] = useMemo(() => {
     if (!csv_download) return []
@@ -111,6 +111,7 @@ const Chart = (props) => {
         className='-mt-1 md:m-0'
         type={query[line_type_accessor]}
         parameter={parameterConfig}
+        groupStackedColours={group_stacked_colors}
       />
     </>
   )
