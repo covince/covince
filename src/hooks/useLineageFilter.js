@@ -19,7 +19,7 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
       const mutsIndex = lineage.indexOf('+')
       const hasMuts = mutsIndex !== -1
       const pango = hasMuts ? lineage.slice(0, mutsIndex) : lineage
-      const altName = nomenclatureLookup[lineage]
+      const altName = hasMuts ? null : nomenclatureLookup[lineage]
       memo[lineage] = {
         lineage,
         altName,
