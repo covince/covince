@@ -1,6 +1,6 @@
 import './LineageMenu.css'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Popover } from '@headlessui/react'
 import { usePopper } from 'react-popper'
 import { HiDotsHorizontal } from 'react-icons/hi'
@@ -28,18 +28,31 @@ export const ColourPalette = ({ palette, lineage, colour, setColour }) => (
   </div>
 )
 
+const MenuButton = React.forwardRef(
+  (props, ref) => (
+    <button
+      {...props}
+      ref={ref}
+      className='py-0 px-1 md:px-0.5 border border-transparent font-medium text-gray-500 dark:text-gray-300 rounded focus:primary-ring'
+    >
+      <HiDotsHorizontal className='w-5 h-5' />
+    </button>
+  )
+)
+MenuButton.displayName = 'MenuButton'
+
 const defaults = {
   placement: 'bottom',
   offset: [0, 8]
 }
 
-const LineageMenu = props => {
+export const LineageMenu = props => {
   const {
     children,
     className,
-    buttonLabel = <HiDotsHorizontal className='w-5 h-5' />,
     placement = defaults.Button,
-    offset = defaults.offset
+    offset = defaults.offset,
+    openOnMount
   } = props
 
   const [referenceElement, setReferenceElement] = useState()
@@ -58,14 +71,15 @@ const LineageMenu = props => {
     ]
   })
 
+  useEffect(() => {
+    if (openOnMount && referenceElement) {
+      referenceElement.click()
+    }
+  }, [referenceElement])
+
   return (
     <Popover as={React.Fragment}>
-      <Popover.Button
-        ref={setReferenceElement}
-        className='py-0 px-1 md:px-0.5 border border-transparent font-medium text-gray-500 dark:text-gray-300 rounded focus:primary-ring'
-      >
-        {buttonLabel}
-      </Popover.Button>
+      <Popover.Button ref={setReferenceElement} as={MenuButton} />
       <Popover.Panel
         ref={setPopperElement}
         style={styles.popper}
@@ -83,4 +97,12 @@ const LineageMenu = props => {
   )
 }
 
-export default LineageMenu
+export const LazyLineageMenu = props => {
+  const [clicked, setClicked] = useState(false)
+  if (clicked) {
+    return <LineageMenu {...props} openOnMount />
+  }
+  return <MenuButton onClick={() => setClicked(true)} />
+}
+
+export default LazyLineageMenu
