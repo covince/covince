@@ -54,7 +54,7 @@ const useLineages = (api, options, lineages) => {
     data: null
   })
 
-  const lineagesKey = useMemo(() => lineages.sort().join(','), [lineages])
+  const lineagesKey = useMemo(() => [...lineages].sort().join(','), [lineages])
 
   useEffect(() => {
     if (

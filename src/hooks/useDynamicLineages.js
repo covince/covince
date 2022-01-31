@@ -66,13 +66,8 @@ export default (config) => {
     updateQuery(nextQuery)
   }, [])
 
-  const [parsedLineages, parsedColourIndexes] = useMemo(
-    () => [
-      lineages.length ? lineages.split(',') : [],
-      colours.length ? colours.split(',') : []
-    ],
-    [lineages, colours]
-  )
+  const parsedLineages = useMemo(() => lineages.length ? lineages.split(',') : [], [lineages])
+  const parsedColourIndexes = useMemo(() => colours.length ? colours.split(',') : [], [colours])
 
   const lineageToColourIndex = useMemo(() => {
     const pairs = {}

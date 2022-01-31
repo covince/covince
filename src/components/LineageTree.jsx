@@ -45,6 +45,7 @@ const LineageCheckbox = props => {
     </span>
   )
 }
+LineageCheckbox.displayName = 'LineageCheckbox'
 
 const MutationsHelp = () => (
   <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
@@ -215,15 +216,6 @@ const Branch = memo(({ node, ...props }) => {
 
 Branch.displayName = 'Branch'
 
-const getNextColour = (colours, palette) => {
-  const unique = new Set(colours)
-  for (let i = 0; i < palette.length; i++) {
-    if (unique.has(i.toString())) continue
-    return i.toString()
-  }
-  return (colours.length % palette.length).toString()
-}
-
 const LineageTree = (props) => {
   const {
     action,
@@ -260,22 +252,25 @@ const LineageTree = (props) => {
     })
   }, [scrollRef])
 
-  const getLineageQueryUpdate = useCallback((...lineages) => {
-    const nextValues = { ...lineageToColourIndex }
-    for (const l of lineages) {
-      if (typeof l !== 'string' || l.length === 0) continue
-      if (l in nextValues) {
-        delete nextValues[l]
-      } else {
-        nextValues[l] = getNextColour(Object.values(nextValues), colourPalette)
-      }
+  const nextColourIndex = useMemo(() => {
+    const colours = Object.values(lineageToColourIndex)
+    const unique = new Set(colours)
+    for (let i = 0; i < colourPalette.length; i++) {
+      if (unique.has(i.toString())) continue
+      return i.toString()
     }
-    return nextValues
+    return colours.length % colourPalette.length
   }, [lineageToColourIndex])
 
-  const toggleSelect = useCallback((...lineages) => {
-    submit(getLineageQueryUpdate(...lineages))
-  }, [lineageToColourIndex])
+  const toggleSelect = useCallback((lineage) => {
+    const nextValues = { ...lineageToColourIndex }
+    if (lineage in nextValues) {
+      delete nextValues[lineage]
+    } else {
+      nextValues[lineage] = nextColourIndex
+    }
+    submit(nextValues)
+  }, [lineageToColourIndex, colourPalette])
 
   const setColour = useCallback((lineage, colourIndex) => {
     const update = {
@@ -287,15 +282,23 @@ const LineageTree = (props) => {
 
   const applyMutations = useCallback((lineage, muts, replacing) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, muts)
-    const lineageUpdate = getLineageQueryUpdate(replacing, `${lineage}+${muts}`)
+    const lineageUpdate = { ...lineageToColourIndex }
+    const newKey = `${lineage}+${muts}`
+    if (replacing) {
+      lineageUpdate[newKey] = lineageToColourIndex[replacing]
+      delete lineageUpdate[replacing]
+    } else {
+      lineageUpdate[newKey] = nextColourIndex
+    }
     submit(lineageUpdate, mutationUpdate)
-  }, [getMutationQueryUpdate, getLineageQueryUpdate])
+  }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const removeMutations = useCallback((lineage, muts) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, muts, false)
-    const lineageUpdate = getLineageQueryUpdate(`${lineage}+${muts}`)
+    const lineageUpdate = { ...lineageToColourIndex }
+    delete lineageUpdate[`${lineage}+${muts}`]
     submit(lineageUpdate, mutationUpdate)
-  }, [[getMutationQueryUpdate, getLineageQueryUpdate]])
+  }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const lightOrDarkPalette = useMemo(() =>
     colourPalette.map(item => item[darkMode ? 'dark' : 'light'])
