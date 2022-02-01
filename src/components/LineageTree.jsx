@@ -86,7 +86,7 @@ const Branch = memo(({ node, ...props }) => {
   const isDisabled = selectDisabled && !checked
   const muts = lineageToMutations[lineage]
   const lineageWithMuts = `${lineage}+${muts}`
-  const mutsSearch = muts ? lineageWithMuts.toLowerCase() : ''
+  const mutsInSearch = muts && search.length ? lineageWithMuts.toLowerCase().includes(search) : false
   const mutsChecked = lineageWithMuts in values
   const mutsColour = values[lineageWithMuts]
 
@@ -102,7 +102,7 @@ const Branch = memo(({ node, ...props }) => {
   }
 
   if (
-    (search.length && !node.searchText.includes(search) && !mutsSearch.includes(search)) ||
+    (search.length && !node.searchText.includes(search) && !mutsInSearch) ||
     (preset === 'selected' && !checked && !mutsChecked)
   ) {
     return childBranches
@@ -120,7 +120,7 @@ const Branch = memo(({ node, ...props }) => {
   const children = (
     <ul>
       {(preset === 'selected' ? mutsChecked : muts) &&
-        <li className={classNames('flex mt-1.5', { 'lg:ml-5 ml-7': checked || preset !== 'selected' })}>
+        <li className='flex mt-1.5 lg:ml-5 ml-7'>
           <LineageCheckbox
             checked={mutsChecked}
             colour={mutsColour}
@@ -157,7 +157,10 @@ const Branch = memo(({ node, ...props }) => {
     </ul>
   )
 
-  if (preset === 'selected' && mutsChecked && !checked) {
+  if (
+    (search.length && mutsInSearch) ||
+    (preset === 'selected' && mutsChecked && !checked)
+  ) {
     return children
   }
 
