@@ -84,10 +84,12 @@ const Branch = memo(({ node, ...props }) => {
   const checked = lineage in values
   const colour = values[lineage] || null
   const isDisabled = selectDisabled && !checked
+  const inSearch = search.length ? node.searchText.includes(search) : false
+
   const muts = lineageToMutations[lineage]
   const lineageWithMuts = `${lineage}+${muts}`
-  const mutsInSearch = muts && search.length ? lineageWithMuts.toLowerCase().includes(search) : false
   const mutsChecked = lineageWithMuts in values
+  const mutsInSearch = muts && search.length ? lineageWithMuts.toLowerCase().includes(search) : false
   const mutsColour = values[lineageWithMuts]
 
   let childBranches = []
@@ -102,7 +104,7 @@ const Branch = memo(({ node, ...props }) => {
   }
 
   if (
-    (search.length && !node.searchText.includes(search) && !mutsInSearch) ||
+    (search.length && !inSearch && !mutsInSearch) ||
     (preset === 'selected' && !checked && !mutsChecked)
   ) {
     return childBranches
@@ -158,7 +160,7 @@ const Branch = memo(({ node, ...props }) => {
   )
 
   if (
-    (search.length && mutsInSearch) ||
+    (search.length && mutsInSearch && !inSearch) ||
     (preset === 'selected' && mutsChecked && !checked)
   ) {
     return children
