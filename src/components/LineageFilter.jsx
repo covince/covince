@@ -150,7 +150,7 @@ const LineageFilter = (props) => {
               ref={el => { sectionRefs.current[i] = el }}
               className={classNames(
                 'w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative',
-                { 'lg:px-1 md:w-104': fixedLayout }
+                { 'lg:px-1': fixedLayout }
               )}
               style={gridStyle}
             >
@@ -159,7 +159,7 @@ const LineageFilter = (props) => {
                   <Checkbox
                     key={lineage}
                     className={classNames(
-                      'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
+                      'w-1/3 my-1 h-7 md:w-24 md:my-0 md:mx-2',
                       {
                         'md:mb-1': isScrolling && nomenclature.length === 0,
                         'lg:mx-0.5': fixedLayout
