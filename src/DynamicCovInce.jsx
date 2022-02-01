@@ -50,19 +50,21 @@ const DynamicUI = ({
   const { colourPalette, lineages, lineageToColourIndex, submit } = useDynamicLineages(staticConfig)
   const api = useAPIImpl({ api_url, lineages, info, confidence, avg })
 
-  const [{ lineageView, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0' })
+  const [{ lineageView, lineageFilter, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0', lineageFilter: 'all' })
   const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
+  const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
 
   const lineageTree = useLineageTree({
     api_url,
     area,
     colourPalette,
-    // compat with desktop links
     fromDate: xMin,
-    toDate: xMax,
     lineageToColourIndex,
-    showLineageView
+    preset: lineageFilter,
+    setPreset: setLineageFilter,
+    showLineageView,
+    toDate: xMax
   })
 
   const injection = useDynamicComponents({

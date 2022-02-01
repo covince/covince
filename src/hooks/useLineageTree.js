@@ -88,7 +88,9 @@ export default ({
   area,
   colourPalette,
   fromDate,
+  preset,
   lineageToColourIndex,
+  setPreset,
   showLineageView,
   toDate
 }) => {
@@ -131,8 +133,6 @@ export default ({
         return { ...state, scrollPosition: action.payload }
       case 'SEARCH':
         return { ...state, search: action.payload }
-      case 'PRESET':
-        return { ...state, preset: action.payload }
       default:
         return state
     }
@@ -141,8 +141,7 @@ export default ({
     loadedProps: null,
     nodeIndex: null,
     topology: [],
-    scrollPosition: null,
-    preset: 'all'
+    scrollPosition: null
   })
 
   const { loadedProps } = state
@@ -205,14 +204,15 @@ export default ({
 
   const topology = useMemo(() => {
     const { topology, ...rest } = state
-    return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias })
-  }, [state.topology, state.preset, toAlias])
+    return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias, preset })
+  }, [state.topology, preset, toAlias])
 
   return useMemo(() => ({
     colourPalette,
 
     // state
     ...state,
+    preset,
     isLoading: loadedProps === null,
     numberSelected,
     topology,
@@ -220,7 +220,7 @@ export default ({
     // actions
     setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
     setSearch: text => dispatch({ type: 'SEARCH', payload: text }),
-    setPreset: preset => dispatch({ type: 'PRESET', payload: preset }),
+    setPreset,
     toggleOpen
   }), [state, numberSelected, topology, colourPalette])
 }
