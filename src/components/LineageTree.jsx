@@ -82,6 +82,13 @@ const Branch = memo(({ node, ...props }) => {
   } = index[node.name] || {}
 
   const checked = lineage in values
+  const colour = values[lineage] || null
+  const isDisabled = selectDisabled && !checked
+  const muts = lineageToMutations[lineage]
+  const lineageWithMuts = `${lineage}+${muts}`
+  const mutsSearch = muts ? lineageWithMuts.toLowerCase() : ''
+  const mutsChecked = lineageWithMuts in values
+  const mutsColour = values[lineageWithMuts]
 
   let childBranches = []
   for (const child of node.children) {
@@ -95,18 +102,11 @@ const Branch = memo(({ node, ...props }) => {
   }
 
   if (
-    (search.length && !node.searchText.includes(search)) ||
-    (preset === 'selected' && !checked)
+    (search.length && !node.searchText.includes(search) && !mutsSearch.includes(search)) ||
+    (preset === 'selected' && !checked && !mutsChecked)
   ) {
     return childBranches
   }
-
-  const colour = values[lineage] || null
-
-  const muts = lineageToMutations[lineage]
-  const lineageWithMuts = `${lineage}+${muts}`
-  const mutsChecked = lineageWithMuts in values
-  const mutsColour = values[lineageWithMuts]
 
   const submitMutations = (value) => {
     if (value.length) {
@@ -117,7 +117,49 @@ const Branch = memo(({ node, ...props }) => {
     }
   }
 
-  const isDisabled = selectDisabled && !checked
+  const children = (
+    <ul>
+      {(preset === 'selected' ? mutsChecked : muts) &&
+        <li className={classNames('flex mt-1.5', { 'lg:ml-5 ml-7': checked || preset !== 'selected' })}>
+          <LineageCheckbox
+            checked={mutsChecked}
+            colour={mutsColour}
+            disabled={isDisabled}
+            id={`lineage_selector_${lineageWithMuts}`}
+            label={<span className='text-gray-700 dark:text-gray-100'>{lineage}+{muts}</span>}
+            menu={
+              <LineageMenu
+                className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
+              >
+                <MutationForm
+                  label="Edit mutation query"
+                  initialValue={muts}
+                  onSubmit={submitMutations}
+                  onRemove={() => removeMutations(lineage, muts)}
+                />
+                { mutsChecked
+                  ? <ColourPalette
+                    colour={mutsColour}
+                    lineage={lineageWithMuts}
+                    palette={colourPalette}
+                    setColour={setColour}
+                  />
+                  : <MutationsHelp /> }
+              </LineageMenu>
+            }
+            onChange={() => toggleSelect(lineageWithMuts)}
+          />
+        </li> }
+      { (isOpen || (preset === 'selected' && !checked)) &&
+        <li>
+          <ul className='lg:ml-6'>{childBranches}</ul>
+        </li> }
+    </ul>
+  )
+
+  if (preset === 'selected' && mutsChecked && !checked) {
+    return children
+  }
 
   const Chevron = isOpen ? HiChevronDown : HiChevronRight
   return (
@@ -166,43 +208,7 @@ const Branch = memo(({ node, ...props }) => {
         }
         onChange={() => toggleSelect(lineage)}
       >
-        <ul>
-          { muts &&
-            <li className='ml-7 lg:ml-5 flex mt-1.5'>
-              <LineageCheckbox
-                checked={mutsChecked}
-                colour={mutsColour}
-                disabled={isDisabled}
-                id={`lineage_selector_${lineageWithMuts}`}
-                label={<span className='text-gray-700 dark:text-gray-100'>{lineage}+{muts}</span>}
-                menu={
-                  <LineageMenu
-                    className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
-                  >
-                    <MutationForm
-                      label="Edit mutation query"
-                      initialValue={muts}
-                      onSubmit={submitMutations}
-                      onRemove={() => removeMutations(lineage, muts)}
-                    />
-                    { mutsChecked
-                      ? <ColourPalette
-                        colour={mutsColour}
-                        lineage={lineageWithMuts}
-                        palette={colourPalette}
-                        setColour={setColour}
-                      />
-                      : <MutationsHelp /> }
-                  </LineageMenu>
-                }
-                onChange={() => toggleSelect(lineageWithMuts)}
-              />
-            </li> }
-          { isOpen &&
-            <li>
-              <ul className='lg:ml-6'>{childBranches}</ul>
-            </li> }
-        </ul>
+        { children }
       </LineageCheckbox>
     </li>
   )
