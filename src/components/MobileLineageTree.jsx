@@ -7,16 +7,23 @@ import Button, { PrimaryPillButton } from './Button'
 import LineageTree from './LineageTree'
 
 import { LineageLimit, lineagePresets } from '../hooks/useDynamicComponents'
+import useQueryAsState from '../hooks/useQueryAsState'
 
 const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
   const [tempValues, setTempValues] = React.useState(initialValues)
+  const [, updateQuery] = useQueryAsState()
+
   const numberSelected = React.useMemo(() => Object.keys(tempValues).length, [tempValues])
+  const submit = React.useCallback((lineages, queryUpdate) => {
+    updateQuery(queryUpdate)
+    setTempValues(lineages)
+  }, [tempValues])
   return (
     <>
       <LineageTree
         className='flex-grow pr-1.5'
         lineageToColourIndex={tempValues}
-        submit={setTempValues}
+        submit={submit}
         {...props}
         numberSelected={numberSelected}
         action={
