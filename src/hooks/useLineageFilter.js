@@ -28,7 +28,7 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
         label: altName ? `${altName} (${lineage})` : lineage,
         primaryText: hasMuts ? pango : altName,
         secondaryText: hasMuts ? lineage.slice(mutsIndex) : lineage,
-        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === pango)
+        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === lineage)
       }
       return memo
     }, {})
@@ -47,7 +47,7 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
     lineagesWithNomenclature.sort((a, b) => {
       if (a.nomenclatureIndex > b.nomenclatureIndex) return 1
       if (a.nomenclatureIndex < b.nomenclatureIndex) return -1
-      return 0
+      return collator.compare(b.lineage, a.lineage)
     })
     lineagesWithoutNomenclature.sort((a, b) => collator.compare(a.lineage, b.lineage))
     return [
