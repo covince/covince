@@ -66,6 +66,7 @@ const Branch = memo(({ node, ...props }) => {
     search = '',
     selectDisabled,
     setColour,
+    showMutationSearch,
     toggleOpen,
     toggleSelect,
     values
@@ -198,17 +199,31 @@ const Branch = memo(({ node, ...props }) => {
         menu={
           (checked || !muts) &&
             <LineageMenu
-              className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
+              className='divide-y divide-gray-100 dark:divide-gray-500 text-right'
             >
-              { !muts && <MutationForm label="Add mutation query" onSubmit={submitMutations} /> }
-              { checked
-                ? <ColourPalette
+              <ul className='my-1'>
+                <li>
+                  <button
+                    className={`
+                      text-xs font-bold text-right w-full px-3 py-1.5
+                      border border-transparent
+                      hover:bg-gray-100 dark:hover:bg-gray-700
+                      focus-visible:primary-ring
+                    `}
+                    onClick={() => showMutationSearch(lineage)}
+                  >
+                    Search mutations
+                  </button>
+                </li>
+              </ul>
+              {/* { !muts && <MutationForm label="Add mutation query" onSubmit={submitMutations} /> } */}
+              { checked &&
+                <ColourPalette
                   colour={colour}
                   lineage={lineage}
                   palette={colourPalette}
                   setColour={setColour}
-                />
-                : <MutationsHelp /> }
+                /> }
             </LineageMenu>
         }
         onChange={() => toggleSelect(lineage)}
@@ -230,6 +245,7 @@ const LineageTree = (props) => {
     lineageToColourIndex,
     maxLineages = colourPalette.length,
     numberSelected,
+    showMutationSearch,
     submit,
 
     // external tree state
@@ -357,6 +373,7 @@ const LineageTree = (props) => {
               search={search.toLowerCase()}
               selectDisabled={numberSelected >= maxLineages}
               setColour={setColour}
+              showMutationSearch={showMutationSearch}
               toggleOpen={toggleOpen}
               toggleSelect={toggleSelect}
               values={lineageToColour}

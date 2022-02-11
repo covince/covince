@@ -8,7 +8,7 @@ import classNames from 'classnames'
 
 export const ColourPalette = ({ palette, lineage, colour, setColour }) => (
   <div className='p-3 space-y-3 w-32'>
-    <h4 className='font-bold text-xs tracking-wide text-subheading text-center'>Colour palette</h4>
+    <h4 className='font-bold text-xs tracking-wide text-subheading'>Colour palette</h4>
     <ul className='grid grid-cols-3 gap-3 place-items-center pb-1'>
       {palette.map((item, i) => (
         <li key={i}>
@@ -42,15 +42,15 @@ const MenuButton = React.forwardRef(
 MenuButton.displayName = 'MenuButton'
 
 const defaults = {
-  placement: 'bottom',
-  offset: [0, 8]
+  placement: 'bottom-end',
+  offset: [4, 8]
 }
 
 export const LineageMenu = props => {
   const {
     children,
     className,
-    placement = defaults.Button,
+    placement = defaults.placement,
     offset = defaults.offset,
     openOnMount
   } = props

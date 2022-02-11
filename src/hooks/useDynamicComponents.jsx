@@ -1,17 +1,16 @@
 import React, { useMemo, useCallback } from 'react'
 import { HiOutlineCog } from 'react-icons/hi'
-import { format } from 'date-fns'
 import classNames from 'classnames'
 
 import Button from '../components/Button'
 import Select from '../components/Select'
-import { DescriptiveHeading, Heading } from '../components/Typography'
+import { Heading } from '../components/Typography'
 import Spinner from '../components/Spinner'
 import FadeTransition from '../components/FadeTransition'
 
 import LineageTree from '../components/LineageTree'
-
-import useQueryAsState from './useQueryAsState'
+import LineageDateFilter from '../components/LineageDateFilter'
+import SearchMutations from '../components/SearchMutations'
 
 export const LineageLimit = ({ className, numberSelected, maxLineages }) => (
   <p className={classNames(className, 'whitespace-nowrap', { 'font-bold text-red-700 dark:text-red-300': numberSelected === maxLineages })}>
@@ -59,73 +58,6 @@ const InstantLineageTree = ({ onClose, lineageToColourIndex, submit, ...props })
   )
 }
 
-const LineageDateFilter = ({ dates = [] }) => {
-  const defaultValues = dates.length
-    ? {
-        xMin: dates[0],
-        xMax: dates[dates.length - 1]
-      }
-    : {}
-  const [{ xMin, xMax }, updateQuery] = useQueryAsState(defaultValues)
-
-  const options = useMemo(() => {
-    return dates.map(d => ({ value: d, label: format(new Date(d), 'dd MMM y') }))
-  }, [dates])
-
-  const [fromOptions, toOptions] = useMemo(() => {
-    const fromItem = options.find(_ => _.value === xMin)
-    const toItem = options.find(_ => _.value === xMax)
-    return [
-      toItem ? options.slice(0, options.indexOf(toItem) + 1) : options,
-      fromItem ? options.slice(options.indexOf(fromItem)) : options
-    ]
-  }, [xMin, xMax])
-
-  return (
-    <div className='h-20'>
-      <header className='flex justify-between items-center'>
-        <DescriptiveHeading>Time Period</DescriptiveHeading>
-        <Button
-          disabled={xMin === defaultValues.xMin && xMax === defaultValues.xMax}
-          className='flex items-center h-6 px-2 disabled:text-gray-500 dark:disabled:text-gray-400'
-          onClick={() => updateQuery({ xMin: undefined, xMax: undefined })}
-        >
-          Reset dates
-        </Button>
-      </header>
-      <form className='mt-3 flex items-baseline text-sm space-x-3'>
-        <div className='w-1/2'>
-          <label className='block font-medium mb-1 sr-only'>
-            From Date
-          </label>
-          <Select
-            className={classNames(xMin === defaultValues.xMin ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
-            value={xMin}
-            name='lineages from date'
-            onChange={e => updateQuery({ xMin: e.target.value === defaultValues.xMin ? undefined : e.target.value })}
-          >
-            {fromOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-          </Select>
-        </div>
-        <p>to</p>
-        <div className='w-1/2'>
-          <label className='block font-medium mb-1 sr-only'>
-            To Date
-          </label>
-          <Select
-            className={classNames(xMax === defaultValues.xMax ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
-            value={xMax}
-            name='lineages to date'
-            onChange={e => updateQuery({ xMax: e.target.value === defaultValues.xMax ? undefined : e.target.value })}
-          >
-            {toOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-          </Select>
-        </div>
-      </form>
-    </div>
-  )
-}
-
 export default (props) => {
   const {
     darkMode,
@@ -136,6 +68,8 @@ export default (props) => {
     lineageTree,
     setLineageView,
     showLineageView,
+    searchingMutations,
+    showMutationSearch,
     submit
   } = props
 
@@ -149,20 +83,30 @@ export default (props) => {
         lineageTree,
         lineageToColourIndex,
         setLineageView,
+        searchingMutations,
+        showMutationSearch,
         showLineageView,
         submit
       } = props
       return (
         <MapView heading={showLineageView ? null : heading}>
           { showLineageView
-            ? <InstantLineageTree
-                darkMode={darkMode}
-                maxLineages={info.maxLineages}
-                onClose={() => setLineageView(false)}
-                lineageToColourIndex={lineageToColourIndex}
-                submit={submit}
-                {...lineageTree}
-              />
+            ? searchingMutations
+              ? <SearchMutations
+                  lineage={searchingMutations}
+                  lineageToColourIndex={lineageToColourIndex}
+                  showMutationSearch={showMutationSearch}
+                  submit={submit}
+                />
+              : <InstantLineageTree
+                  darkMode={darkMode}
+                  maxLineages={info.maxLineages}
+                  onClose={() => setLineageView(false)}
+                  lineageToColourIndex={lineageToColourIndex}
+                  showMutationSearch={showMutationSearch}
+                  submit={submit}
+                  {...lineageTree}
+                />
             : children }
         </MapView>
       )
@@ -171,13 +115,15 @@ export default (props) => {
   }, [isMobile])
 
   const mapViewProps = useMemo(() => ({
-    showLineageView,
-    setLineageView,
     darkMode,
-    lineageTree,
     lineageToColourIndex,
+    lineageTree,
+    searchingMutations,
+    setLineageView,
+    showLineageView,
+    showMutationSearch,
     submit
-  }), [showLineageView, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex])])
+  }), [showLineageView, searchingMutations, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex])])
 
   const LineageFilter = useCallback((LineageFilter) => {
     const DecoratedLineageFilter =
