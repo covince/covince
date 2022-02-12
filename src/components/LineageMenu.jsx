@@ -28,6 +28,23 @@ export const ColourPalette = ({ palette, lineage, colour, setColour }) => (
   </div>
 )
 
+export const MenuItems = ({ children }) => <ul className='py-1'>{children}</ul>
+export const MenuItem = ({ onClick, children }) => (
+  <li>
+    <button
+      className={`
+        text-xs font-bold text-right w-full px-3 py-1.5
+        border border-transparent
+        hover:bg-gray-100 dark:hover:bg-gray-700
+        focus-visible:primary-ring
+      `}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  </li>
+)
+
 const MenuButton = React.forwardRef(
   (props, ref) => (
     <button
@@ -49,7 +66,7 @@ const defaults = {
 export const LineageMenu = props => {
   const {
     children,
-    className,
+    // className,
     placement = defaults.placement,
     offset = defaults.offset,
     openOnMount
@@ -87,7 +104,7 @@ export const LineageMenu = props => {
         className={classNames(
           'shadow-lg bg-white dark:bg-gray-600 rounded-md z-10',
           'ring-1 ring-black dark:ring-gray-500 ring-opacity-5',
-          className
+          'divide-y divide-gray-100 dark:divide-gray-500 text-right'
         )}
         onSubmit={() => { if (referenceElement) { referenceElement.click() } }}
       >

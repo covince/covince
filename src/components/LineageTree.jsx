@@ -7,8 +7,7 @@ import Button from './Button'
 import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
-import LineageMenu, { ColourPalette } from './LineageMenu'
-import MutationForm from './MutationForm'
+import LineageMenu, { MenuItems, MenuItem, ColourPalette } from './LineageMenu'
 import useMutations from '../hooks/useMutations'
 
 const LineageCheckbox = props => {
@@ -47,17 +46,8 @@ const LineageCheckbox = props => {
 }
 LineageCheckbox.displayName = 'LineageCheckbox'
 
-const MutationsHelp = () => (
-  <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
-    {/* <h4 className='font-bold text-subheading'>Guidance</h4> */}
-    <p>Add up to two mutations separated by a &ldquo;+&rdquo; character.</p>
-    <p>Two mutations are considered a boolean AND.</p>
-  </div>
-)
-
 const Branch = memo(({ node, ...props }) => {
   const {
-    applyMutations,
     colourPalette,
     index,
     lineageToMutations,
@@ -111,15 +101,6 @@ const Branch = memo(({ node, ...props }) => {
     return childBranches
   }
 
-  const submitMutations = (value) => {
-    if (value.length) {
-      const cleanValue = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
-      if (cleanValue !== muts) {
-        applyMutations(lineage, cleanValue, muts ? lineageWithMuts : undefined)
-      }
-    }
-  }
-
   const children = (
     <ul>
       {(preset === 'selected' ? mutsChecked : muts) &&
@@ -131,23 +112,24 @@ const Branch = memo(({ node, ...props }) => {
             id={`lineage_selector_${lineageWithMuts}`}
             label={<span className='text-gray-700 dark:text-gray-100'>{lineage}+{muts}</span>}
             menu={
-              <LineageMenu
-                className='flex items-stretch divide-x divide-gray-100 dark:divide-gray-500'
-              >
-                <MutationForm
-                  label="Edit mutation query"
-                  initialValue={muts}
-                  onSubmit={submitMutations}
-                  onRemove={() => removeMutations(lineage, muts)}
-                />
-                { mutsChecked
-                  ? <ColourPalette
+              <LineageMenu>
+                <MenuItems>
+                  <MenuItem onClick={() => showMutationSearch(lineage)}>
+                    Edit mutations
+                  </MenuItem>
+                </MenuItems>
+                { mutsChecked &&
+                  <ColourPalette
                     colour={mutsColour}
                     lineage={lineageWithMuts}
                     palette={colourPalette}
                     setColour={setColour}
-                  />
-                  : <MutationsHelp /> }
+                  /> }
+                  <MenuItems>
+                    <MenuItem onClick={() => removeMutations(lineage, muts)}>
+                      Remove
+                    </MenuItem>
+                  </MenuItems>
               </LineageMenu>
             }
             onChange={() => toggleSelect(lineageWithMuts)}
@@ -198,25 +180,12 @@ const Branch = memo(({ node, ...props }) => {
         }
         menu={
           (checked || !muts) &&
-            <LineageMenu
-              className='divide-y divide-gray-100 dark:divide-gray-500 text-right'
-            >
-              <ul className='my-1'>
-                <li>
-                  <button
-                    className={`
-                      text-xs font-bold text-right w-full px-3 py-1.5
-                      border border-transparent
-                      hover:bg-gray-100 dark:hover:bg-gray-700
-                      focus-visible:primary-ring
-                    `}
-                    onClick={() => showMutationSearch(lineage)}
-                  >
-                    Search mutations
-                  </button>
-                </li>
-              </ul>
-              {/* { !muts && <MutationForm label="Add mutation query" onSubmit={submitMutations} /> } */}
+            <LineageMenu>
+              <MenuItems>
+                <MenuItem onClick={() => showMutationSearch(lineage)}>
+                  Search mutations
+                </MenuItem>
+              </MenuItems>
               { checked &&
                 <ColourPalette
                   colour={colour}
@@ -301,19 +270,6 @@ const LineageTree = (props) => {
     submit(update)
   }, [lineageToColourIndex])
 
-  const applyMutations = useCallback((lineage, muts, replacing) => {
-    const mutationUpdate = getMutationQueryUpdate(lineage, muts)
-    const lineageUpdate = { ...lineageToColourIndex }
-    const newKey = `${lineage}+${muts}`
-    if (replacing) {
-      lineageUpdate[newKey] = lineageToColourIndex[replacing]
-      delete lineageUpdate[replacing]
-    } else {
-      lineageUpdate[newKey] = nextColourIndex
-    }
-    submit(lineageUpdate, mutationUpdate)
-  }, [getMutationQueryUpdate, lineageToColourIndex])
-
   const removeMutations = useCallback((lineage, muts) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, muts, false)
     const lineageUpdate = { ...lineageToColourIndex }
@@ -362,7 +318,6 @@ const LineageTree = (props) => {
         <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
           {nodeIndex && topology.map(node =>
             <Branch
-              applyMutations={applyMutations}
               colourPalette={lightOrDarkPalette}
               index={nodeIndex}
               key={node.name}
