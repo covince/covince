@@ -8,6 +8,7 @@ import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
 import LineageMenu, { MenuItems, MenuItem, ColourPalette } from './LineageMenu'
+
 import useMutations from '../hooks/useMutations'
 
 const LineageCheckbox = props => {
@@ -183,7 +184,7 @@ const Branch = memo(({ node, ...props }) => {
             <LineageMenu>
               <MenuItems>
                 <MenuItem onClick={() => showMutationSearch(lineage)}>
-                  Search mutations
+                  Select mutations
                 </MenuItem>
               </MenuItems>
               { checked &&

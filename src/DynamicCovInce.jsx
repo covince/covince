@@ -97,22 +97,24 @@ const DynamicUI = ({
       />
       { isMobile &&
         <Dialog isOpen={showLineageView} onClose={() => {}}>
-            <div className='fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3 pl-3'>
-              { showLineageView &&
-                <MobileLineageTree
-                  darkMode={darkMode}
-                  onClose={values => {
-                    if (values !== lineageToColourIndex) {
-                      submit(values, { lineageView: undefined })
-                    } else {
-                      setLineageView(false)
-                    }
-                  }}
-                  initialValues={lineageToColourIndex}
-                  maxLineages={info.maxLineages}
-                  {...lineageTree}
-                /> }
-            </div>
+          <div className='fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3 pl-3'>
+            { showLineageView &&
+              <MobileLineageTree
+                darkMode={darkMode}
+                onClose={values => {
+                  if (values !== lineageToColourIndex) {
+                    submit(values, { lineageView: undefined })
+                  } else {
+                    setLineageView(false)
+                  }
+                }}
+                initialValues={lineageToColourIndex}
+                maxLineages={info.maxLineages}
+                searchingMutations={searchingMutations}
+                showMutationSearch={showMutationSearch}
+                {...lineageTree}
+              /> }
+          </div>
         </Dialog> }
     </>
   )

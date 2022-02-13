@@ -5,6 +5,7 @@ import { BsThreeDotsVertical, BsCheckCircle } from 'react-icons/bs'
 
 import Button, { PrimaryPillButton } from './Button'
 import LineageTree from './LineageTree'
+import SearchMutations from './SearchMutations'
 
 import { LineageLimit, lineagePresets } from '../hooks/useDynamicComponents'
 import useQueryAsState from '../hooks/useQueryAsState'
@@ -19,7 +20,14 @@ const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
     setTempValues(lineages)
   }, [tempValues])
   return (
-    <>
+    props.searchingMutations
+      ? <SearchMutations
+          lineage={props.searchingMutations}
+          lineageToColourIndex={tempValues}
+          submit={submit}
+          showMutationSearch={props.showMutationSearch}
+        />
+      : <>
       <LineageTree
         className='flex-grow pr-1.5'
         lineageToColourIndex={tempValues}

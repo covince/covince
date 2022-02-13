@@ -10,8 +10,10 @@ import { Heading } from './Typography'
 //   </div>
 // )
 
-const SearchMutations = props => {
+export const SearchMutations = props => {
   const {
+    // lineage
+    // lineageToColourIndex
     // submit
     showMutationSearch
   } = props
