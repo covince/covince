@@ -19,6 +19,7 @@ const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
     updateQuery(queryUpdate)
     setTempValues(lineages)
   }, [tempValues])
+
   return (
     props.searchingMutations
       ? <SearchMutations

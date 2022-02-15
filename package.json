@@ -32,6 +32,8 @@
     "react-query": "^3.13.8",
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.1",
+    "react-window": "^1.8.6",
+    "react-window-infinite-loader": "^1.0.7",
     "recharts": "^2.0.4",
     "tailwindcss": "^2.2.4",
     "vite": "^2.3.8",

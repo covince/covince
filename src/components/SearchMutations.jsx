@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import Select from './Select'
+import Input from './TextInput'
 import { Heading } from './Typography'
+import MutationsList from './MutationsList'
+
+import { expandLineage } from '../pango'
 
 // const MutationsHelp = () => (
 //   <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
@@ -12,6 +17,8 @@ import { Heading } from './Typography'
 
 export const SearchMutations = props => {
   const {
+    api_url,
+    // genes,
     // lineage
     // lineageToColourIndex
     // submit
@@ -19,7 +26,8 @@ export const SearchMutations = props => {
   } = props
 
   const lineage = React.useMemo(() => props.lineage, [])
-
+  const pangoClade = React.useMemo(() => expandLineage(lineage), [lineage])
+  const genes = React.useMemo(() => props.genes.sort(), [])
   // const submitMutations = (value) => {
   //   if (value.length) {
   //     const cleanValue = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
@@ -42,6 +50,9 @@ export const SearchMutations = props => {
   //   submit(lineageUpdate, mutationUpdate)
   // }, [getMutationQueryUpdate, lineageToColourIndex])
 
+  const [gene, setGene] = useState('')
+  const [filter, setFilter] = useState('')
+
   return (
     <>
       <header className='flex items-baseline'>
@@ -53,6 +64,22 @@ export const SearchMutations = props => {
           Back to Lineages
         </button>
       </header>
+      <form className='my-4'>
+        <div className='flex items-center space-x-1.5'>
+          <Select value={gene} onChange={e => setGene(e.target.value)}>
+            <option value=''>(gene)</option>
+            {genes.map(g => <option key={g} value={g}>{g}</option>)}
+          </Select>
+          <p>:</p>
+          <Input value={filter} onChange={e => setFilter(e.target.value)}/>
+        </div>
+      </form>
+      <MutationsList
+        api_url={api_url}
+        lineage={pangoClade}
+        gene={gene}
+        filter={filter}
+      />
     </>
   )
 }

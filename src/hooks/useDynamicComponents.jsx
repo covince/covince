@@ -60,6 +60,7 @@ const InstantLineageTree = ({ onClose, lineageToColourIndex, submit, ...props })
 
 export default (props) => {
   const {
+    api_url,
     darkMode,
     info,
     isMobile,
@@ -93,6 +94,8 @@ export default (props) => {
           { showLineageView
             ? searchingMutations
               ? <SearchMutations
+                  api_url={api_url}
+                  genes={info.genes}
                   lineage={searchingMutations}
                   lineageToColourIndex={lineageToColourIndex}
                   showMutationSearch={showMutationSearch}

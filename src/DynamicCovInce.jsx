@@ -69,6 +69,7 @@ const DynamicUI = ({
   })
 
   const injection = useDynamicComponents({
+    api_url,
     darkMode,
     info,
     isMobile,
