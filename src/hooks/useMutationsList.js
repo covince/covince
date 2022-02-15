@@ -19,13 +19,14 @@ const useTableSort = (defaultSort) => {
   }
 }
 
-export default (api_url, lineage, gene, filter = '', totalRows) => {
+export default (api_url, lineage, gene, filter = '') => {
   const { sortColumn, sortAscending, sortBy } = useTableSort('count')
   const [rows, setRows] = useState([])
+  const [total, setTotal] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
   const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = rows) => {
-    if (stopIndex < currentRows.length || totalRows === 0) return Promise.resolve()
+    if (stopIndex < currentRows.length) return Promise.resolve()
     setIsLoading(true)
     const query = new URLSearchParams({
       lineage,
@@ -37,8 +38,10 @@ export default (api_url, lineage, gene, filter = '', totalRows) => {
     })
     const response = await fetch(`${api_url}/mutations?${query.toString()}`)
     const data = await response.json()
-    const newRows = Object.entries(data).map(([mutation, count]) => ({ mutation, count }))
+
+    const newRows = data.page.map(_ => ({ mutation: _.key, count: _.count }))
     setRows([...currentRows, ...newRows])
+    setTotal(data.total)
     setIsLoading(false)
   }
 
@@ -53,6 +56,7 @@ export default (api_url, lineage, gene, filter = '', totalRows) => {
   return [
     {
       rows,
+      total,
       isLoading,
       sortColumn,
       sortAscending

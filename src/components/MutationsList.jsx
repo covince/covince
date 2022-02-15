@@ -27,7 +27,7 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
     scope="col"
     className={classNames(
       className,
-      'px-6 py-3 cursor-pointer sticky top-0 z-0 h-14',
+      'px-3 py-1.5 cursor-pointer sticky top-0 z-0',
       'text-xs leading-5 font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider',
       align === 'right' ? 'text-right' : 'text-left'
     )}
@@ -43,12 +43,12 @@ const formatFrequency = f => {
   return _f.startsWith('0.000') ? '> 0.001' : _f
 }
 
-const MutationsList = ({ api_url, lineage, gene, filter, totalRows, denominator, loading, selectMutation, selected }) => {
-  const [state, actions] = useMutationsList(api_url, lineage, gene, filter, totalRows)
+const MutationsList = ({ api_url, lineage, gene, filter, denominator, loading, selectMutation, selected }) => {
+  const [state, actions] = useMutationsList(api_url, lineage, gene, filter)
   const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
-  const hasNextPage = state.rows.length < totalRows
+  const hasNextPage = state.rows.length < state.total
   const itemCount = hasNextPage ? state.rows.length + 1 : state.rows.length
   const isItemLoaded = index => !hasNextPage || index < state.rows.length
 
@@ -60,8 +60,8 @@ const MutationsList = ({ api_url, lineage, gene, filter, totalRows, denominator,
   }, [denominator, state.isLoading, loading])
 
   return (
-    <div className='flex-grow border rounded overflow-hidden flex flex-col bg-white dark:bg-gray-700'>
-      <div className='flex bg-gray-50 dark:bg-gray-800 border-b border-solid dark:border-gray-500'>
+    <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
+      <div className='flex border-b border-solid dark:border-gray-500'>
         <TableHeader
           key='not-searching'
           className='w-1/2'
@@ -118,7 +118,7 @@ const MutationsList = ({ api_url, lineage, gene, filter, totalRows, denominator,
                   className='!overflow-y-scroll heron-styled-scrollbars'
                   height={listSize.height}
                   itemCount={itemCount}
-                  itemSize={48}
+                  itemSize={36}
                   onItemsRendered={onItemsRendered}
                   ref={ref}
                   width={listSize.width}
@@ -126,30 +126,25 @@ const MutationsList = ({ api_url, lineage, gene, filter, totalRows, denominator,
                   {({ index, style }) => {
                     if (index < state.rows.length) {
                       const row = state.rows[index]
-                      const previous = state.rows[index - 1]
+                      // const previous = state.rows[index - 1]
                       return (
                         <div
                           style={style}
                           className={classNames(
-                            'flex items-baseline py-1 cursor-pointer border-t hover:bg-gray-50 dark:hover:bg-gray-600',
+                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-50 dark:hover:bg-gray-600 rounded',
                             {
-                              'bg-gray-50 dark:bg-gray-600': selected === row.mutation,
-                              'border-primary dark:border-dark-primary': selected === row.mutation || (previous && selected === previous.mutation),
-                              'border-gray-200 dark:border-gray-500': selected !== row.mutation && index > 0,
-                              'border-transparent': selected !== row.mutation && index === 0,
-                              'border-b': index === totalRows - 1,
-                              'border-b-gray-200 dark:border-b-gray-500': previous && previous.mutation === selected
+                              'bg-gray-50 dark:bg-gray-600': selected === row.mutation
                             }
                           )}
                           onClick={() => selectMutation(row.mutation)}
                         >
                           { row &&
                             <>
-                              <span className={classNames('px-6 w-1/2 leading-10 font-medium', { 'text-primary': selected === row.mutation })}>{row.mutation}</span>
-                              <span className='px-6 w-1/4 leading-10 text-sm text-right whitespace-nowrap'>
+                              <span className={classNames('px-3 flex-grow leading-9 font-medium', { 'text-primary': selected === row.mutation })}>{row.mutation}</span>
+                              <span className='px-3 w-1/4 leading-9 text-sm text-right whitespace-nowrap'>
                                 {showFrequency ? `${formatFrequency(row.count / denominator)}%` : ''}
                               </span>
-                              <span className='px-6 w-1/4 leading-10 text-sm text-right'>{row.count.toLocaleString()}</span>
+                              <span className='px-3 w-1/4 leading-9 text-sm text-right'>{row.count.toLocaleString()}</span>
                             </> }
                         </div>
                       )
@@ -158,7 +153,7 @@ const MutationsList = ({ api_url, lineage, gene, filter, totalRows, denominator,
                       return (
                         <div
                           style={style}
-                          className='border-t border-gray-200 dark:border-gray-500 grid place-items-center'
+                          className='grid place-items-center'
                         >
                           <Spinner className='block h-5 w-5 text-gray-600 dark:text-gray-300' />
                         </div>

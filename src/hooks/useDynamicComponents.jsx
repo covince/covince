@@ -98,6 +98,7 @@ export default (props) => {
                   genes={info.genes}
                   lineage={searchingMutations}
                   lineageToColourIndex={lineageToColourIndex}
+                  topology={lineageTree.topology}
                   showMutationSearch={showMutationSearch}
                   submit={submit}
                 />

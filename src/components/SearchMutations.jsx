@@ -15,9 +15,24 @@ import { expandLineage } from '../pango'
 //   </div>
 // )
 
+const findNode = (topo, lineage) => {
+  let n = null
+  for (const node of topo) {
+    if (node.lineage === lineage) {
+      return node
+    }
+    n = findNode(node.children, lineage)
+    if (n != null) {
+      break
+    }
+  }
+  return n
+}
+
 export const SearchMutations = props => {
   const {
     api_url,
+    topology,
     // genes,
     // lineage
     // lineageToColourIndex
@@ -28,6 +43,9 @@ export const SearchMutations = props => {
   const lineage = React.useMemo(() => props.lineage, [])
   const pangoClade = React.useMemo(() => expandLineage(lineage), [lineage])
   const genes = React.useMemo(() => props.genes.sort(), [])
+
+  const node = React.useMemo(() => findNode(topology, lineage))
+
   // const submitMutations = (value) => {
   //   if (value.length) {
   //     const cleanValue = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
@@ -76,6 +94,7 @@ export const SearchMutations = props => {
       </form>
       <MutationsList
         api_url={api_url}
+        denominator={node ? node.sum + node.sumOfClade : null}
         lineage={pangoClade}
         gene={gene}
         filter={filter}
