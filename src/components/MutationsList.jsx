@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react'
+import React, { useRef, useState, useMemo, useEffect } from 'react'
 import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc } from 'react-icons/bs'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
@@ -43,8 +43,20 @@ const formatFrequency = f => {
   return _f.startsWith('0.000') ? '> 0.001' : _f
 }
 
-const MutationsList = ({ api_url, lineage, gene, filter, denominator, loading, selectMutation, selected }) => {
-  const [state, actions] = useMutationsList(api_url, lineage, gene, filter)
+const MutationsList = props => {
+  const {
+    api_url,
+    denominator,
+    filter,
+    gene,
+    lineage,
+    loading,
+    queryParams,
+    selected,
+    selectMutation
+  } = props
+
+  const [state, actions] = useMutationsList(api_url, queryParams, lineage, gene, filter)
   const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
@@ -54,10 +66,19 @@ const MutationsList = ({ api_url, lineage, gene, filter, denominator, loading, s
 
   const loaderRef = useRef()
 
+  const [syncedDenominator, setSyncedDenominator] = useState(denominator)
+
+  useEffect(() => {
+    if (loading === false && state.isLoading === false && denominator !== syncedDenominator) {
+      setSyncedDenominator(denominator)
+    }
+  }, [loading, state.isLoading])
+
   const showFrequency = useMemo(() => {
-    if (denominator && loading) return state.isLoading // show current result while loading list and denominator
-    return !!denominator
-  }, [denominator, state.isLoading, loading])
+    return denominator === syncedDenominator
+  }, [denominator, syncedDenominator])
+
+  console.log(showFrequency, denominator, syncedDenominator)
 
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
@@ -142,7 +163,7 @@ const MutationsList = ({ api_url, lineage, gene, filter, denominator, loading, s
                             <>
                               <span className={classNames('px-3 flex-grow leading-9 font-medium', { 'text-primary': selected === row.mutation })}>{row.mutation}</span>
                               <span className='px-3 w-1/4 leading-9 text-sm text-right whitespace-nowrap'>
-                                {showFrequency ? `${formatFrequency(row.count / denominator)}%` : ''}
+                                {showFrequency ? `${formatFrequency(row.count / syncedDenominator)}%` : ''}
                               </span>
                               <span className='px-3 w-1/4 leading-9 text-sm text-right'>{row.count.toLocaleString()}</span>
                             </> }

@@ -164,8 +164,9 @@ export default ({
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
-      dispatch({ type: 'LOADING', payload: { props: { area, fromDate, toDate } } })
-      let lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
+      const props = { area, fromDate, toDate }
+      dispatch({ type: 'LOADING', payload: { props } })
+      let lineageData = await fetchLineages(api_url, props)
 
       // handle backend v2 response
       if (!Array.isArray(lineageData)) {
@@ -186,7 +187,7 @@ export default ({
           ]
         })
       )
-      dispatch({ type: 'FETCHED', payload: { index, props: { area, fromDate, toDate } } })
+      dispatch({ type: 'FETCHED', payload: { index, props } })
     } catch (e) {
       dispatch({ type: 'ERROR', payload: e })
     }

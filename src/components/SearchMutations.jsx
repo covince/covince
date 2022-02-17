@@ -5,6 +5,8 @@ import Input from './TextInput'
 import { Heading } from './Typography'
 import MutationsList from './MutationsList'
 
+import useMutations from '../hooks/useMutations'
+
 import { expandLineage } from '../pango'
 
 // const MutationsHelp = () => (
@@ -15,15 +17,17 @@ import { expandLineage } from '../pango'
 //   </div>
 // )
 
-const findNode = (topo, lineage) => {
+const findNode = (topo, pango) => {
   let n = null
   for (const node of topo) {
-    if (node.lineage === lineage) {
+    if (node.name === pango) {
       return node
     }
-    n = findNode(node.children, lineage)
-    if (n != null) {
-      break
+    if (pango.startsWith(node.name)) {
+      n = findNode(node.children, pango)
+      if (n != null) {
+        break
+      }
     }
   }
   return n
@@ -32,11 +36,11 @@ const findNode = (topo, lineage) => {
 export const SearchMutations = props => {
   const {
     api_url,
-    topology,
+    lineageTree,
     // genes,
     // lineage
-    // lineageToColourIndex
-    // submit
+    lineageToColourIndex,
+    submit,
     showMutationSearch
   } = props
 
@@ -44,29 +48,32 @@ export const SearchMutations = props => {
   const pangoClade = React.useMemo(() => expandLineage(lineage), [lineage])
   const genes = React.useMemo(() => props.genes.sort(), [])
 
-  const node = React.useMemo(() => findNode(topology, lineage))
+  const denominator = React.useMemo(() => {
+    const node = findNode(lineageTree.topology, pangoClade)
+    return node ? node.sum + node.sumOfClade : null
+  }, [lineageTree.topology])
 
-  // const submitMutations = (value) => {
-  //   if (value.length) {
-  //     const cleanValue = value.split('+').slice(0, 2).map(_ => _.trim()).join('+')
-  //     if (cleanValue !== muts) {
-  //       applyMutations(lineage, cleanValue, muts ? lineageWithMuts : undefined)
-  //     }
-  //   }
-  // }
+  const queryParams = React.useMemo(() => {
+    return lineageTree.loading || lineageTree.loadedProps
+  }, [lineageTree.loading, lineageTree.loadedProps])
 
-  // const applyMutations = useCallback((lineage, muts, replacing) => {
-  //   const mutationUpdate = getMutationQueryUpdate(lineage, muts)
-  //   const lineageUpdate = { ...lineageToColourIndex }
-  //   const newKey = `${lineage}+${muts}`
-  //   if (replacing) {
-  //     lineageUpdate[newKey] = lineageToColourIndex[replacing]
-  //     delete lineageUpdate[replacing]
-  //   } else {
-  //     lineageUpdate[newKey] = nextColourIndex
-  //   }
-  //   submit(lineageUpdate, mutationUpdate)
-  // }, [getMutationQueryUpdate, lineageToColourIndex])
+  const { lineageToMutations, getMutationQueryUpdate } = useMutations()
+
+  const currentMut = lineageToMutations[lineage]
+
+  const applyMutations = React.useCallback((mut) => {
+    const mutationUpdate = getMutationQueryUpdate(lineage, mut)
+    const lineageUpdate = { ...lineageToColourIndex }
+    const newKey = `${lineage}+${mut}`
+    const replacing = currentMut ? `${lineage}+${currentMut}` : null
+    if (replacing) {
+      lineageUpdate[newKey] = lineageToColourIndex[replacing]
+      delete lineageUpdate[replacing]
+    } else {
+      lineageUpdate[newKey] = '1' // TODO: use next colour index algo
+    }
+    submit(lineageUpdate, mutationUpdate)
+  }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const [gene, setGene] = useState('')
   const [filter, setFilter] = useState('')
@@ -94,10 +101,14 @@ export const SearchMutations = props => {
       </form>
       <MutationsList
         api_url={api_url}
-        denominator={node ? node.sum + node.sumOfClade : null}
+        denominator={denominator}
         lineage={pangoClade}
         gene={gene}
         filter={filter}
+        queryParams={queryParams}
+        loading={lineageTree.isLoading}
+        selected={currentMut}
+        selectMutation={applyMutations}
       />
     </>
   )

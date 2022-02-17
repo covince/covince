@@ -19,7 +19,7 @@ const useTableSort = (defaultSort) => {
   }
 }
 
-export default (api_url, lineage, gene, filter = '') => {
+export default (api_url, queryParams, lineage, gene, filter = '') => {
   const { sortColumn, sortAscending, sortBy } = useTableSort('count')
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
@@ -36,10 +36,16 @@ export default (api_url, lineage, gene, filter = '') => {
       skip: startIndex,
       limit: 15
     })
+
+    const { area, toDate, fromDate } = queryParams
+    if (area) query.append('area', area)
+    if (toDate) query.append('to', toDate)
+    if (fromDate) query.append('from', fromDate)
+
     const response = await fetch(`${api_url}/mutations?${query.toString()}`)
     const data = await response.json()
 
-    const newRows = data.page.map(_ => ({ mutation: _.key, count: _.count }))
+    const newRows = data.page.filter(_ => _).map(_ => ({ mutation: _.key, count: _.count }))
     setRows([...currentRows, ...newRows])
     setTotal(data.total)
     setIsLoading(false)
@@ -47,11 +53,11 @@ export default (api_url, lineage, gene, filter = '') => {
 
   const isMounted = useRef(false)
   useEffect(() => {
-    if (isMounted.current) {
+    if (isMounted.current && queryParams) {
       loadMoreItems(undefined, undefined, [])
     }
     isMounted.current = true
-  }, [sortColumn, sortAscending, gene, filter])
+  }, [sortColumn, sortAscending, gene, filter, queryParams])
 
   return [
     {
