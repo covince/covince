@@ -6,6 +6,7 @@ import { Heading } from './Typography'
 import MutationsList from './MutationsList'
 
 import useMutations from '../hooks/useMutations'
+import useDebouncedValue from '../hooks/useDebouncedValue'
 
 import { expandLineage } from '../pango'
 
@@ -77,7 +78,7 @@ export const SearchMutations = props => {
 
   const [gene, setGene] = useState('')
   const [filter, setFilter] = useState('')
-
+  const debouncedfilter = useDebouncedValue(filter, 500)
   return (
     <>
       <header className='flex items-baseline'>
@@ -104,7 +105,7 @@ export const SearchMutations = props => {
         denominator={denominator}
         lineage={pangoClade}
         gene={gene}
-        filter={filter}
+        filter={debouncedfilter}
         queryParams={queryParams}
         loading={lineageTree.isLoading}
         selected={currentMut}

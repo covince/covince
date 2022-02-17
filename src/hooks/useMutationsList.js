@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
@@ -34,7 +34,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
       direction: sortAscending ? 'asc' : 'desc',
       search: gene ? gene + ':' + filter : '',
       skip: startIndex,
-      limit: 15
+      limit: 20
     })
 
     const { area, toDate, fromDate } = queryParams
@@ -51,12 +51,12 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
     setIsLoading(false)
   }
 
-  const isMounted = useRef(false)
+  // const isMounted = useRef(false)
   useEffect(() => {
-    if (isMounted.current && queryParams) {
+    if (queryParams) {
       loadMoreItems(undefined, undefined, [])
     }
-    isMounted.current = true
+    // isMounted.current = true
   }, [sortColumn, sortAscending, gene, filter, queryParams])
 
   return [

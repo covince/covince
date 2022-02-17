@@ -78,8 +78,6 @@ const MutationsList = props => {
     return denominator === syncedDenominator
   }, [denominator, syncedDenominator])
 
-  console.log(showFrequency, denominator, syncedDenominator)
-
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
       <div className='flex border-b border-solid dark:border-gray-500'>

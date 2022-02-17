@@ -1,5 +1,6 @@
 import React, { lazy, memo } from 'react'
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import classNames from 'classnames'
 
 import MobileLineageTree from './components/MobileLineageTree'
 import Dialog from './components/Dialog'
@@ -98,9 +99,15 @@ const DynamicUI = ({
       />
       { isMobile &&
         <Dialog isOpen={showLineageView} onClose={() => {}}>
-          <div className='fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3 pl-3'>
+          <div
+            className={classNames(
+              'fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3',
+              searchingMutations ? 'px-3' : 'pl-3'
+            )}
+          >
             { showLineageView &&
               <MobileLineageTree
+                api_url={api_url}
                 darkMode={darkMode}
                 onClose={values => {
                   if (values !== lineageToColourIndex) {
@@ -113,7 +120,8 @@ const DynamicUI = ({
                 maxLineages={info.maxLineages}
                 searchingMutations={searchingMutations}
                 showMutationSearch={showMutationSearch}
-                {...lineageTree}
+                lineageTree={lineageTree}
+                info={info}
               /> }
           </div>
         </Dialog> }

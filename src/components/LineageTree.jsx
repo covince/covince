@@ -182,11 +182,12 @@ const Branch = memo(({ node, ...props }) => {
         menu={
           (checked || !muts) &&
             <LineageMenu>
-              <MenuItems>
-                <MenuItem onClick={() => showMutationSearch(lineage)}>
-                  Select mutations
-                </MenuItem>
-              </MenuItems>
+              { !muts &&
+                <MenuItems>
+                  <MenuItem onClick={() => showMutationSearch(lineage)}>
+                    Select mutations
+                  </MenuItem>
+                </MenuItems> }
               { checked &&
                 <ColourPalette
                   colour={colour}
