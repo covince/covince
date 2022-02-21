@@ -47,6 +47,7 @@ const MobileLineageTree = (props) => {
           className='flex-grow pr-1.5'
           lineageToColourIndex={tempValues}
           submit={submit}
+          maxLineages={info.maxLineages}
           {...lineageTree}
           showMutationSearch={showMutationSearch}
           darkMode={darkMode}

@@ -197,6 +197,16 @@ export default ({
     dispatch({ type: 'TOGGLE_OPEN', payload: { nodeName, isOpen } })
   }, [dispatch])
 
+  const nextColourIndex = useMemo(() => {
+    const colours = Object.values(lineageToColourIndex)
+    const unique = new Set(colours)
+    for (let i = 0; i < colourPalette.length; i++) {
+      if (unique.has(i.toString())) continue
+      return i.toString()
+    }
+    return colours.length % colourPalette.length
+  }, [lineageToColourIndex])
+
   const selectedLineages = useMemo(
     () => Object.keys(lineageToColourIndex),
     [lineageToColourIndex]
@@ -215,6 +225,7 @@ export default ({
     ...state,
     preset,
     isLoading: loadedProps === null,
+    nextColourIndex,
     numberSelected,
     topology,
 

@@ -57,7 +57,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
       loadMoreItems(undefined, undefined, [])
     }
     // isMounted.current = true
-  }, [sortColumn, sortAscending, gene, filter, queryParams])
+  }, [sortColumn, sortAscending, lineage, gene, filter, queryParams])
 
   return [
     {

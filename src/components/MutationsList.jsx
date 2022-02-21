@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react'
-import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc } from 'react-icons/bs'
+import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc, BsCheckCircle } from 'react-icons/bs'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import classNames from 'classnames'
@@ -49,14 +49,14 @@ const MutationsList = props => {
     denominator,
     filter,
     gene,
-    lineage,
+    pangoClade,
     loading,
     queryParams,
     selected,
     selectMutation
   } = props
 
-  const [state, actions] = useMutationsList(api_url, queryParams, lineage, gene, filter)
+  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, gene, filter)
   const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
@@ -145,21 +145,23 @@ const MutationsList = props => {
                   {({ index, style }) => {
                     if (index < state.rows.length) {
                       const row = state.rows[index]
+                      const isSelected = selected.includes(row.mutation)
                       // const previous = state.rows[index - 1]
                       return (
                         <div
                           style={style}
                           className={classNames(
-                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-50 dark:hover:bg-gray-600 rounded',
-                            {
-                              'bg-gray-50 dark:bg-gray-600': selected === row.mutation
-                            }
+                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded',
+                            { 'font-bold': isSelected }
                           )}
                           onClick={() => selectMutation(row.mutation)}
                         >
                           { row &&
                             <>
-                              <span className={classNames('px-3 flex-grow leading-9 font-medium', { 'text-primary': selected === row.mutation })}>{row.mutation}</span>
+                              <span className='px-3 flex-grow leading-9 flex items-center'>
+                                <span>{row.mutation}</span>
+                                { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2' /> }
+                              </span>
                               <span className='px-3 w-1/4 leading-9 text-sm text-right whitespace-nowrap'>
                                 {showFrequency ? `${formatFrequency(row.count / syncedDenominator)}%` : ''}
                               </span>
