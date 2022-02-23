@@ -11,8 +11,6 @@ import useDebouncedValue from '../hooks/useDebouncedValue'
 
 import { expandLineage, findNode } from '../pango'
 import { BsX } from 'react-icons/bs'
-import FadeTransition from './FadeTransition'
-import Spinner from './Spinner'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
   <section className='mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500 flex items-baseline text-center text-sm max-w-max'>
