@@ -42,6 +42,22 @@ export const topologise = (lineages, fillGaps = false) => {
 
 export const buildFullTopology = lineages => topologise(lineages, true)
 
+export const findNode = (topo, pango) => {
+  let n = null
+  for (const node of topo) {
+    if (node.name === pango) {
+      return node
+    }
+    if (pango.startsWith(node.name)) {
+      n = findNode(node.children, pango)
+      if (n != null) {
+        break
+      }
+    }
+  }
+  return n
+}
+
 const lineageRegex = /^[A-Z]{1,3}(\.[0-9]+)*$/
 
 export const isPangoLineage = string => lineageRegex.test(string)

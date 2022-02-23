@@ -151,7 +151,7 @@ const MutationsList = props => {
                         <div
                           style={style}
                           className={classNames(
-                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded',
+                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
                             { 'font-bold': isSelected }
                           )}
                           onClick={() => selectMutation(row.mutation)}
@@ -185,8 +185,8 @@ const MutationsList = props => {
                 </List>
               )}
             </InfiniteLoader>
-            <FadeTransition in={state.isLoading && state.rows.length === 0}>
-              <div className='absolute inset-0 z-10 grid place-items-center'>
+            <FadeTransition in={state.loading === 'LIST'}>
+              <div className='absolute inset-0 z-10 grid place-items-center bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50'>
                 <Spinner className='block h-6 w-6 text-gray-600 dark:text-gray-300' />
               </div>
             </FadeTransition>

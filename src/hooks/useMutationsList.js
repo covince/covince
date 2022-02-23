@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useReducer } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
@@ -19,36 +19,75 @@ const useTableSort = (defaultSort) => {
   }
 }
 
+const getLoadingType = (query) => {
+  if (query.skip > 0) {
+    return 'PAGE'
+  }
+  return 'LIST'
+}
+
 export default (api_url, queryParams, lineage, gene, filter = '') => {
   const { sortColumn, sortAscending, sortBy } = useTableSort('count')
-  const [rows, setRows] = useState([])
-  const [total, setTotal] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+
+  const [state, dispatch] = useReducer((state, { type, payload }) => {
+    switch (type) {
+      case 'LOADING': {
+        return {
+          ...state,
+          query: payload.query,
+          loading: getLoadingType(payload.query)
+        }
+      }
+      case 'SUCCESS': {
+        if (state.query !== payload.query) return state
+        return {
+          ...state,
+          rows: payload.rows,
+          total: payload.total,
+          loading: null
+        }
+      }
+      default:
+        return state
+    }
+  }, {
+    rows: [],
+    total: 0,
+    query: null,
+    loading: null
+  })
+
+  const { rows, total, loading } = state
 
   const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = rows) => {
     if (stopIndex < currentRows.length) return Promise.resolve()
-    setIsLoading(true)
-    const query = new URLSearchParams({
+
+    const query = {
       lineage,
+      gene,
+      filter,
       sort: sortColumn,
       direction: sortAscending ? 'asc' : 'desc',
-      search: gene ? gene + ':' + filter : '',
       skip: startIndex,
       limit: 20
-    })
+    }
 
     const { area, toDate, fromDate } = queryParams
-    if (area) query.append('area', area)
-    if (toDate) query.append('to', toDate)
-    if (fromDate) query.append('from', fromDate)
+    if (area) query.area = area
+    if (toDate) query.to = toDate
+    if (fromDate) query.from = fromDate
 
-    const response = await fetch(`${api_url}/mutations?${query.toString()}`)
+    dispatch({ type: 'LOADING', payload: { query } })
+
+    const response = await fetch(`${api_url}/mutations?${new URLSearchParams(query).toString()}`)
     const data = await response.json()
 
     const newRows = data.page.filter(_ => _).map(_ => ({ mutation: _.key, count: _.count }))
-    setRows([...currentRows, ...newRows])
-    setTotal(data.total)
-    setIsLoading(false)
+
+    dispatch({
+      type: 'SUCCESS',
+      payload: { query, rows: [...currentRows, ...newRows], total: data.total }
+    })
   }
 
   // const isMounted = useRef(false)
@@ -63,7 +102,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
     {
       rows,
       total,
-      isLoading,
+      loading,
       sortColumn,
       sortAscending
     },

@@ -9,70 +9,46 @@ import Button from './Button'
 import useMutations from '../hooks/useMutations'
 import useDebouncedValue from '../hooks/useDebouncedValue'
 
-import { expandLineage } from '../pango'
+import { expandLineage, findNode } from '../pango'
 import { BsX } from 'react-icons/bs'
+import FadeTransition from './FadeTransition'
+import Spinner from './Spinner'
 
-// const MutationsHelp = () => (
-//   <div className='p-3 text-xs tracking-wide space-y-1.5 w-48 flex flex-col justify-center'>
-//     {/* <h4 className='font-bold text-subheading'>Guidance</h4> */}
-//     <p>Add up to two mutations separated by a &ldquo;+&rdquo; character.</p>
-//     <p>Two mutations are considered a boolean AND.</p>
-//   </div>
-// )
-
-const findNode = (topo, pango) => {
-  let n = null
-  for (const node of topo) {
-    if (node.name === pango) {
-      return node
-    }
-    if (pango.startsWith(node.name)) {
-      n = findNode(node.children, pango)
-      if (n != null) {
-        break
-      }
-    }
-  }
-  return n
-}
-
-const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => {
-  if (muts.length === 0) {
-    return <p className='text-subheading text-sm px-1.5 py-0.5'>Select first mutation below</p>
-  }
-
-  return (
-    <>
-      <h3 className='text-subheading font-bold uppercase text-xs tracking-wider mx-1.5 leading-6'>
-        Selected:
-      </h3>
-      <span className='mx-3'>{muts[0]}</span>
-      { secondMut
-        ? <span className='text-subheading font-bold'>+</span>
-        : <Button
-            className='h-6 leading-6 py-0 px-0.5 -ml-1 whitespace-nowrap self-start'
-            onClick={removeMutation}
-            title='Clear mutation'
-          >
-            <BsX className='w-5 h-5' />
-          </Button> }
-      { muts[1]
-        ? <>
-            <span className='mx-3'>{muts[1]}</span>
-            <Button
-              className='h-6 leading-6 py-0 px-0.5 whitespace-nowrap self-start'
-              onClick={removeMutation}
-              title='Clear mutation'
-            >
-              <BsX className='w-5 h-5' />
-            </Button>
-          </>
-        : <Button className='h-6 leading-6 py-0 px-1.5 whitespace-nowrap ml-3' onClick={() => setSecondMut(!secondMut)}>
-            { secondMut ? 'Cancel' : 'Add' } 2nd mut.
-          </Button> }
-    </>
-  )
-}
+const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
+  <section className='mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500 flex items-baseline text-center text-sm max-w-max'>
+    <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6'>
+      Selected:
+    </h3>
+    { muts.length === 0
+      ? <p className='text-subheading text-sm px-3'>none</p>
+      : <>
+          <span className='mx-3'>{muts[0]}</span>
+          { secondMut
+            ? <span className='text-subheading font-bold'>+</span>
+            : <Button
+                className='h-6 leading-6 py-0 px-0.5 -ml-1 whitespace-nowrap self-center'
+                onClick={removeMutation}
+                title='Clear mutation'
+              >
+                <BsX className='w-5 h-5' />
+              </Button> }
+          { muts[1]
+            ? <>
+                <span className='mx-3'>{muts[1]}</span>
+                <Button
+                  className='h-6 leading-6 py-0 px-0.5 whitespace-nowrap self-center'
+                  onClick={removeMutation}
+                  title='Clear mutation'
+                >
+                  <BsX className='w-5 h-5' />
+                </Button>
+              </>
+            : <Button className='h-6 leading-6 py-0 px-1.5 whitespace-nowrap ml-3 self-center' onClick={() => setSecondMut(!secondMut)}>
+                { secondMut ? 'Cancel' : 'Add' } 2nd mut.
+              </Button> }
+        </> }
+  </section>
+)
 
 const getNextMuts = (mutsArray, newMut, secondMutMode) => {
   if (mutsArray.length > 0 && secondMutMode) {
@@ -164,14 +140,12 @@ export const SearchMutations = props => {
           Back to Lineages
         </button>
       </header>
-      <section className='mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500 flex items-baseline text-center text-sm max-w-max'>
-        <ManageSelection
-          muts={splitMuts}
-          secondMut={secondMutMode}
-          setSecondMut={setSecondMutMode}
-          removeMutation={removeMutation}
-        />
-      </section>
+      <ManageSelection
+        muts={splitMuts}
+        secondMut={secondMutMode}
+        setSecondMut={setSecondMutMode}
+        removeMutation={removeMutation}
+      />
       <form className='mt-4 mb-1.5'>
         <div className='flex items-center space-x-1.5'>
           <Select value={gene} onChange={e => setGene(e.target.value)}>
@@ -189,11 +163,11 @@ export const SearchMutations = props => {
       <MutationsList
         api_url={api_url}
         denominator={denominator}
-        pangoClade={maybeFirstMut.pangoClade}
-        gene={gene}
         filter={debouncedfilter}
-        queryParams={queryParams}
+        gene={gene}
         loading={lineageTree.isLoading}
+        pangoClade={maybeFirstMut.pangoClade}
+        queryParams={queryParams}
         selected={splitMuts}
         selectMutation={addMutation}
       />
