@@ -39,6 +39,7 @@ const MobileLineageTree = (props) => {
       ? <SearchMutations
           api_url={api_url}
           genes={info.genes}
+          isMobile
           lineage={searchingMutations}
           lineageToColourIndex={tempValues}
           lineageTree={lineageTree}
@@ -93,11 +94,11 @@ const MobileLineageTree = (props) => {
                             className={classNames(
                               'px-4 py-2 whitespace-nowrap w-full text-right flex items-center justify-end',
                               'no-webkit-tap focus:outline-none active:bg-gray-100 dark:active:bg-gray-700',
-                              { 'font-bold': value === props.preset }
+                              { 'font-bold': value === lineageTree.preset }
                             )}
-                            onClick={() => props.setPreset(value)}
+                            onClick={() => lineageTree.setPreset(value)}
                           >
-                            { value === props.preset &&
+                            { value === lineageTree.preset &&
                               <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-5 h-5 mr-2' /> }
                             {label}
                           </button>

@@ -157,7 +157,7 @@ export default ({
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
-      const props = { ...queryParams }
+      const props = queryParams
       dispatch({ type: 'LOADING', payload: { props } })
       let lineageData = await fetchLineages(api_url, props)
 

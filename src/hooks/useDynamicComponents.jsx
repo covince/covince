@@ -25,7 +25,7 @@ export const lineagePresets = [
   { value: 'who', label: 'WHO variants' }
 ]
 
-const InstantLineageTree = ({ onClose, lineageToColourIndex, submit, ...props }) => {
+const DesktopLineageTree = ({ onClose, lineageToColourIndex, submit, ...props }) => {
   const { numberSelected, maxLineages, preset, setPreset } = props
   return (
     <>
@@ -97,7 +97,7 @@ export default (props) => {
         <MapView heading={lineageView ? null : heading}>
           { lineageView
             ? lineageView === '1'
-              ? <InstantLineageTree
+              ? <DesktopLineageTree
                   darkMode={darkMode}
                   maxLineages={info.maxLineages}
                   onClose={() => setLineageView(false)}

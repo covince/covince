@@ -126,11 +126,11 @@ const Branch = memo(({ node, ...props }) => {
                     palette={colourPalette}
                     setColour={setColour}
                   /> }
-                  <MenuItems>
-                    <MenuItem onClick={() => removeMutations(lineage, muts)}>
-                      Remove
-                    </MenuItem>
-                  </MenuItems>
+                <MenuItems>
+                  <MenuItem onClick={() => removeMutations(lineage, muts)}>
+                    Remove
+                  </MenuItem>
+                </MenuItems>
               </LineageMenu>
             }
             onChange={() => toggleSelect(lineageWithMuts)}
@@ -174,7 +174,7 @@ const Branch = memo(({ node, ...props }) => {
                 / {altName}
               </span> }
             { (!!sum || !!sumOfClade) &&
-              <span className='ml-2 italic font-normal text-xs tracking-wide text-subheading dark:text-dark-subheading'>
+              <span className='ml-2 italic font-normal text-xs tracking-wide text-subheading'>
                 {!!sum && sum.toLocaleString()} {!!sumOfClade && `+ ${sumOfClade.toLocaleString()}`}
               </span> }
           </>
