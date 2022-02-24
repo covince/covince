@@ -67,49 +67,55 @@ export default (props) => {
     lineages,
     lineageToColourIndex,
     lineageTree,
+    lineageView,
+    nextColourIndex,
+    queryParams,
     setLineageView,
-    showLineageView,
-    searchingMutations,
     showMutationSearch,
     submit
   } = props
 
   const MapView = useCallback((MapView) => {
-    if (isMobile) return MapView
+    if (isMobile) {
+      return MapView
+    }
     const DecoratedMapView = (props) => {
       const {
         children,
         darkMode,
         heading,
-        lineageTree,
         lineageToColourIndex,
+        lineageTree,
+        lineageView,
+        nextColourIndex,
+        queryParams,
         setLineageView,
-        searchingMutations,
         showMutationSearch,
-        showLineageView,
         submit
       } = props
       return (
-        <MapView heading={showLineageView ? null : heading}>
-          { showLineageView
-            ? searchingMutations
-              ? <SearchMutations
-                  api_url={api_url}
-                  genes={info.genes}
-                  lineage={searchingMutations}
-                  lineageToColourIndex={lineageToColourIndex}
-                  lineageTree={lineageTree}
-                  showMutationSearch={showMutationSearch}
-                  submit={submit}
-                />
-              : <InstantLineageTree
+        <MapView heading={lineageView ? null : heading}>
+          { lineageView
+            ? lineageView === '1'
+              ? <InstantLineageTree
                   darkMode={darkMode}
                   maxLineages={info.maxLineages}
                   onClose={() => setLineageView(false)}
                   lineageToColourIndex={lineageToColourIndex}
+                  nextColourIndex={nextColourIndex}
                   showMutationSearch={showMutationSearch}
                   submit={submit}
                   {...lineageTree}
+                />
+              : <SearchMutations
+                  api_url={api_url}
+                  genes={info.genes}
+                  lineage={lineageView}
+                  lineageToColourIndex={lineageToColourIndex}
+                  nextColourIndex={nextColourIndex}
+                  queryParams={queryParams}
+                  showMutationSearch={showMutationSearch}
+                  submit={submit}
                 />
             : children }
         </MapView>
@@ -122,16 +128,17 @@ export default (props) => {
     darkMode,
     lineageToColourIndex,
     lineageTree,
-    searchingMutations,
+    lineageView,
+    nextColourIndex,
+    queryParams,
     setLineageView,
-    showLineageView,
     showMutationSearch,
     submit
-  }), [showLineageView, searchingMutations, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex])])
+  }), [lineageView, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex, queryParams])])
 
   const LineageFilter = useCallback((LineageFilter) => {
     const DecoratedLineageFilter =
-      ({ showLineageView, setLineageView, lineages, ...props }) => {
+      ({ lineageView, setLineageView, lineages, ...props }) => {
         const { activeLineages } = props
         const isLoading = useMemo(() => Object.keys(activeLineages).length !== lineages.length, [activeLineages, lineages])
         return (
@@ -142,7 +149,7 @@ export default (props) => {
               <div className='relative z-10 -top-0.5 -left-1.5 md:-left-1 space-x-1.5 pr-8'>
                 <Button
                   className='h-8 md:h-6 pl-2 pr-1 flex items-center hover:bg-gray-50 !text-primary'
-                  onClick={() => setLineageView(!showLineageView)}
+                  onClick={() => setLineageView(!lineageView)}
                 >
                   Lineages
                   <HiOutlineCog className='ml-1 h-5 w-5 stroke-current' />
@@ -168,18 +175,18 @@ export default (props) => {
   }, [])
 
   const lineageFilterProps = useMemo(() => ({
-    showLineageView,
+    lineageView,
     setLineageView,
     lineages
-  }), [showLineageView, lineages])
+  }), [lineageView, lineages])
 
   const DateFilter = useCallback((DateFilter) => {
-    if (isMobile || !showLineageView) return DateFilter
+    if (isMobile || !lineageView) return DateFilter
     const DecoratedDateFilter = ({ allDates }) => {
       return <LineageDateFilter dates={allDates} />
     }
     return DecoratedDateFilter
-  }, [isMobile, showLineageView])
+  }, [isMobile, lineageView])
 
   const dateFilterProps = useMemo(() => ({
     allDates: info.dates

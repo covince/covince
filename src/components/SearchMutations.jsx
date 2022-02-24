@@ -9,7 +9,7 @@ import Button from './Button'
 import useMutations from '../hooks/useMutations'
 import useDebouncedValue from '../hooks/useDebouncedValue'
 
-import { expandLineage, findNode } from '../pango'
+import { expandLineage } from '../pango'
 import { BsX } from 'react-icons/bs'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
@@ -42,7 +42,7 @@ const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
                 </Button>
               </>
             : <Button className='h-6 leading-6 py-0 px-1.5 whitespace-nowrap ml-3 self-center' onClick={() => setSecondMut(!secondMut)}>
-                { secondMut ? 'Cancel' : 'Add' } 2nd mut.
+                { secondMut ? 'cancel' : 'Add' } 2nd mut.
               </Button> }
         </> }
   </section>
@@ -58,26 +58,16 @@ const getNextMuts = (mutsArray, newMut, secondMutMode) => {
 export const SearchMutations = props => {
   const {
     api_url,
-    lineageTree,
-    // genes,
-    // lineage
     lineageToColourIndex,
-    submit,
-    showMutationSearch
+    nextColourIndex,
+    queryParams,
+    showMutationSearch,
+    submit
   } = props
 
   const lineage = useMemo(() => props.lineage, [])
   const pangoClade = useMemo(() => expandLineage(lineage), [lineage])
   const genes = useMemo(() => props.genes.sort(), [])
-
-  const denominator = useMemo(() => {
-    const node = findNode(lineageTree.topology, pangoClade)
-    return node ? node.sum + node.sumOfClade : null
-  }, [lineageTree.topology])
-
-  const queryParams = useMemo(() => {
-    return lineageTree.loading || lineageTree.loadedProps
-  }, [lineageTree.loading, lineageTree.loadedProps])
 
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
@@ -109,7 +99,7 @@ export const SearchMutations = props => {
       }
       delete lineageUpdate[replacing]
     } else {
-      lineageUpdate[newKey] = lineageTree.nextColourIndex
+      lineageUpdate[newKey] = nextColourIndex
     }
     submit(lineageUpdate, mutationUpdate)
   }, [getMutationQueryUpdate, lineageToColourIndex])
@@ -160,10 +150,8 @@ export const SearchMutations = props => {
       </form>
       <MutationsList
         api_url={api_url}
-        denominator={denominator}
         filter={debouncedfilter}
         gene={gene}
-        loading={lineageTree.isLoading}
         pangoClade={maybeFirstMut.pangoClade}
         queryParams={queryParams}
         selected={splitMuts}

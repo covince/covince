@@ -46,11 +46,9 @@ const formatFrequency = f => {
 const MutationsList = props => {
   const {
     api_url,
-    denominator,
     filter,
     gene,
     pangoClade,
-    loading,
     queryParams,
     selected,
     selectMutation
@@ -66,17 +64,15 @@ const MutationsList = props => {
 
   const loaderRef = useRef()
 
-  const [syncedDenominator, setSyncedDenominator] = useState(denominator)
+  const showFrequency = useMemo(() => {
+    return !!state.denominator
+  }, [state.denominator])
 
   useEffect(() => {
-    if (loading === false && state.isLoading === false && denominator !== syncedDenominator) {
-      setSyncedDenominator(denominator)
+    if (state.loading === 'LIST' && loaderRef.current) {
+      loaderRef.current._listRef.scrollTo(0)
     }
-  }, [loading, state.isLoading])
-
-  const showFrequency = useMemo(() => {
-    return denominator === syncedDenominator
-  }, [denominator, syncedDenominator])
+  }, [state.loading])
 
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
@@ -101,15 +97,6 @@ const MutationsList = props => {
             Frequency
           </span>
         </TableHeader>
-        {/* <TableHeader
-          className='w-1/4'
-          sorted={state.sortColumn === 'total'}
-          align='right'
-          onClick={() => actions.sortBy('total')}
-        >
-          <TableSort active={state.sortColumn === 'total'} ascending={state.sortAscending} />
-          <span className={classNames({ 'whitespace-nowrap text-center leading-4': !isTableLayout })}>Total Samples</span>
-        </TableHeader> */}
         <div>
           <div className='overflow-y-scroll heron-styled-scrollbars opacity-0' />
         </div>
@@ -163,7 +150,7 @@ const MutationsList = props => {
                                 { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2' /> }
                               </span>
                               <span className='px-3 w-1/4 leading-9 text-sm text-right whitespace-nowrap'>
-                                {showFrequency ? `${formatFrequency(row.count / syncedDenominator)}%` : ''}
+                                {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
                               <span className='px-3 w-1/4 leading-9 text-sm text-right'>{row.count.toLocaleString()}</span>
                             </> }
@@ -172,10 +159,7 @@ const MutationsList = props => {
                     }
                     if (state.rows.length > 0 && hasNextPage) {
                       return (
-                        <div
-                          style={style}
-                          className='grid place-items-center'
-                        >
+                        <div style={style} className='grid place-items-center'>
                           <Spinner className='block h-5 w-5 text-gray-600 dark:text-gray-300' />
                         </div>
                       )

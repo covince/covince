@@ -17,7 +17,9 @@ const MobileLineageTree = (props) => {
     info,
     initialValues,
     lineageTree,
+    nextColourIndex,
     onClose,
+    queryParams,
     searchingMutations,
     showMutationSearch
   } = props
@@ -36,18 +38,21 @@ const MobileLineageTree = (props) => {
     { props.searchingMutations
       ? <SearchMutations
           api_url={api_url}
+          genes={info.genes}
           lineage={searchingMutations}
           lineageToColourIndex={tempValues}
-          submit={submit}
-          showMutationSearch={showMutationSearch}
           lineageTree={lineageTree}
-          genes={info.genes}
+          nextColourIndex={nextColourIndex}
+          queryParams={queryParams}
+          showMutationSearch={showMutationSearch}
+          submit={submit}
         />
       : <LineageTree
           className='flex-grow pr-1.5'
           lineageToColourIndex={tempValues}
           submit={submit}
           maxLineages={info.maxLineages}
+          nextColourIndex={nextColourIndex}
           {...lineageTree}
           showMutationSearch={showMutationSearch}
           darkMode={darkMode}

@@ -77,11 +77,22 @@ export default (config) => {
     return pairs
   }, [parsedLineages, parsedColourIndexes])
 
+  const nextColourIndex = useMemo(() => {
+    const colours = Object.values(lineageToColourIndex)
+    const unique = new Set(colours)
+    for (let i = 0; i < colourPalette.length; i++) {
+      if (unique.has(i.toString())) continue
+      return i.toString()
+    }
+    return colours.length % colourPalette.length
+  }, [lineageToColourIndex])
+
   return {
     colourPalette,
     colourIndexes: parsedColourIndexes,
     lineages: parsedLineages,
     lineageToColourIndex,
+    nextColourIndex,
     submit
   }
 }

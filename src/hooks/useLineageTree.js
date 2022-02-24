@@ -85,14 +85,12 @@ const mapStateToNodes = (nodes, state) => {
 
 export default ({
   api_url,
-  area,
   colourPalette,
-  fromDate,
   preset,
   lineageToColourIndex,
+  queryParams,
   setPreset,
-  showLineageView,
-  toDate
+  showLineageView
 }) => {
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -147,24 +145,19 @@ export default ({
   const { loadedProps } = state
 
   useEffect(() => {
-    if (
-      showLineageView && loadedProps !== null && (
-        loadedProps.area !== area ||
-        loadedProps.fromDate !== fromDate ||
-        loadedProps.toDate !== toDate
-      )) {
+    if (showLineageView && loadedProps !== queryParams) {
       dispatch({ type: 'QUEUE_REFETCH' })
     }
   }, [showLineageView])
 
-  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [area, fromDate, toDate])
+  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [queryParams])
 
   const toAlias = useReverseAliasLookup()
 
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
-      const props = { area, fromDate, toDate }
+      const props = { ...queryParams }
       dispatch({ type: 'LOADING', payload: { props } })
       let lineageData = await fetchLineages(api_url, props)
 
@@ -197,16 +190,6 @@ export default ({
     dispatch({ type: 'TOGGLE_OPEN', payload: { nodeName, isOpen } })
   }, [dispatch])
 
-  const nextColourIndex = useMemo(() => {
-    const colours = Object.values(lineageToColourIndex)
-    const unique = new Set(colours)
-    for (let i = 0; i < colourPalette.length; i++) {
-      if (unique.has(i.toString())) continue
-      return i.toString()
-    }
-    return colours.length % colourPalette.length
-  }, [lineageToColourIndex])
-
   const selectedLineages = useMemo(
     () => Object.keys(lineageToColourIndex),
     [lineageToColourIndex]
@@ -219,13 +202,13 @@ export default ({
   }, [state.topology, preset, toAlias])
 
   return useMemo(() => ({
+    // props
     colourPalette,
 
     // state
     ...state,
     preset,
     isLoading: loadedProps === null,
-    nextColourIndex,
     numberSelected,
     topology,
 

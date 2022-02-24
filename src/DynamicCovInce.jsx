@@ -48,25 +48,39 @@ const DynamicUI = ({
 
   const isMobile = useMobile()
 
-  const { colourPalette, lineages, lineageToColourIndex, submit } = useDynamicLineages(staticConfig)
+  const {
+    colourPalette,
+    lineages,
+    lineageToColourIndex,
+    nextColourIndex,
+    submit
+  } = useDynamicLineages(staticConfig)
+
   const api = useAPIImpl({ api_url, lineages, info, confidence, avg })
 
-  const [{ lineageView, searchingMutations, lineageFilter, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: '0', lineageFilter: 'all' })
-  const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
+  const [{ lineageView, lineageFilter, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: null, lineageFilter: 'all' })
+
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
   const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
-  const showMutationSearch = React.useCallback((lineage) => updateQuery({ searchingMutations: lineage }), [])
+  const showMutationSearch = React.useCallback((lineage = '1') => updateQuery({ lineageView: lineage }), [])
+
+  const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
+  const searchingMutations = React.useMemo(() => lineageView === '1' ? undefined : lineageView, [lineageView])
+
+  const queryParams = React.useMemo(() => ({
+    area,
+    fromDate: xMin,
+    toDate: xMax
+  }), [area, xMin, xMax])
 
   const lineageTree = useLineageTree({
     api_url,
-    area,
     colourPalette,
-    fromDate: xMin,
     lineageToColourIndex,
     preset: lineageFilter,
+    queryParams,
     setPreset: setLineageFilter,
-    showLineageView,
-    toDate: xMax
+    showLineageView
   })
 
   const injection = useDynamicComponents({
@@ -77,9 +91,10 @@ const DynamicUI = ({
     lineages,
     lineageToColourIndex,
     lineageTree,
-    searchingMutations,
+    lineageView,
+    nextColourIndex,
+    queryParams,
     setLineageView,
-    showLineageView,
     showMutationSearch,
     submit
   })
@@ -98,17 +113,22 @@ const DynamicUI = ({
         tiles={tiles}
       />
       { isMobile &&
-        <Dialog isOpen={showLineageView} onClose={() => {}}>
+        <Dialog isOpen={!!lineageView} onClose={() => {}}>
           <div
             className={classNames(
               'fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3',
               searchingMutations ? 'px-3' : 'pl-3'
             )}
           >
-            { showLineageView &&
+            { lineageView &&
               <MobileLineageTree
                 api_url={api_url}
                 darkMode={darkMode}
+                info={info}
+                initialValues={lineageToColourIndex}
+                lineageTree={lineageTree}
+                maxLineages={info.maxLineages}
+                nextColourIndex={nextColourIndex}
                 onClose={values => {
                   if (values !== lineageToColourIndex) {
                     submit(values, { lineageView: undefined })
@@ -116,12 +136,9 @@ const DynamicUI = ({
                     setLineageView(false)
                   }
                 }}
-                initialValues={lineageToColourIndex}
-                maxLineages={info.maxLineages}
+                queryParams={queryParams}
                 searchingMutations={searchingMutations}
                 showMutationSearch={showMutationSearch}
-                lineageTree={lineageTree}
-                info={info}
               /> }
           </div>
         </Dialog> }

@@ -44,6 +44,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
           ...state,
           rows: payload.rows,
           total: payload.total,
+          denominator: payload.denominator,
           loading: null
         }
       }
@@ -53,13 +54,12 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
   }, {
     rows: [],
     total: 0,
+    denominator: null,
     query: null,
     loading: null
   })
 
-  const { rows, total, loading } = state
-
-  const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = rows) => {
+  const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = state.rows) => {
     if (stopIndex < currentRows.length) return Promise.resolve()
 
     const query = {
@@ -86,7 +86,12 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
 
     dispatch({
       type: 'SUCCESS',
-      payload: { query, rows: [...currentRows, ...newRows], total: data.total }
+      payload: {
+        query,
+        rows: [...currentRows, ...newRows],
+        total: data.total_rows,
+        denominator: data.total_records
+      }
     })
   }
 
@@ -100,9 +105,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
 
   return [
     {
-      rows,
-      total,
-      loading,
+      ...state,
       sortColumn,
       sortAscending
     },
