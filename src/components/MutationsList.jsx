@@ -170,7 +170,7 @@ const MutationsList = props => {
               )}
             </InfiniteLoader>
             <FadeTransition in={state.loading === 'LIST'}>
-              <div className='absolute inset-0 z-10 grid place-items-center bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50'>
+              <div className='absolute inset-0 z-10 flex justify-center items-center bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50'>
                 <Spinner className='block h-6 w-6 text-gray-600 dark:text-gray-300' />
               </div>
             </FadeTransition>

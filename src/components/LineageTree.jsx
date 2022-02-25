@@ -111,7 +111,10 @@ const Branch = memo(({ node, ...props }) => {
             colour={mutsColour}
             disabled={isDisabled}
             id={`lineage_selector_${lineageWithMuts}`}
-            label={<span className='text-gray-700 dark:text-gray-100'>{lineage}+{muts}</span>}
+            label={
+              <span className='text-gray-700 dark:text-gray-100'>
+                {lineage}<span className='text-xs tracking-wide'> +{muts}</span>
+              </span>}
             menu={
               <LineageMenu>
                 <MenuItems>

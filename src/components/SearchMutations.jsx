@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import classNames from 'classnames'
-import { BsX } from 'react-icons/bs'
+import { BsPlus, BsX, BsDash as RemoveIcon } from 'react-icons/bs'
 
 import Select from './Select'
 import Input from './TextInput'
@@ -14,40 +14,43 @@ import useDebouncedValue from '../hooks/useDebouncedValue'
 import { expandLineage } from '../pango'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
-  <section className='mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500 flex items-baseline'>
-    <h3 className='text-subheading font-bold uppercase text-xs tracking-wider mx-1.5 leading-6'>
+  <section
+    className={`
+      flex items-baseline space-x-2 max-w-max text-sm leading-6 h-10
+      mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500
+    `}
+  >
+    <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6 hidden md:block'>
       Selected:
     </h3>
-    <div className='mx-1.5 space-x-3 flex flex-wrap items-baseline text-center text-sm max-w-max'>
-      { muts.length === 0
-        ? <p className='text-subheading text-sm'>none</p>
-        : <>
-            <span className=''>{muts[0]}</span>
-            { secondMut
-              ? <span className='text-subheading font-bold'>+</span>
-              : <Button
-                  className='h-6 leading-6 py-0 px-0.5 -ml-1 whitespace-nowrap self-center'
+    { muts.length === 0
+      ? <p className='text-subheading pr-1.5'>none</p>
+      : <>
+          <span>{muts[0]}</span>
+          { secondMut
+            ? <BsPlus className='text-subheading h-5 w-5 self-center' />
+            : <Button
+                className='py-0.5 px-1 self-center'
+                onClick={removeMutation}
+                title='Remove mutation'
+              >
+                <RemoveIcon className='w-5 h-5' />
+              </Button> }
+          { muts[1]
+            ? <>
+                <span>{muts[1]}</span>
+                <Button
+                  className='py-0.5 px-1 self-center'
                   onClick={removeMutation}
-                  title='Clear mutation'
+                  title='Remove mutation'
                 >
-                  <BsX className='w-5 h-5' />
-                </Button> }
-            { muts[1]
-              ? <>
-                  <span className='mx-3'>{muts[1]}</span>
-                  <Button
-                    className='h-6 leading-6 py-0 px-0.5 whitespace-nowrap self-center'
-                    onClick={removeMutation}
-                    title='Clear mutation'
-                  >
-                    <BsX className='w-5 h-5' />
-                  </Button>
-                </>
-              : <Button className='h-6 leading-6 py-0 px-1.5 whitespace-nowrap ml-3 self-center' onClick={() => setSecondMut(!secondMut)}>
-                  { secondMut ? 'cancel' : 'Add' } 2nd mut.
-                </Button> }
-          </> }
-    </div>
+                  <RemoveIcon className='w-5 h-5' />
+                </Button>
+              </>
+            : <Button className='py-0.5 px-2 whitespace-nowrap -mr-3 self-center' onClick={() => setSecondMut(!secondMut)}>
+                { secondMut ? 'cancel' : 'Add' } 2nd mut.
+              </Button> }
+        </> }
   </section>
 )
 
@@ -143,7 +146,7 @@ export const SearchMutations = props => {
         setSecondMut={setSecondMutMode}
         removeMutation={removeMutation}
       />
-      <form className='mt-4 mb-1.5'>
+      <form className='mt-3 mb-1.5'>
         <div className='flex items-center space-x-1.5'>
           <Select responsive value={gene} onChange={e => setGene(e.target.value)}>
             <option value=''>(gene)</option>
