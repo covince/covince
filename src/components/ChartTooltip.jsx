@@ -12,16 +12,21 @@ const formatNumber = (number, percentage, precision = percentage ? 1 : 2) => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: precision })
 }
 
-const formatLineage = lineage => {
-  const mutSeparatorIndex = lineage.indexOf('+')
+const formatLineage = lineageWithMuts => {
+  const [lineage, ...muts] = lineageWithMuts.split('+')
   return (
-    mutSeparatorIndex === -1
+    muts.length === 0
       ? lineage
-      : <span className='leading-none max-w'>
-          {lineage.slice(0, mutSeparatorIndex)}
-          <span className='block text-xs tracking-wide leading-none text-gray-600 dark:text-gray-200'>
-            {lineage.slice(mutSeparatorIndex)}
-          </span>
+      : <span className='leading-4'>
+          {lineage}
+          {muts.map((mut, i) => (
+            <>
+              <span key={mut} className={classNames('text-xs tracking-wide leading-none text-gray-600 dark:text-gray-200', { block: muts.length === 1 })}>
+                +{mut}
+              </span>
+              {i === 0 && muts.length > 1 && <br className='leading-none'/>}
+            </>
+          ))}
         </span>
   )
 }
@@ -97,7 +102,7 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
-                <td className='px-3'>
+                <td className='px-3 leading-none'>
                   {formatLineage(
                     tooltip.use_nomenclature
                       ? nomenclatureLookup[item.name] || item.name
