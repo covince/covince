@@ -128,7 +128,6 @@ const DynamicUI = ({
                 initialValues={lineageToColourIndex}
                 lineageTree={lineageTree}
                 maxLineages={info.maxLineages}
-                nextColourIndex={nextColourIndex}
                 onClose={values => {
                   if (values !== lineageToColourIndex) {
                     submit(values, { lineageView: undefined })

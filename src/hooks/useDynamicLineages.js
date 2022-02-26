@@ -50,6 +50,16 @@ const initialise = ({ dynamic_mode }) => {
   }
 }
 
+export const getNextColourIndex = (lineageToColourIndex, colourPalette) => {
+  const colours = Object.values(lineageToColourIndex)
+  const unique = new Set(colours)
+  for (let i = 0; i < colourPalette.length; i++) {
+    if (unique.has(i.toString())) continue
+    return i.toString()
+  }
+  return colours.length % colourPalette.length
+}
+
 export default (config) => {
   const { initial, colourPalette } = useMemo(() => config ? initialise(config) : {}, [config])
   const [{ lineages, colours }, updateQuery] = useQueryAsState(initial)
@@ -77,15 +87,9 @@ export default (config) => {
     return pairs
   }, [parsedLineages, parsedColourIndexes])
 
-  const nextColourIndex = useMemo(() => {
-    const colours = Object.values(lineageToColourIndex)
-    const unique = new Set(colours)
-    for (let i = 0; i < colourPalette.length; i++) {
-      if (unique.has(i.toString())) continue
-      return i.toString()
-    }
-    return colours.length % colourPalette.length
-  }, [lineageToColourIndex])
+  const nextColourIndex = useMemo(() =>
+    getNextColourIndex(lineageToColourIndex, colourPalette)
+  , [lineageToColourIndex])
 
   return {
     colourPalette,

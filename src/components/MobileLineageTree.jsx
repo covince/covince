@@ -9,6 +9,7 @@ import SearchMutations from './SearchMutations'
 
 import { LineageLimit, lineagePresets } from '../hooks/useDynamicComponents'
 import useQueryAsState from '../hooks/useQueryAsState'
+import { getNextColourIndex } from '../hooks/useDynamicLineages'
 
 const MobileLineageTree = (props) => {
   const {
@@ -17,7 +18,7 @@ const MobileLineageTree = (props) => {
     info,
     initialValues,
     lineageTree,
-    nextColourIndex,
+    // nextColourIndex,
     onClose,
     queryParams,
     searchingMutations,
@@ -32,6 +33,10 @@ const MobileLineageTree = (props) => {
     updateQuery(queryUpdate)
     setTempValues(lineages)
   }, [tempValues])
+
+  const nextColourIndex = React.useMemo(() =>
+    getNextColourIndex(tempValues, lineageTree.colourPalette)
+  , [tempValues])
 
   return (
     <>
