@@ -12,6 +12,7 @@ import useMutations from '../hooks/useMutations'
 import useDebouncedValue from '../hooks/useDebouncedValue'
 
 import { expandLineage } from '../pango'
+import useQueryAsState from '../hooks/useQueryAsState'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
   <section
@@ -121,9 +122,9 @@ export const SearchMutations = props => {
     applyMutations(nextMuts)
   }, [currentMuts, secondMutMode])
 
-  const [gene, setGene] = useState('')
-  const [filter, setFilter] = useState('')
-  const debouncedfilter = useDebouncedValue(filter, 250)
+  const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
+  const debouncedfilter = useDebouncedValue(mutationFilter, 250)
+
   return (
     <>
       <header className={classNames('flex h-6', isMobile ? 'items-center justify-between' : 'items-baseline')}>
@@ -148,15 +149,15 @@ export const SearchMutations = props => {
       />
       <form className='mt-3 mb-1.5'>
         <div className='flex items-center space-x-1.5'>
-          <Select responsive value={gene} onChange={e => setGene(e.target.value)}>
+          <Select responsive value={gene} onChange={e => updateQuery({ gene: e.target.value })}>
             <option value=''>(gene)</option>
             {genes.map(g => <option key={g} value={g}>{g}</option>)}
           </Select>
           <p>:</p>
           <Input
-            onChange={e => setFilter(e.target.value.toUpperCase())}
+            onChange={e => updateQuery({ mutationFilter: e.target.value.toUpperCase() })}
             placeholder='filter mutations'
-            value={filter}
+            value={mutationFilter}
           />
         </div>
       </form>
