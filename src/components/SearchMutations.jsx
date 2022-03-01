@@ -118,6 +118,9 @@ export const SearchMutations = props => {
   }, [currentMuts])
 
   const addMutation = React.useCallback((mut) => {
+    if (splitMuts.includes(mut)) {
+      return
+    }
     const nextMuts = getNextMuts(splitMuts, mut, secondMutMode)
     applyMutations(nextMuts)
   }, [currentMuts, secondMutMode])
