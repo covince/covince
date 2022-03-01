@@ -114,7 +114,7 @@ export const SearchMutations = props => {
 
   const removeMutation = React.useCallback(() => {
     applyMutations(splitMuts.slice(0, -1).join('+'))
-    setSecondMutMode(false)
+    // setSecondMutMode(false)
   }, [currentMuts])
 
   const addMutation = React.useCallback((mut) => {
@@ -144,26 +144,28 @@ export const SearchMutations = props => {
             : 'Back to Lineages' }
         </button>
       </header>
-      <ManageSelection
-        muts={splitMuts}
-        secondMut={secondMutMode}
-        setSecondMut={setSecondMutMode}
-        removeMutation={removeMutation}
-      />
-      <form className='mt-3 mb-1.5'>
-        <div className='flex items-center space-x-1.5'>
-          <Select responsive value={gene} onChange={e => updateQuery({ gene: e.target.value })}>
-            <option value=''>(gene)</option>
-            {genes.map(g => <option key={g} value={g}>{g}</option>)}
-          </Select>
-          <p>:</p>
-          <Input
-            onChange={e => updateQuery({ mutationFilter: e.target.value.toUpperCase() })}
-            placeholder='filter mutations'
-            value={mutationFilter}
-          />
-        </div>
-      </form>
+      <div className='big:flex flex-row-reverse justify-end'>
+        <ManageSelection
+          muts={splitMuts}
+          secondMut={secondMutMode}
+          setSecondMut={setSecondMutMode}
+          removeMutation={removeMutation}
+        />
+        <form className='mt-3 mb-1.5 big:mr-3'>
+          <div className='flex items-center space-x-1.5'>
+            <Select responsive value={gene} onChange={e => updateQuery({ gene: e.target.value })}>
+              <option value=''>(gene)</option>
+              {genes.map(g => <option key={g} value={g}>{g}</option>)}
+            </Select>
+            <p>:</p>
+            <Input
+              onChange={e => updateQuery({ mutationFilter: e.target.value.toUpperCase() })}
+              placeholder='filter mutations'
+              value={mutationFilter}
+            />
+          </div>
+        </form>
+      </div>
       <MutationsList
         api_url={api_url}
         filter={debouncedfilter}

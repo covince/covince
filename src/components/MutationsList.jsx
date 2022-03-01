@@ -79,7 +79,7 @@ const MutationsList = props => {
       <div className='flex border-b border-solid dark:border-gray-500'>
         <TableHeader
           key='not-searching'
-          className='w-1/2'
+          className='mr-auto'
           sorted={state.sortColumn === 'name'}
           onClick={() => actions.sortBy('name')}
         >
@@ -87,7 +87,6 @@ const MutationsList = props => {
           {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
         </TableHeader>
         <TableHeader
-          className='w-1/2'
           sorted={state.sortColumn === 'count'}
           align='right'
           onClick={() => actions.sortBy('count')}
@@ -138,21 +137,21 @@ const MutationsList = props => {
                         <div
                           style={style}
                           className={classNames(
-                            'flex items-baseline cursor-pointer text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                            'flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
                             { 'font-bold': isSelected }
                           )}
                           onClick={() => selectMutation(row.mutation)}
                         >
                           { row &&
                             <>
-                              <span className='px-3 flex-grow leading-9 flex items-center'>
+                              <span className='px-3 flex-grow flex items-baseline'>
                                 <span>{row.mutation}</span>
-                                { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2' /> }
+                                { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                               </span>
-                              <span className='px-3 w-1/4 leading-9 text-sm text-right whitespace-nowrap'>
+                              <span className='px-3 w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
                                 {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
-                              <span className='px-3 w-1/4 leading-9 text-sm text-right'>{row.count.toLocaleString()}</span>
+                              <span className='px-3 w-1/4 lg:w-1/5 text-right'>{row.count.toLocaleString()}</span>
                             </> }
                         </div>
                       )
