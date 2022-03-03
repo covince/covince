@@ -8,7 +8,6 @@ import { Heading } from '../components/Typography'
 import Spinner from '../components/Spinner'
 import FadeTransition from '../components/FadeTransition'
 
-import LineageTree from '../components/LineageTree'
 import LineageDateFilter from '../components/LineageDateFilter'
 import SearchMutations from '../components/SearchMutations'
 
@@ -25,7 +24,7 @@ export const lineagePresets = [
   { value: 'who', label: 'WHO variants' }
 ]
 
-const DesktopLineageTree = ({ onClose, lineageToColourIndex, submit, ...props }) => {
+const DesktopLineageTree = ({ onClose, lineageToColourIndex, submit, TreeComponent, ...props }) => {
   const { numberSelected, maxLineages, preset, setPreset } = props
   return (
     <>
@@ -41,7 +40,7 @@ const DesktopLineageTree = ({ onClose, lineageToColourIndex, submit, ...props })
           </Button>
         </div>
       </header>
-      <LineageTree
+      <TreeComponent
         className='mt-3 flex-grow'
         lineageToColourIndex={lineageToColourIndex}
         submit={submit}

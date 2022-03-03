@@ -7,11 +7,9 @@ import Button from './Button'
 import Input from './TextInput'
 import Checkbox from './Checkbox'
 import LoadingOverlay from './LoadingOverlay'
-import LineageMenu, { MenuItems, MenuItem, ColourPalette } from './LineageMenu'
+import LineageMenu, { ColourPalette } from './LineageMenu'
 
-import useMutations from '../hooks/useMutations'
-
-const LineageCheckbox = props => {
+export const LineageCheckbox = props => {
   const {
     checked,
     children,
@@ -47,20 +45,45 @@ const LineageCheckbox = props => {
 }
 LineageCheckbox.displayName = 'LineageCheckbox'
 
-const Branch = memo(({ node, ...props }) => {
+const DefaultMenu = props => {
   const {
+    colour,
+    palette,
+    enabled,
+    lineage,
+    setColour
+  } = props
+
+  if (enabled) {
+    return (
+      <LineageMenu>
+        <ColourPalette
+          colour={colour}
+          lineage={lineage}
+          palette={palette}
+          setColour={setColour}
+        />
+      </LineageMenu>
+    )
+  }
+
+  return null
+}
+
+export const LineageTreeBranch = memo(({ node, ...props }) => {
+  const {
+    checked,
+    colour,
     colourPalette,
-    index,
-    lineageToMutations,
-    preset,
-    removeMutations,
-    search = '',
-    selectDisabled,
+    children,
+    hasChildren,
+    isDisabled,
+    isOpen,
+    Menu = DefaultMenu,
+    renderChildren,
     setColour,
-    showMutationSearch,
     toggleOpen,
-    toggleSelect,
-    values
+    toggleSelect
   } = props
 
   const {
@@ -69,95 +92,12 @@ const Branch = memo(({ node, ...props }) => {
     sum,
     sumOfClade
   } = node
-  const {
-    isOpen = node.childIsSelected
-  } = index[node.name] || {}
-
-  const checked = lineage in values
-  const colour = values[lineage] || null
-  const isDisabled = selectDisabled && !checked
-  const inSearch = search.length ? node.searchText.includes(search) : false
-
-  const muts = lineageToMutations[lineage]
-  const lineageWithMuts = `${lineage}+${muts}`
-  const mutsChecked = lineageWithMuts in values
-  const mutsInSearch = muts && search.length ? lineageWithMuts.toLowerCase().includes(search) : false
-  const mutsColour = values[lineageWithMuts]
-
-  let childBranches = []
-  for (const child of node.children) {
-    childBranches = childBranches.concat(
-      <Branch
-        key={child.name}
-        node={child}
-        {...props}
-      />
-    )
-  }
-
-  if (
-    (search.length && !inSearch && !mutsInSearch) ||
-    (preset === 'selected' && !checked && !mutsChecked)
-  ) {
-    return childBranches
-  }
-
-  const children = (
-    <ul>
-      {(preset === 'selected' ? mutsChecked : muts) &&
-        <li className='flex mt-1.5 lg:ml-5 ml-7'>
-          <LineageCheckbox
-            checked={mutsChecked}
-            colour={mutsColour}
-            disabled={isDisabled}
-            id={`lineage_selector_${lineageWithMuts}`}
-            label={
-              <span className='text-gray-700 dark:text-gray-100'>
-                {lineage}<span className='text-xs tracking-wide pl-1'>+{muts}</span>
-              </span>}
-            menu={
-              <LineageMenu>
-                <MenuItems>
-                  <MenuItem onClick={() => showMutationSearch(lineage)}>
-                    Edit mutations
-                  </MenuItem>
-                </MenuItems>
-                { mutsChecked &&
-                  <ColourPalette
-                    colour={mutsColour}
-                    lineage={lineageWithMuts}
-                    palette={colourPalette}
-                    setColour={setColour}
-                  /> }
-                <MenuItems>
-                  <MenuItem onClick={() => removeMutations(lineage, muts)}>
-                    Remove
-                  </MenuItem>
-                </MenuItems>
-              </LineageMenu>
-            }
-            onChange={() => toggleSelect(lineageWithMuts)}
-          />
-        </li> }
-      { (isOpen || (preset === 'selected' && !checked)) &&
-        <li>
-          <ul className='lg:ml-6'>{childBranches}</ul>
-        </li> }
-    </ul>
-  )
-
-  if (
-    (search.length && mutsInSearch && !inSearch) ||
-    (preset === 'selected' && mutsChecked && !checked)
-  ) {
-    return children
-  }
 
   const Chevron = isOpen ? HiChevronDown : HiChevronRight
   return (
     <li className='flex items-start mt-1.5'>
       <span className='mt-1 w-5 h-5 mr-2 text-gray-400 dark:text-gray-300' onClick={e => e.stopPropagation()}>
-        { childBranches.length > 0 &&
+        { hasChildren &&
           <Button className='!p-0' onClick={() => toggleOpen(node.name, isOpen)}>
             <Chevron className='w-5 h-5' />
           </Button> }
@@ -183,36 +123,80 @@ const Branch = memo(({ node, ...props }) => {
           </>
         }
         menu={
-          (checked || !muts) &&
-            <LineageMenu>
-              { !muts &&
-                <MenuItems>
-                  <MenuItem onClick={() => showMutationSearch(lineage)}>
-                    Select mutations
-                  </MenuItem>
-                </MenuItems> }
-              { checked &&
-                <ColourPalette
-                  colour={colour}
-                  lineage={lineage}
-                  palette={colourPalette}
-                  setColour={setColour}
-                /> }
-            </LineageMenu>
+          <Menu
+            enabled={checked}
+            colour={colour}
+            lineage={lineage}
+            palette={colourPalette}
+            setColour={setColour}
+          />
         }
         onChange={() => toggleSelect(lineage)}
       >
-        { children }
+        {renderChildren ? renderChildren() : children}
       </LineageCheckbox>
     </li>
   )
 })
 
-Branch.displayName = 'Branch'
+LineageTreeBranch.displayName = 'LineageTreeBranch'
+
+export const useBranch = (props) => {
+  const { node, index, preset, selectDisabled, search = '', values } = props
+  const { lineage } = node
+  const { isOpen = node.childIsSelected } = index[node.name] || {}
+
+  const checked = node.lineage in values
+  const colour = values[lineage] || null
+  const isDisabled = selectDisabled && !checked
+  const inSearch = search.length ? node.searchText.includes(search) : false
+
+  return {
+    checked,
+    colour,
+    isDisabled,
+    isOpen,
+    inSearch,
+    skipNode: (search.length && !inSearch) || (preset === 'selected' && !checked)
+  }
+}
+
+const DefaultBranch = props => {
+  const { node } = props
+
+  let childBranches = []
+  for (const child of node.children) {
+    childBranches = childBranches.concat(
+      <DefaultBranch
+        key={child.name}
+        {...props}
+        node={child}
+      />
+    )
+  }
+
+  const branch = useBranch(props)
+  const { skipNode, isOpen } = branch
+
+  if (skipNode) {
+    return childBranches
+  }
+
+  return (
+    <LineageTreeBranch
+      {...props}
+      {...branch}
+      hasChildren={childBranches.length > 0}
+    >
+      {isOpen ? <ul className='lg:ml-6'>{childBranches}</ul> : null}
+    </LineageTreeBranch>
+  )
+}
 
 const LineageTree = (props) => {
   const {
     action,
+    Branch = DefaultBranch,
     className,
     colourPalette,
     darkMode,
@@ -220,7 +204,6 @@ const LineageTree = (props) => {
     maxLineages = colourPalette.length,
     nextColourIndex,
     numberSelected,
-    showMutationSearch,
     submit,
 
     // external tree state
@@ -228,8 +211,6 @@ const LineageTree = (props) => {
     scrollPosition, setScrollPosition,
     isLoading, nodeIndex, topology, toggleOpen
   } = props
-
-  const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
   const inputRef = React.useRef()
   const scrollRef = React.useRef()
@@ -265,13 +246,6 @@ const LineageTree = (props) => {
     }
     submit(update)
   }, [lineageToColourIndex])
-
-  const removeMutations = useCallback((lineage, muts) => {
-    const mutationUpdate = getMutationQueryUpdate(lineage, muts, false)
-    const lineageUpdate = { ...lineageToColourIndex }
-    delete lineageUpdate[`${lineage}+${muts}`]
-    submit(lineageUpdate, mutationUpdate)
-  }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const lightOrDarkPalette = useMemo(() =>
     colourPalette.map(item => item[darkMode ? 'dark' : 'light'])
@@ -314,17 +288,15 @@ const LineageTree = (props) => {
         <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
           {nodeIndex && topology.map(node =>
             <Branch
+              Branch={Branch}
               colourPalette={lightOrDarkPalette}
               index={nodeIndex}
               key={node.name}
-              lineageToMutations={lineageToMutations}
               node={node}
               preset={preset}
-              removeMutations={removeMutations}
               search={search.toLowerCase()}
               selectDisabled={numberSelected >= maxLineages}
               setColour={setColour}
-              showMutationSearch={showMutationSearch}
               toggleOpen={toggleOpen}
               toggleSelect={toggleSelect}
               values={lineageToColour}

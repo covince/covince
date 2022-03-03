@@ -1,5 +1,8 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
 
+import LineageTree from '../components/LineageTree'
+import LineageTreeWithMutations from '../components/LineageTreeWithMutations'
+
 import { buildFullTopology, whoVariants } from '../pango'
 import useReverseAliasLookup from './useReverseAliasLookup'
 
@@ -88,6 +91,7 @@ export default ({
   colourPalette,
   preset,
   lineageToColourIndex,
+  mutationsEnabled,
   queryParams,
   setPreset,
   showLineageView
@@ -204,6 +208,7 @@ export default ({
   return useMemo(() => ({
     // props
     colourPalette,
+    TreeComponent: mutationsEnabled ? LineageTreeWithMutations : LineageTree,
 
     // state
     ...state,

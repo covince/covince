@@ -4,7 +4,6 @@ import { Menu, Transition } from '@headlessui/react'
 import { BsThreeDotsVertical, BsCheckCircle } from 'react-icons/bs'
 
 import Button, { PrimaryPillButton } from './Button'
-import LineageTree from './LineageTree'
 import SearchMutations from './SearchMutations'
 
 import { LineageLimit, lineagePresets } from '../hooks/useDynamicComponents'
@@ -21,8 +20,7 @@ const MobileLineageTree = (props) => {
     // nextColourIndex,
     onClose,
     queryParams,
-    searchingMutations,
-    showMutationSearch
+    searchingMutations
   } = props
 
   const [tempValues, setTempValues] = React.useState(initialValues)
@@ -50,17 +48,15 @@ const MobileLineageTree = (props) => {
           lineageTree={lineageTree}
           nextColourIndex={nextColourIndex}
           queryParams={queryParams}
-          showMutationSearch={showMutationSearch}
           submit={submit}
         />
-      : <LineageTree
+      : <lineageTree.TreeComponent
           className='flex-grow pr-1.5'
           lineageToColourIndex={tempValues}
           submit={submit}
           maxLineages={info.maxLineages}
           nextColourIndex={nextColourIndex}
           {...lineageTree}
-          showMutationSearch={showMutationSearch}
           darkMode={darkMode}
           numberSelected={numberSelected}
           action={

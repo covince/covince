@@ -58,14 +58,18 @@ const DynamicUI = ({
 
   const api = useAPIImpl({ api_url, lineages, info, confidence, avg })
 
+  const config = useDynamicConfig({ colourPalette, lineages, lineageToColourIndex, staticConfig })
+
   const [{ lineageView, lineageFilter, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: null, lineageFilter: 'all' })
 
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
   const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
   const showMutationSearch = React.useCallback((lineage = '1') => updateQuery({ lineageView: lineage }), [])
 
-  const showLineageView = React.useMemo(() => lineageView === '1', [lineageView])
-  const searchingMutations = React.useMemo(() => lineageView === '1' ? undefined : lineageView, [lineageView])
+  const mutationsEnabled = React.useMemo(() => config.dynamic_mode.mutations, [config])
+
+  const showLineageView = React.useMemo(() => mutationsEnabled ? lineageView === '1' : !!lineageView, [lineageView, mutationsEnabled])
+  const searchingMutations = React.useMemo(() => lineageView === '1' || !mutationsEnabled ? undefined : lineageView, [lineageView, mutationsEnabled])
 
   const queryParams = React.useMemo(() => ({
     area,
@@ -77,6 +81,7 @@ const DynamicUI = ({
     api_url,
     colourPalette,
     lineageToColourIndex,
+    mutationsEnabled,
     preset: lineageFilter,
     queryParams,
     setPreset: setLineageFilter,
@@ -98,8 +103,6 @@ const DynamicUI = ({
     showMutationSearch,
     submit
   })
-
-  const config = useDynamicConfig({ colourPalette, lineages, lineageToColourIndex, staticConfig })
 
   return (
     <>
