@@ -57,7 +57,7 @@ const Branch = memo(props => {
             disabled={isDisabled}
             id={`lineage_selector_${lineageWithMuts}`}
             label={
-              <span className='text-gray-700 dark:text-gray-100'>
+              <span className='text-gray-700 dark:text-gray-100 leading-5'>
                 {lineage}<span className='text-xs tracking-wide pl-1'>+{muts}</span>
               </span>}
             menu={
