@@ -7,9 +7,7 @@ import Select from '../components/Select'
 import { Heading } from '../components/Typography'
 import Spinner from '../components/Spinner'
 import FadeTransition from '../components/FadeTransition'
-
 import LineageDateFilter from '../components/LineageDateFilter'
-import SearchMutations from '../components/SearchMutations'
 
 export const LineageLimit = ({ className, numberSelected, maxLineages }) => (
   <p className={classNames(className, 'whitespace-nowrap', { 'font-bold text-red-700 dark:text-red-300': numberSelected === maxLineages })}>
@@ -27,39 +25,38 @@ export const lineagePresets = [
 const DesktopLineageTree = ({ onClose, lineageToColourIndex, submit, TreeComponent, ...props }) => {
   const { numberSelected, maxLineages, preset, setPreset } = props
   return (
-    <>
-      <header className='flex items-baseline'>
-        <Heading>Lineages</Heading>
-        <button className='text-subheading dark:text-dark-subheading h-6 px-1 mx-1.5 flex items-center text-sm border border-transparent focus:primary-ring rounded' onClick={onClose}>
-          Back to Map
-        </button>
-        <div className='text-right flex items-baseline space-x-3 ml-auto text-sm'>
-          <LineageLimit numberSelected={numberSelected} maxLineages={maxLineages} />
-          <Button className='flex items-center h-6 px-2' onClick={() => submit({})}>
-            Clear <span className='hidden md:inline'>&nbsp;selection</span>
-          </Button>
-        </div>
-      </header>
-      <TreeComponent
-        className='mt-3 flex-grow'
-        lineageToColourIndex={lineageToColourIndex}
-        submit={submit}
-        {...props}
-        action={
-          <Select value={preset} onChange={e => setPreset(e.target.value)}>
-            {lineagePresets.map(({ value, label }) =>
-              <option key={value} value={value}>{label}</option>
-            )}
-          </Select>
-        }
-      />
-    </>
+    <TreeComponent
+      className='mt-3 flex-grow'
+      header={
+        <header className='flex items-baseline'>
+          <Heading>Lineages</Heading>
+          <button className='text-subheading dark:text-dark-subheading h-6 px-1 mx-1.5 flex items-center text-sm border border-transparent focus:primary-ring rounded' onClick={onClose}>
+            Back to Map
+          </button>
+          <div className='text-right flex items-baseline space-x-3 ml-auto text-sm'>
+            <LineageLimit numberSelected={numberSelected} maxLineages={maxLineages} />
+            <Button className='flex items-center h-6 px-2' onClick={() => submit({})}>
+              Clear <span className='hidden md:inline'>&nbsp;selection</span>
+            </Button>
+          </div>
+        </header>
+      }
+      lineageToColourIndex={lineageToColourIndex}
+      submit={submit}
+      {...props}
+      action={
+        <Select value={preset} onChange={e => setPreset(e.target.value)}>
+          {lineagePresets.map(({ value, label }) =>
+            <option key={value} value={value}>{label}</option>
+          )}
+        </Select>
+      }
+    />
   )
 }
 
 export default (props) => {
   const {
-    api_url,
     darkMode,
     info,
     isMobile,
@@ -68,9 +65,7 @@ export default (props) => {
     lineageTree,
     lineageView,
     nextColourIndex,
-    queryParams,
     setLineageView,
-    showMutationSearch,
     submit
   } = props
 
@@ -87,35 +82,21 @@ export default (props) => {
         lineageTree,
         lineageView,
         nextColourIndex,
-        queryParams,
         setLineageView,
-        showMutationSearch,
         submit
       } = props
       return (
         <MapView heading={lineageView ? null : heading}>
           { lineageView
-            ? lineageView === '1'
-              ? <DesktopLineageTree
-                  darkMode={darkMode}
-                  maxLineages={info.maxLineages}
-                  onClose={() => setLineageView(false)}
-                  lineageToColourIndex={lineageToColourIndex}
-                  nextColourIndex={nextColourIndex}
-                  showMutationSearch={showMutationSearch}
-                  submit={submit}
-                  {...lineageTree}
-                />
-              : <SearchMutations
-                  api_url={api_url}
-                  genes={info.genes}
-                  lineage={lineageView}
-                  lineageToColourIndex={lineageToColourIndex}
-                  nextColourIndex={nextColourIndex}
-                  queryParams={queryParams}
-                  showMutationSearch={showMutationSearch}
-                  submit={submit}
-                />
+            ? <DesktopLineageTree
+                darkMode={darkMode}
+                maxLineages={info.maxLineages}
+                onClose={() => setLineageView(false)}
+                lineageToColourIndex={lineageToColourIndex}
+                nextColourIndex={nextColourIndex}
+                submit={submit}
+                {...lineageTree}
+              />
             : children }
         </MapView>
       )
@@ -129,11 +110,9 @@ export default (props) => {
     lineageTree,
     lineageView,
     nextColourIndex,
-    queryParams,
     setLineageView,
-    showMutationSearch,
     submit
-  }), [lineageView, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex, queryParams])])
+  }), [lineageView, darkMode, ...(isMobile ? [] : [lineageTree, lineageToColourIndex])])
 
   const LineageFilter = useCallback((LineageFilter) => {
     const DecoratedLineageFilter =

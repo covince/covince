@@ -68,8 +68,8 @@ export const SearchMutations = props => {
     isMobile,
     lineageToColourIndex,
     nextColourIndex,
+    onClose,
     queryParams,
-    showMutationSearch,
     submit
   } = props
 
@@ -130,21 +130,21 @@ export const SearchMutations = props => {
 
   return (
     <>
-      <header className={classNames('flex h-6', isMobile ? 'items-center justify-between' : 'items-baseline')}>
+      <header className={classNames('flex h-6 px-3 md:px-0', isMobile ? 'items-center justify-between' : 'items-baseline')}>
         <Heading className='truncate'>Mutations in {lineage}</Heading>
         <button
           className={classNames(
             'text-subheading border border-transparent focus:primary-ring rounded',
             { 'h-6 px-1 mx-1.5 text-sm whitespace-nowrap': !isMobile }
           )}
-          onClick={() => showMutationSearch(undefined)}
+          onClick={onClose}
         >
           { isMobile
             ? <BsX className='h-7 w-7' />
             : 'Back to Lineages' }
         </button>
       </header>
-      <div className='big:flex flex-row-reverse justify-end'>
+      <div className='px-3 md:px-0 big:flex flex-row-reverse justify-end'>
         <ManageSelection
           muts={splitMuts}
           secondMut={secondMutMode}

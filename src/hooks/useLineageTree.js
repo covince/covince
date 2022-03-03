@@ -209,6 +209,8 @@ export default ({
     // props
     colourPalette,
     TreeComponent: mutationsEnabled ? LineageTreeWithMutations : LineageTree,
+    queryParams,
+    api_url,
 
     // state
     ...state,

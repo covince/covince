@@ -27,7 +27,7 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
     scope="col"
     className={classNames(
       className,
-      'px-3 py-1.5 cursor-pointer sticky top-0 z-0',
+      'px-4 md:px-6  py-1.5 cursor-pointer sticky top-0 z-0',
       'text-xs leading-5 font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider',
       align === 'right' ? 'text-right' : 'text-left'
     )}
@@ -137,21 +137,21 @@ const MutationsList = props => {
                         <div
                           style={style}
                           className={classNames(
-                            'flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                            'px-4 space-x-4 md:px-6 md:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
                             { 'font-bold': isSelected }
                           )}
                           onClick={() => selectMutation(row.mutation)}
                         >
                           { row &&
                             <>
-                              <span className='px-3 flex-grow flex items-baseline'>
+                              <span className='flex-grow flex items-baseline'>
                                 <span>{row.mutation}</span>
                                 { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                               </span>
-                              <span className='px-3 w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
+                              <span className='w-1/4 md:w-1/5 text-right whitespace-nowrap text-subheading'>
                                 {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
-                              <span className='px-3 w-1/4 lg:w-1/5 text-right'>{row.count.toLocaleString()}</span>
+                              <span className='w-1/4 md:w-1/5 text-right'>{row.count.toLocaleString()}</span>
                             </> }
                         </div>
                       )

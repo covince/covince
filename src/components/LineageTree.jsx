@@ -200,6 +200,7 @@ const LineageTree = (props) => {
     className,
     colourPalette,
     darkMode,
+    header,
     lineageToColourIndex,
     maxLineages = colourPalette.length,
     nextColourIndex,
@@ -261,50 +262,53 @@ const LineageTree = (props) => {
   }, [lineageToColourIndex, lightOrDarkPalette])
 
   return (
-    <div className={classNames('flex flex-col', className)}>
-      <form className='flex justify-between items-end space-x-3' onSubmit={e => { e.preventDefault() }}>
-        <div className='flex items-center space-x-1'>
-          <Input
-            ref={inputRef}
-            className='w-48'
-            placeholder='Filter lineages'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          { search.length > 0 &&
-            <button
-              onClick={() => { setSearch(''); inputRef.current.focus() }}
-              className='w-7 h-7 md:w-5 md:h-5 flex justify-center items-center rounded border border-transparent focus:primary-ring no-webkit-tap'
-            >
-              <BsX className='flex-shrink-0 w-7 h-7 md:w-5 md:h-5 text-gray-700 dark:text-gray-300' />
-            </button> }
-        </div>
-        {action}
-      </form>
-      <LoadingOverlay
-        className='flex-grow mt-2'
-        loading={isLoading}
-      >
-        <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
-          {nodeIndex && topology.map(node =>
-            <Branch
-              Branch={Branch}
-              colourPalette={lightOrDarkPalette}
-              index={nodeIndex}
-              key={node.name}
-              node={node}
-              preset={preset}
-              search={search.toLowerCase()}
-              selectDisabled={numberSelected >= maxLineages}
-              setColour={setColour}
-              toggleOpen={toggleOpen}
-              toggleSelect={toggleSelect}
-              values={lineageToColour}
+    <>
+      {header}
+      <div className={classNames('flex flex-col', className)}>
+        <form className='flex justify-between items-end space-x-3' onSubmit={e => { e.preventDefault() }}>
+          <div className='flex items-center space-x-1'>
+            <Input
+              ref={inputRef}
+              className='w-48'
+              placeholder='Filter lineages'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
-          )}
-        </ul>
-      </LoadingOverlay>
-    </div>
+            { search.length > 0 &&
+              <button
+                onClick={() => { setSearch(''); inputRef.current.focus() }}
+                className='w-7 h-7 md:w-5 md:h-5 flex justify-center items-center rounded border border-transparent focus:primary-ring no-webkit-tap'
+              >
+                <BsX className='flex-shrink-0 w-7 h-7 md:w-5 md:h-5 text-gray-700 dark:text-gray-300' />
+              </button> }
+          </div>
+          {action}
+        </form>
+        <LoadingOverlay
+          className='flex-grow mt-2'
+          loading={isLoading}
+        >
+          <ul ref={scrollRef} className='overflow-scroll gutterless-scrollbars absolute inset-0 pl-1 -mr-1.5'>
+            {nodeIndex && topology.map(node =>
+              <Branch
+                Branch={Branch}
+                colourPalette={lightOrDarkPalette}
+                index={nodeIndex}
+                key={node.name}
+                node={node}
+                preset={preset}
+                search={search.toLowerCase()}
+                selectDisabled={numberSelected >= maxLineages}
+                setColour={setColour}
+                toggleOpen={toggleOpen}
+                toggleSelect={toggleSelect}
+                values={lineageToColour}
+              />
+            )}
+          </ul>
+        </LoadingOverlay>
+      </div>
+    </>
   )
 }
 

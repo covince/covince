@@ -2,8 +2,11 @@ import React, { useCallback, memo } from 'react'
 
 import LineageMenu, { MenuItems, MenuItem, ColourPalette } from './LineageMenu'
 import LineageTree, { LineageCheckbox, LineageTreeBranch, useBranch } from './LineageTree'
+import SearchMutations from './SearchMutations'
 
 import useMutations from '../hooks/useMutations'
+import useQueryAsState from '../hooks/useQueryAsState'
+import { useInfo } from '../hooks/useDynamicInfo'
 
 const Branch = memo(props => {
   const {
@@ -138,6 +141,10 @@ const LineageTreeWithMutations = (props) => {
 
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
+  const [{ lineageView }, updateQuery] = useQueryAsState({ lineageView: null })
+  const showMutationSearch = React.useCallback((lineage = '1') => updateQuery({ lineageView: lineage }), [])
+  const searchingMutations = React.useMemo(() => lineageView === '1' ? undefined : lineageView, [lineageView])
+
   const removeMutations = useCallback((lineage, muts) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, muts, false)
     const lineageUpdate = { ...lineageToColourIndex }
@@ -150,8 +157,25 @@ const LineageTreeWithMutations = (props) => {
       {...props}
       lineageToMutations={lineageToMutations}
       removeMutations={removeMutations}
+      showMutationSearch={showMutationSearch}
     />
   ), [lineageToMutations, removeMutations])
+
+  const info = useInfo()
+
+  if (searchingMutations) {
+    return (
+      <SearchMutations
+        {...props}
+        genes={info.genes}
+        lineage={searchingMutations}
+        lineageToColourIndex={lineageToColourIndex}
+        onClose={() => showMutationSearch(undefined)}
+        submit={submit}
+        showMutationSearch={showMutationSearch}
+      />
+    )
+  }
 
   return (
     <LineageTree

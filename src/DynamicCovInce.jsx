@@ -1,17 +1,17 @@
 import React, { lazy, memo } from 'react'
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
-import classNames from 'classnames'
 
 import MobileLineageTree from './components/MobileLineageTree'
 import Dialog from './components/Dialog'
 
 import { useMobile } from './hooks/useMediaQuery'
-import useQueryAsState from './hooks/useQueryAsState'
-import useDynamicLineages from './hooks/useDynamicLineages'
 import useDynamicAPI from './hooks/useDynamicAPI'
-import useDynamicConfig from './hooks/useDynamicConfig'
 import useDynamicComponents from './hooks/useDynamicComponents'
+import useDynamicConfig from './hooks/useDynamicConfig'
+import { useInfoQuery, InfoContext } from './hooks/useDynamicInfo'
+import useDynamicLineages from './hooks/useDynamicLineages'
 import useLineageTree from './hooks/useLineageTree'
+import useQueryAsState from './hooks/useQueryAsState'
 
 const UI = memo(lazy(() => import('./components/UI')))
 
@@ -32,13 +32,7 @@ const DynamicUI = ({
   }
   const { data: tiles } = useQuery('tiles', getTiles, { suspense: true })
 
-  const getInfo = async () => {
-    const response = await fetch(`${api_url}/info`)
-    const info = await response.json()
-    info.dates.sort()
-    return info
-  }
-  const { data: info } = useQuery('info', getInfo, { suspense: true })
+  const info = useInfoQuery(api_url)
 
   const fetchConfig = async () => {
     const response = await fetch(config_url)
@@ -64,12 +58,9 @@ const DynamicUI = ({
 
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
   const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
-  const showMutationSearch = React.useCallback((lineage = '1') => updateQuery({ lineageView: lineage }), [])
 
+  const showLineageView = React.useMemo(() => !!lineageView, [lineageView])
   const mutationsEnabled = React.useMemo(() => config.dynamic_mode.mutations, [config])
-
-  const showLineageView = React.useMemo(() => mutationsEnabled ? lineageView === '1' : !!lineageView, [lineageView, mutationsEnabled])
-  const searchingMutations = React.useMemo(() => lineageView === '1' || !mutationsEnabled ? undefined : lineageView, [lineageView, mutationsEnabled])
 
   const queryParams = React.useMemo(() => ({
     area,
@@ -100,12 +91,11 @@ const DynamicUI = ({
     nextColourIndex,
     queryParams,
     setLineageView,
-    showMutationSearch,
     submit
   })
 
   return (
-    <>
+    <InfoContext.Provider value={info}>
       <UI
         {...props}
         api={api}
@@ -117,12 +107,7 @@ const DynamicUI = ({
       />
       { isMobile &&
         <Dialog isOpen={!!lineageView} onClose={() => {}}>
-          <div
-            className={classNames(
-              'fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3',
-              searchingMutations ? 'px-3' : 'pl-3'
-            )}
-          >
+          <div className='fixed inset-0 flex flex-col bg-white dark:bg-gray-700 pt-3'>
             { lineageView &&
               <MobileLineageTree
                 api_url={api_url}
@@ -130,7 +115,6 @@ const DynamicUI = ({
                 info={info}
                 initialValues={lineageToColourIndex}
                 lineageTree={lineageTree}
-                maxLineages={info.maxLineages}
                 onClose={values => {
                   if (values !== lineageToColourIndex) {
                     submit(values, { lineageView: undefined })
@@ -139,12 +123,10 @@ const DynamicUI = ({
                   }
                 }}
                 queryParams={queryParams}
-                searchingMutations={searchingMutations}
-                showMutationSearch={showMutationSearch}
               /> }
           </div>
         </Dialog> }
-    </>
+    </InfoContext.Provider>
   )
 }
 
