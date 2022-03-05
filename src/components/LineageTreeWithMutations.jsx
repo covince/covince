@@ -95,7 +95,7 @@ const Branch = memo(props => {
   )
 
   if (
-    !skipNode && (
+    skipNode && (
       (search.length && mutsInSearch) ||
       (preset === 'selected' && mutsChecked)
     )
@@ -109,7 +109,7 @@ const Branch = memo(props => {
         { !muts &&
           <MenuItems>
             <MenuItem onClick={() => showMutationSearch(lineage)}>
-              Select mutations
+              View mutations
             </MenuItem>
           </MenuItems> }
         { checked &&

@@ -151,7 +151,7 @@ export const SearchMutations = props => {
           setSecondMut={setSecondMutMode}
           removeMutation={removeMutation}
         />
-        <form className='mt-3 mb-1.5 big:mr-3'>
+        <form className='mt-3 mb-1.5 big:mr-3' onSubmit={e => e.preventDefault()}>
           <div className='flex items-center space-x-1.5'>
             <Select responsive value={gene} onChange={e => updateQuery({ gene: e.target.value })}>
               <option value=''>(gene)</option>
@@ -159,10 +159,18 @@ export const SearchMutations = props => {
             </Select>
             <p>:</p>
             <Input
-              onChange={e => updateQuery({ mutationFilter: e.target.value.toUpperCase() })}
+              onChange={e => updateQuery({ mutationFilter: e.target.value.toUpperCase() }, 'replace')}
               placeholder='filter mutations'
               value={mutationFilter}
             />
+            { (gene || mutationFilter) &&
+              <button
+                className='rounded border border-transparent focus:primary-ring text-subheading'
+                title='Reset filter'
+                onClick={() => updateQuery({ gene: undefined, mutationFilter: undefined })}
+              >
+                <BsX className='h-5 w-5' />
+              </button> }
           </div>
         </form>
       </div>

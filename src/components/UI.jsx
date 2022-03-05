@@ -240,10 +240,10 @@ export const UI = ({
           {...injectProps.MapView}
         >
           <form className={classNames(
-            'grid grid-cols-3 gap-3 max-w-md lg:flex lg:gap-0 lg:space-x-3 lg:max-w-none text-sm pb-3 mt-2 md:mt-3 transition-opacity',
+            'grid grid-cols-3 gap-3 lg:flex lg:gap-0 lg:space-x-3 text-sm pb-3 mt-2 md:mt-3 transition-opacity',
             { 'opacity-50 pointer-events-none': mapDataState.status === 'LOADING' && !isInitialLoad }
           )}>
-            <div>
+            <div className='max-w-max w-48'>
               <label className='block font-medium mb-1'>
                 Lineage
               </label>

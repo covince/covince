@@ -29,11 +29,12 @@ export const ColourPalette = ({ palette, lineage, colour, setColour }) => (
 )
 
 export const MenuItems = ({ children }) => <ul className='py-1'>{children}</ul>
+
 export const MenuItem = ({ onClick, children }) => (
   <li>
     <button
       className={`
-        text-xs font-bold text-right w-full px-3 py-1.5
+        text-sm font-bold text-right w-full px-3 py-1.5
         border border-transparent
         hover:bg-gray-100 dark:hover:bg-gray-700
         focus-visible:primary-ring
