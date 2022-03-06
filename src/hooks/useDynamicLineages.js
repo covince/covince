@@ -60,21 +60,19 @@ export const getNextColourIndex = (lineageToColourIndex, colourPalette) => {
   return colours.length % colourPalette.length
 }
 
+const updateShow = (show, lineages, nextLineages) => {
+  const newLineages = nextLineages.filter(l => !lineages.includes(l))
+  const nextShow = new Set(
+    show.split(',')
+      .filter(l => nextLineages.includes(l))
+      .concat(newLineages)
+  )
+  return Array.from(nextShow).join(',')
+}
+
 export default (config) => {
   const { initial, colourPalette } = useMemo(() => config ? initialise(config) : {}, [config])
-  const [{ lineages, colours }, updateQuery] = useQueryAsState(initial)
-
-  const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
-    const nextLineages = Object.keys(lineageToColourIndexes)
-    const nextColours = Object.values(lineageToColourIndexes)
-    const nextQuery = {
-      ...extraQueryUpdates,
-      lineages: nextLineages.join(',') || '',
-      colours: nextColours.join(',') || '',
-      show: undefined
-    }
-    updateQuery(nextQuery)
-  }, [])
+  const [{ lineages, colours, show }, updateQuery] = useQueryAsState(initial)
 
   const parsedLineages = useMemo(() => lineages.length ? lineages.split(',') : [], [lineages])
   const parsedColourIndexes = useMemo(() => colours.length ? colours.split(',') : [], [colours])
@@ -90,6 +88,18 @@ export default (config) => {
   const nextColourIndex = useMemo(() =>
     getNextColourIndex(lineageToColourIndex, colourPalette)
   , [lineageToColourIndex])
+
+  const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
+    const nextLineages = Object.keys(lineageToColourIndexes)
+    const nextColours = Object.values(lineageToColourIndexes)
+    const nextQuery = {
+      ...extraQueryUpdates,
+      lineages: nextLineages.join(',') || '',
+      colours: nextColours.join(',') || '',
+      show: show ? updateShow(show, parsedLineages, nextLineages) : undefined
+    }
+    updateQuery(nextQuery)
+  }, [show, parsedLineages])
 
   return {
     colourPalette,
