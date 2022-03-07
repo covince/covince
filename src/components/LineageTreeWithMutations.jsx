@@ -152,14 +152,11 @@ const LineageTreeWithMutations = (props) => {
     submit(lineageUpdate, mutationUpdate)
   }, [getMutationQueryUpdate, lineageToColourIndex])
 
-  const branchComponent = useCallback(props => (
-    <Branch
-      {...props}
-      lineageToMutations={lineageToMutations}
-      removeMutations={removeMutations}
-      showMutationSearch={showMutationSearch}
-    />
-  ), [lineageToMutations, removeMutations])
+  const branchProps = React.useMemo(() => ({
+    lineageToMutations,
+    removeMutations,
+    showMutationSearch
+  }), [lineageToMutations, removeMutations])
 
   const info = useInfo()
 
@@ -180,7 +177,8 @@ const LineageTreeWithMutations = (props) => {
   return (
     <LineageTree
       {...props}
-      Branch={branchComponent}
+      Branch={Branch}
+      branchProps={branchProps}
     />
   )
 }

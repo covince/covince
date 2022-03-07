@@ -197,6 +197,7 @@ const LineageTree = (props) => {
   const {
     action,
     Branch = DefaultBranch,
+    branchProps,
     className,
     colourPalette,
     darkMode,
@@ -303,6 +304,7 @@ const LineageTree = (props) => {
                 toggleOpen={toggleOpen}
                 toggleSelect={toggleSelect}
                 values={lineageToColour}
+                {...branchProps}
               />
             )}
           </ul>
