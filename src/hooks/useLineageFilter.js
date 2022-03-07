@@ -21,14 +21,15 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
       const pango = hasMuts ? lineage.slice(0, mutsIndex) : lineage
       const altName = hasMuts ? null : nomenclatureLookup[lineage]
       memo[lineage] = {
-        lineage,
+        active: queryLineages.has(lineage),
         altName,
         colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
-        active: queryLineages.has(lineage),
         label: altName ? `${altName} (${lineage})` : lineage,
+        lineage,
+        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === pango),
+        pango,
         primaryText: hasMuts ? pango : altName,
-        secondaryText: hasMuts ? lineage.slice(mutsIndex) : lineage,
-        nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === pango)
+        secondaryText: hasMuts ? lineage.slice(mutsIndex) : lineage
       }
       return memo
     }, {})
@@ -49,7 +50,12 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
       if (a.nomenclatureIndex < b.nomenclatureIndex) return -1
       return collator.compare(a.lineage, b.lineage)
     })
-    lineagesWithoutNomenclature.sort((a, b) => collator.compare(b.lineage, a.lineage))
+    lineagesWithoutNomenclature.sort((a, b) => {
+      if (a.pango === b.pango) {
+        return a.lineage > b.lineage
+      }
+      return collator.compare(b.pango, a.pango)
+    })
     return [
       ...lineagesWithNomenclature,
       ...lineagesWithoutNomenclature
