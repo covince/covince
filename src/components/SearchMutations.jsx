@@ -117,12 +117,13 @@ export const SearchMutations = props => {
     // setSecondMutMode(false)
   }, [currentMuts])
 
-  const addMutation = React.useCallback((mut) => {
+  const selectMutation = React.useCallback((mut) => {
     if (splitMuts.includes(mut)) {
-      return
+      applyMutations(splitMuts.filter(m => m !== mut).join('+'))
+    } else {
+      const nextMuts = getNextMuts(splitMuts, mut, secondMutMode)
+      applyMutations(nextMuts)
     }
-    const nextMuts = getNextMuts(splitMuts, mut, secondMutMode)
-    applyMutations(nextMuts)
   }, [currentMuts, secondMutMode])
 
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
@@ -181,7 +182,7 @@ export const SearchMutations = props => {
         pangoClade={maybeFirstMut.pangoClade}
         queryParams={queryParams}
         selected={splitMuts}
-        selectMutation={addMutation}
+        selectMutation={selectMutation}
       />
     </>
   )
