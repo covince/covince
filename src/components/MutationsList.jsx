@@ -49,12 +49,13 @@ const MutationsList = props => {
     filter,
     gene,
     pangoClade,
+    excluding,
     queryParams,
     selected,
     selectMutation
   } = props
 
-  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, gene, filter)
+  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, excluding, gene, filter)
   const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 

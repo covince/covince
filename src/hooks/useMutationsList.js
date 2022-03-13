@@ -26,7 +26,7 @@ const getLoadingType = (query) => {
   return 'LIST'
 }
 
-export default (api_url, queryParams, lineage, gene, filter = '') => {
+export default (api_url, queryParams, lineage, excluding, gene, filter = '') => {
   const { sortColumn, sortAscending, sortBy } = useTableSort('count')
 
   const [state, dispatch] = useReducer((state, { type, payload }) => {
@@ -64,6 +64,7 @@ export default (api_url, queryParams, lineage, gene, filter = '') => {
 
     const query = {
       lineage,
+      excluding,
       gene,
       filter,
       sort: sortColumn,

@@ -63,6 +63,14 @@ export const findNode = (topo, pango) => {
   return n
 }
 
+export const getChildLineages = (topology, lineage) => {
+  const node = findNode(topology, lineage)
+  if (node) {
+    return node.children.map(c => c.name)
+  }
+  return []
+}
+
 const lineageRegex = /^[A-Z]{1,3}(\.[0-9]+)*$/
 
 export const isPangoLineage = string => lineageRegex.test(string)

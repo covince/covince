@@ -10,9 +10,11 @@ import Button from './Button'
 
 import useMutations from '../hooks/useMutations'
 import useDebouncedValue from '../hooks/useDebouncedValue'
-
-import { expandLineage } from '../pango'
 import useQueryAsState from '../hooks/useQueryAsState'
+import { useLineagesForAPI } from '../hooks/useDynamicAPI'
+import { useScreen } from '../hooks/useMediaQuery'
+
+import { expandLineage, getChildLineages } from '../pango'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
   <section
@@ -65,7 +67,6 @@ const getNextMuts = (mutsArray, newMut, secondMutMode) => {
 export const SearchMutations = props => {
   const {
     api_url,
-    isMobile,
     lineageToColourIndex,
     nextColourIndex,
     onClose,
@@ -73,9 +74,16 @@ export const SearchMutations = props => {
     submit
   } = props
 
+  const isLarge = useScreen('lg')
+
   const lineage = useMemo(() => props.lineage, [])
   const pangoClade = useMemo(() => expandLineage(lineage), [lineage])
   const genes = useMemo(() => props.genes.sort(), [])
+
+  const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex), [lineageToColourIndex])
+
+  const { topology, unaliasedToAliased } = useLineagesForAPI(selectedLineages)
+  const childrenOfSelected = useMemo(() => getChildLineages(topology, pangoClade), [topology, pangoClade])
 
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
@@ -129,21 +137,34 @@ export const SearchMutations = props => {
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
   const debouncedfilter = useDebouncedValue(mutationFilter, 250)
 
+  const excludedLineageString = useMemo(() => {
+    return childrenOfSelected.map(l => unaliasedToAliased[l]).join(', ')
+  }, [childrenOfSelected])
+
+  const excludedTitle = useMemo(() => {
+    return childrenOfSelected.length > 1 ? excludedLineageString : null
+  }, [childrenOfSelected])
+
   return (
     <>
-      <header className={classNames('flex h-6 px-3 md:px-0', isMobile ? 'items-center justify-between' : 'items-baseline')}>
-        <Heading className='truncate'>Mutations in {lineage}</Heading>
-        <button
-          className={classNames(
-            'text-subheading border border-transparent focus:primary-ring rounded',
-            { 'h-6 px-1 mx-1.5 text-sm whitespace-nowrap': !isMobile }
-          )}
-          onClick={onClose}
-        >
-          { isMobile
-            ? <BsX className='h-7 w-7' />
-            : 'Back to Lineages' }
-        </button>
+      <header className='md:flex items-baseline md:h-6 pl-3 md:pl-0 pr-11 md:pr-9 lg:pr-0 relative'>
+        <Heading className='truncate flex-shrink-0'>
+          Mutations in {lineage}
+        </Heading>
+        { childrenOfSelected.length > 0 &&
+          <p className={classNames('text-sm text-subheading truncate md:ml-2', { 'cursor-help': excludedTitle })} title={excludedTitle}>
+            excluding { childrenOfSelected.length === 1 ? excludedLineageString : `${childrenOfSelected.length} sublineages` }
+          </p> }
+        { isLarge
+          ? <Button className='h-6 px-2 ml-auto flex items-center' onClick={onClose}>
+              Back to Lineages
+            </Button>
+          : <button
+              className='!p-0 absolute border border-transparent focus:primary-ring rounded -top-0.5 right-2 md:right-0'
+              onClick={onClose}
+            >
+              <BsX className='h-7 w-7' />
+            </button> }
       </header>
       <div className='px-3 md:px-0 big:flex flex-row-reverse justify-end'>
         <ManageSelection
@@ -177,6 +198,7 @@ export const SearchMutations = props => {
       </div>
       <MutationsList
         api_url={api_url}
+        excluding={childrenOfSelected}
         filter={debouncedfilter}
         gene={gene}
         pangoClade={maybeFirstMut.pangoClade}

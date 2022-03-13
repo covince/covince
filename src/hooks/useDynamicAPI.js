@@ -1,6 +1,6 @@
 import React from 'react'
 import wilson from 'wilson-score-interval'
-import { expandLineage, topologise } from 'pango-utils'
+import { expandLineage, getChildLineages, topologise } from '../pango'
 import useAPI from '../api'
 
 export const indexMapResults = (index, results, key, valueKey = 'sum') => {
@@ -69,26 +69,24 @@ const defaultAvg = count => count / 2
 
 const queryStringify = query => new URLSearchParams(query).toString()
 
-const getChildLineages = (topology, lineage) => {
-  for (const node of topology) {
-    if (node.name === lineage) return node.children.map(c => c.name)
-    if (lineage.startsWith(`${node.name}.`)) {
-      return getChildLineages(node.children, lineage)
-    }
-  }
-  return []
-}
-
-export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
-  const [unaliasedToAliased, expandedLineages, topology] = React.useMemo(() => {
+export const useLineagesForAPI = (lineages) => {
+  return React.useMemo(() => {
     const memo = {}
     for (const l of lineages) {
       const expanded = expandLineage(l)
       memo[expanded] = l
     }
-    const expandedLineages = Object.keys(memo).sort()
-    return [memo, expandedLineages, topologise(expandedLineages.filter(_ => !_.includes('+')))]
+    const expandedLineages = Object.keys(memo)
+    return {
+      expandedLineages,
+      topology: topologise(expandedLineages.filter(_ => !_.includes('+'))),
+      unaliasedToAliased: memo
+    }
   }, [lineages])
+}
+
+export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
+  const { unaliasedToAliased, expandedLineages, topology } = useLineagesForAPI(lineages)
 
   const cachedTotals = React.useRef({ key: null, value: [] })
 
