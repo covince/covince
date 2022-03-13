@@ -13,9 +13,12 @@ import useDynamicLineages from './hooks/useDynamicLineages'
 import useLineageTree from './hooks/useLineageTree'
 import useQueryAsState from './hooks/useQueryAsState'
 
+import { setAliases } from './pango'
+
 const UI = memo(lazy(() => import('./components/UI')))
 
 const DynamicUI = ({
+  aliases_url = 'https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json',
   api_url = './api',
   tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
   config_url = './data/config.json',
@@ -25,6 +28,13 @@ const DynamicUI = ({
   ...props
 }) => {
   const { darkMode } = props
+
+  const getAliases = async () => {
+    const response = await fetch(aliases_url)
+    const aliases = await response.json()
+    setAliases(aliases)
+  }
+  useQuery('aliases', getAliases, { suspense: true })
 
   const getTiles = async () => {
     const response = await fetch(tiles_url)

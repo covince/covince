@@ -1,5 +1,10 @@
 let aliases = null
-export const setAliases = _aliases => { aliases = _aliases }
+export const setAliases = _aliases => {
+  aliases = Object.fromEntries(
+    Object.entries(_aliases)
+      .filter(([_, a]) => typeof a === 'string' && a.length > 0)
+  )
+}
 export const getAliases = () => aliases
 
 export const getReverseAliasLookup = () =>
