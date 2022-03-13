@@ -243,7 +243,7 @@ export const UI = ({
             'grid grid-cols-3 gap-3 lg:flex lg:gap-0 lg:space-x-3 text-sm pb-3 mt-2 md:mt-3 transition-opacity',
             { 'opacity-50 pointer-events-none': mapDataState.status === 'LOADING' && !isInitialLoad }
           )}>
-            <div className='max-w-max lg:w-48'>
+            <div className='lg:max-w-max lg:w-48'>
               <label className='block font-medium mb-1'>
                 Lineage
               </label>
