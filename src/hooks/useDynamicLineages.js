@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
@@ -89,17 +89,23 @@ export default (config) => {
     getNextColourIndex(lineageToColourIndex, colourPalette)
   , [lineageToColourIndex])
 
+  // hack this because the memo trail is too long
+  const submitRef = useRef({})
+  submitRef.current.show = show
+  submitRef.current.parsedLineages = parsedLineages
+
   const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
+    const { show, parsedLineages } = submitRef.current
     const nextLineages = Object.keys(lineageToColourIndexes)
     const nextColours = Object.values(lineageToColourIndexes)
     const nextQuery = {
       ...extraQueryUpdates,
       lineages: nextLineages.join(',') || '',
       colours: nextColours.join(',') || '',
-      show: show ? updateShow(show, parsedLineages, nextLineages) : undefined
+      show: show !== undefined ? updateShow(show, parsedLineages, nextLineages) : undefined
     }
     updateQuery(nextQuery)
-  }, [show, parsedLineages])
+  }, [])
 
   return {
     colourPalette,
