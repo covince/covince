@@ -27,12 +27,12 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
     scope="col"
     className={classNames(
       className,
-      'px-4 md:px-6  py-1.5 cursor-pointer sticky top-0 z-0',
+      'py-1.5 cursor-pointer sticky top-0 z-0',
       'text-xs leading-5 font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider',
       align === 'right' ? 'text-right' : 'text-left'
     )}
   >
-    <span className={classNames('h-full flex items-center space-x-1 select-none leading-4', { 'text-primary font-bold': sorted, 'justify-end': align === 'right' })}>
+    <span className={classNames('h-full flex items-center lg:space-x-1 select-none leading-4', { 'text-primary font-bold': sorted, 'justify-end': align === 'right' })}>
       {children}
     </span>
   </div>
@@ -78,25 +78,39 @@ const MutationsList = props => {
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
       <div className='flex border-b border-solid dark:border-gray-500'>
-        <TableHeader
-          key='not-searching'
-          className='mr-auto'
-          sorted={state.sortColumn === 'name'}
-          onClick={() => actions.sortBy('name')}
-        >
-          <span className={classNames({ 'mr-1': state.sortColumn !== 'name' })}>Mutation</span>
-          {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
-        </TableHeader>
-        <TableHeader
-          sorted={state.sortColumn === 'count'}
-          align='right'
-          onClick={() => actions.sortBy('count')}
-        >
-          <TableSort active={state.sortColumn === 'count'} ascending={state.sortAscending} />
-          <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
-            Frequency
-          </span>
-        </TableHeader>
+        <div className='flex flex-grow space-x-4 lg:space-x-6 px-4 lg:px-6'>
+          <TableHeader
+            key='not-searching'
+            className='mr-auto'
+            sorted={state.sortColumn === 'name'}
+            onClick={() => actions.sortBy('name')}
+          >
+            <span className={classNames({ 'mr-1': state.sortColumn !== 'name' })}>Mutation</span>
+            {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
+          </TableHeader>
+          <TableHeader
+            sorted={state.sortColumn === 'growth'}
+            className='w-1/4 lg:w-1/5'
+            align='right'
+            onClick={() => actions.sortBy('growth')}
+          >
+            <TableSort active={state.sortColumn === 'growth'} ascending={state.sortAscending} />
+            <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
+              Growth
+            </span>
+          </TableHeader>
+          <TableHeader
+            sorted={state.sortColumn === 'count'}
+            className='w-1/4 lg:w-1/5'
+            align='right'
+            onClick={() => actions.sortBy('count')}
+          >
+            <TableSort active={state.sortColumn === 'count'} ascending={state.sortAscending} />
+            <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
+              Frequency
+            </span>
+          </TableHeader>
+        </div>
         <div>
           <div className='overflow-y-scroll heron-styled-scrollbars opacity-0' />
         </div>
@@ -138,7 +152,7 @@ const MutationsList = props => {
                         <div
                           style={style}
                           className={classNames(
-                            'px-4 space-x-4 md:px-6 md:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                            'px-4 space-x-4 lg:px-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
                             { 'font-bold': isSelected }
                           )}
                           onClick={() => selectMutation(row.mutation)}
@@ -149,10 +163,13 @@ const MutationsList = props => {
                                 <span>{row.mutation}</span>
                                 { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                               </span>
-                              <span className='w-1/4 md:w-1/5 text-right whitespace-nowrap text-subheading'>
+                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap _text-subheading'>
+                                {`${formatFrequency(row.growth)}%`}
+                              </span>
+                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap _text-subheading'>
                                 {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
-                              <span className='w-1/4 md:w-1/5 text-right'>{row.count.toLocaleString()}</span>
+                              {/* <span className='w-1/4 md:w-1/5 text-right'>{row.count.toLocaleString()}</span> */}
                             </> }
                         </div>
                       )

@@ -70,7 +70,9 @@ export default (api_url, queryParams, lineage, excluding, gene, filter = '') => 
       sort: sortColumn,
       direction: sortAscending ? 'asc' : 'desc',
       skip: startIndex,
-      limit: 20
+      limit: 20,
+      growthStart: '2022-02-19',
+      growthEnd: '2022-02-26'
     }
 
     const { area, toDate, fromDate } = queryParams
@@ -83,7 +85,7 @@ export default (api_url, queryParams, lineage, excluding, gene, filter = '') => 
     const response = await fetch(`${api_url}/mutations?${new URLSearchParams(query).toString()}`)
     const data = await response.json()
 
-    const newRows = data.page.filter(_ => _).map(_ => ({ mutation: _.key, count: _.count }))
+    const newRows = data.page.filter(_ => _).map(_ => ({ mutation: _.key, count: _.count, growth: _.growth }))
 
     dispatch({
       type: 'SUCCESS',
