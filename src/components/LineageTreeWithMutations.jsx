@@ -67,7 +67,7 @@ const Branch = memo(props => {
               <LineageMenu>
                 <MenuItems>
                   <MenuItem onClick={() => showMutationSearch(lineage)}>
-                    Edit mutations
+                    Edit
                   </MenuItem>
                 </MenuItems>
                 { mutsChecked &&
@@ -104,24 +104,21 @@ const Branch = memo(props => {
   }
 
   const Menu = useCallback(({ colour, palette, lineage, setColour }) => (
-    (checked || !muts)
-      ? <LineageMenu>
-        { !muts &&
-          <MenuItems>
-            <MenuItem onClick={() => showMutationSearch(lineage)}>
-              View mutations
-            </MenuItem>
-          </MenuItems> }
-        { checked &&
-          <ColourPalette
-            colour={colour}
-            lineage={lineage}
-            palette={palette}
-            setColour={setColour}
-          /> }
-      </LineageMenu>
-      : null
-  ), [checked, muts])
+    <LineageMenu>
+      <MenuItems>
+        <MenuItem onClick={() => showMutationSearch(lineage)}>
+          View mutations
+        </MenuItem>
+      </MenuItems>
+      { checked &&
+        <ColourPalette
+          colour={colour}
+          lineage={lineage}
+          palette={palette}
+          setColour={setColour}
+        /> }
+    </LineageMenu>
+  ), [checked])
 
   return (
     <LineageTreeBranch
