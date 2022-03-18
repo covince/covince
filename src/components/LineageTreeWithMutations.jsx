@@ -165,6 +165,7 @@ const LineageTreeWithMutations = (props) => {
       <SearchMutations
         {...props}
         genes={info.genes}
+        dates={info.dates}
         lineage={searchingMutations}
         lineageToColourIndex={lineageToColourIndex}
         onClose={() => showMutationSearch(undefined)}

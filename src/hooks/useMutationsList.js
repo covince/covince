@@ -26,8 +26,8 @@ const getLoadingType = (query) => {
   return 'LIST'
 }
 
-export default (api_url, queryParams, lineage, excluding, gene, filter = '') => {
-  const { sortColumn, sortAscending, sortBy } = useTableSort('count')
+export default (api_url, queryParams, parent, lineages, gene, filter = '', dates) => {
+  const { sortColumn, sortAscending, sortBy } = useTableSort('change')
 
   const [state, dispatch] = useReducer((state, { type, payload }) => {
     switch (type) {
@@ -59,26 +59,34 @@ export default (api_url, queryParams, lineage, excluding, gene, filter = '') => 
     loading: null
   })
 
+  const queryLineages = useMemo(() =>
+    lineages.filter(l => !(l === parent || l.startsWith(`${parent}+`))).concat(parent)
+  , [parent, lineages])
+
   const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = state.rows) => {
     if (stopIndex < currentRows.length) return Promise.resolve()
 
     const query = {
-      lineage,
-      excluding,
+      parent,
+      lineages: queryLineages,
       gene,
       filter,
       sort: sortColumn,
       direction: sortAscending ? 'asc' : 'desc',
       skip: startIndex,
       limit: 20,
-      growthStart: '2022-02-19',
-      growthEnd: '2022-02-26'
+      growthStart: dates[dates.length - 2],
+      growthEnd: dates[dates.length - 1]
     }
 
     const { area, toDate, fromDate } = queryParams
     if (area) query.area = area
-    if (toDate) query.to = toDate
     if (fromDate) query.from = fromDate
+    if (toDate) {
+      query.to = toDate
+      query.growthEnd = toDate
+      query.growthStart = dates[dates.indexOf(toDate) - 1]
+    }
 
     dispatch({ type: 'LOADING', payload: { query } })
 
@@ -104,7 +112,7 @@ export default (api_url, queryParams, lineage, excluding, gene, filter = '') => 
       loadMoreItems(undefined, undefined, [])
     }
     // isMounted.current = true
-  }, [sortColumn, sortAscending, lineage, gene, filter, queryParams])
+  }, [sortColumn, sortAscending, parent, gene, filter, queryParams])
 
   return [
     {

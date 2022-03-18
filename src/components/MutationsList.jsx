@@ -32,7 +32,7 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
       align === 'right' ? 'text-right' : 'text-left'
     )}
   >
-    <span className={classNames('h-full flex items-center lg:space-x-1 select-none leading-4', { 'text-primary font-bold': sorted, 'justify-end': align === 'right' })}>
+    <span className={classNames('h-full flex items-center select-none leading-4', { 'text-primary font-bold': sorted, 'justify-end': align === 'right' })}>
       {children}
     </span>
   </div>
@@ -46,16 +46,17 @@ const formatFrequency = f => {
 const MutationsList = props => {
   const {
     api_url,
+    dates,
     filter,
     gene,
     pangoClade,
-    excluding,
     queryParams,
     selected,
+    selectedLineages,
     selectMutation
   } = props
 
-  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, excluding, gene, filter)
+  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, selectedLineages, gene, filter, dates)
   const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
@@ -89,25 +90,26 @@ const MutationsList = props => {
             {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
           </TableHeader>
           <TableHeader
-            sorted={state.sortColumn === 'growth'}
+            sorted={state.sortColumn === 'freq'}
             className='w-1/4 lg:w-1/5'
             align='right'
-            onClick={() => actions.sortBy('growth')}
+            onClick={() => actions.sortBy('freq')}
           >
-            <TableSort active={state.sortColumn === 'growth'} ascending={state.sortAscending} />
+            <TableSort active={state.sortColumn === 'freq'} ascending={state.sortAscending} />
             <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
-              Growth
+              Frequency
             </span>
           </TableHeader>
           <TableHeader
-            sorted={state.sortColumn === 'count'}
+            sorted={state.sortColumn === 'change'}
             className='w-1/4 lg:w-1/5'
             align='right'
-            onClick={() => actions.sortBy('count')}
+            onClick={() => actions.sortBy('change')}
           >
-            <TableSort active={state.sortColumn === 'count'} ascending={state.sortAscending} />
-            <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
-              Frequency
+            <TableSort active={state.sortColumn === 'change'} ascending={state.sortAscending} />
+            <span className={classNames('text-xs', { 'text-center leading-4': !isTableLayout })}>
+              {/* Growth */}
+              Recent<br/> Change
             </span>
           </TableHeader>
         </div>
@@ -163,13 +165,12 @@ const MutationsList = props => {
                                 <span>{row.mutation}</span>
                                 { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                               </span>
-                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap _text-subheading'>
-                                {`${formatFrequency(row.growth)}%`}
-                              </span>
-                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap _text-subheading'>
+                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap' title={`${row.count} samples`}>
                                 {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
-                              {/* <span className='w-1/4 md:w-1/5 text-right'>{row.count.toLocaleString()}</span> */}
+                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
+                                {`${formatFrequency(row.growth)}%`}
+                              </span>
                             </> }
                         </div>
                       )

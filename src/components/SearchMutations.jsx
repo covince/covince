@@ -82,7 +82,7 @@ export const SearchMutations = props => {
 
   const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex), [lineageToColourIndex])
 
-  const { topology, unaliasedToAliased } = useLineagesForAPI(selectedLineages)
+  const { topology, unaliasedToAliased, expandedLineages } = useLineagesForAPI(selectedLineages)
   const childrenOfSelected = useMemo(() => getChildLineages(topology, pangoClade), [topology, pangoClade])
 
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
@@ -198,12 +198,13 @@ export const SearchMutations = props => {
       </div>
       <MutationsList
         api_url={api_url}
-        excluding={childrenOfSelected}
+        dates={props.dates}
         filter={debouncedfilter}
         gene={gene}
         pangoClade={maybeFirstMut.pangoClade}
         queryParams={queryParams}
         selected={splitMuts}
+        selectedLineages={expandedLineages}
         selectMutation={selectMutation}
       />
     </>
