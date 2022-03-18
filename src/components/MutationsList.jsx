@@ -9,7 +9,6 @@ import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
 
 import useMutationsList from '../hooks/useMutationsList'
-import { useScreen } from '../hooks/useMediaQuery'
 
 const TableSort = ({ active, ascending }) => (
   <span className='text-primary w-6 h-6 flex-shrink-0'>
@@ -49,6 +48,7 @@ const MutationsList = props => {
     dates,
     filter,
     gene,
+    isLarge,
     pangoClade,
     queryParams,
     selected,
@@ -57,7 +57,6 @@ const MutationsList = props => {
   } = props
 
   const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, selectedLineages, gene, filter, dates)
-  const isTableLayout = useScreen('sm')
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
   const hasNextPage = state.rows.length < state.total
@@ -91,12 +90,12 @@ const MutationsList = props => {
           </TableHeader>
           <TableHeader
             sorted={state.sortColumn === 'freq'}
-            className='w-1/4 lg:w-1/5'
+            className='w-1/4'
             align='right'
             onClick={() => actions.sortBy('freq')}
           >
             <TableSort active={state.sortColumn === 'freq'} ascending={state.sortAscending} />
-            <span className={classNames('whitespace-nowrap', { 'text-center leading-4': !isTableLayout })}>
+            <span className='whitespace-nowrap'>
               Frequency
             </span>
           </TableHeader>
@@ -107,7 +106,7 @@ const MutationsList = props => {
             onClick={() => actions.sortBy('change')}
           >
             <TableSort active={state.sortColumn === 'change'} ascending={state.sortAscending} />
-            <span className={classNames('text-xs', { 'text-center leading-4': !isTableLayout })}>
+            <span>
               {/* Growth */}
               Recent<br/> Change
             </span>
@@ -165,7 +164,8 @@ const MutationsList = props => {
                                 <span>{row.mutation}</span>
                                 { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                               </span>
-                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap' title={`${row.count} samples`}>
+                              <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
+                                { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
                                 {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                               </span>
                               <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
