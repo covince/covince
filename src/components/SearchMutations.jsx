@@ -80,15 +80,6 @@ export const SearchMutations = props => {
   const pangoClade = useMemo(() => expandLineage(lineage), [lineage])
   const genes = useMemo(() => props.genes.sort(), [])
 
-  const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
-  const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
-  const excludedLineages = useMemo(() => getExcludedLineages(expandedLineages, topology, pangoClade), [selectedLineages])
-  const lineagesForApi = useMemo(() => Array.from(new Set([
-    ...denominatorLineages,
-    ...excludedLineages,
-    pangoClade
-  ])), [selectedLineages])
-
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
   const currentMuts = lineageToMutations[lineage]
@@ -107,6 +98,16 @@ export const SearchMutations = props => {
           pangoClade
         }
   , [lineage, secondMutMode, currentMuts])
+
+  const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
+  const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
+  const excludedLineages = useMemo(() => getExcludedLineages(expandedLineages, topology, pangoClade), [selectedLineages])
+  const lineagesForApi = useMemo(() => Array.from(new Set([
+    ...denominatorLineages,
+    ...excludedLineages.filter(l => !(l.startsWith(`${pangoClade}+`))),
+    // pangoClade,
+    maybeFirstMut.pangoClade
+  ])), [selectedLineages, maybeFirstMut])
 
   const applyMutations = React.useCallback((nextMuts) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, nextMuts)
