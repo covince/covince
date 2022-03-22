@@ -77,16 +77,37 @@ export const useLineagesForAPI = (lineages) => {
       memo[expanded] = l
     }
     const expandedLineages = Object.keys(memo)
+    const topology = topologise(expandedLineages.filter(_ => !_.includes('+')))
+    const rootLineages = topology.map(_ => _.name)
     return {
       expandedLineages,
-      topology: topologise(expandedLineages.filter(_ => !_.includes('+'))),
-      unaliasedToAliased: memo
+      topology,
+      unaliasedToAliased: memo,
+      denominatorLineages: [
+        ...rootLineages,
+        ...expandedLineages.filter(l => l.includes('+') && !rootLineages.some(r => l.startsWith(r)))
+      ]
     }
   }, [lineages])
 }
 
+export const getExcludedLineages = (expandedLineages, topology, lineage) => {
+  const lineageWithoutMut =
+    lineage.includes('+')
+      ? lineage.slice(0, lineage.indexOf('+'))
+      : lineage
+  return lineage.includes('+')
+    ? topologise(
+      expandedLineages.filter(l => l !== lineage && l !== lineageWithoutMut && `${l}.`.startsWith(`${lineageWithoutMut}.`))
+    ).map(_ => _.name)
+    : [
+        ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
+        ...getChildLineages(topology, lineageWithoutMut)
+      ]
+}
+
 export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
-  const { unaliasedToAliased, expandedLineages, topology } = useLineagesForAPI(lineages)
+  const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(lineages)
 
   const cachedTotals = React.useRef({ key: null, value: [] })
 
@@ -144,33 +165,16 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
     async fetchMapData (aliased = '', parameter) {
       const lineage = expandLineage(aliased)
       const useCachedTotals = cachedTotals.current.key === lineages
-      const lineageWithoutMut =
-        lineage.includes('+')
-          ? lineage.slice(0, lineage.indexOf('+'))
-          : lineage
-      const rootLineages = topology.map(_ => _.name)
       const [totalJson, lineageJson] =
         lineages.length === 0
           ? [{}, {}]
           : await Promise.all([
             useCachedTotals
               ? Promise.resolve(cachedTotals.current.value)
-              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({
-                lineages: [
-                  ...rootLineages,
-                  ...expandedLineages.filter(l => l.includes('+') && !rootLineages.some(r => l.startsWith(r)))
-                ]
-              })}`).then(_ => _.json()),
+              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: denominatorLineages })}`).then(_ => _.json()),
             fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
               lineage,
-              excluding: lineage.includes('+')
-                ? topologise(
-                    expandedLineages.filter(l => l !== lineage && l !== lineageWithoutMut && `${l}.`.startsWith(`${lineageWithoutMut}.`))
-                  ).map(_ => _.name)
-                : [
-                  ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
-                  ...getChildLineages(topology, lineageWithoutMut)
-                ]
+              excluding: getExcludedLineages(expandedLineages, topology, lineage)
             })}`).then(_ => _.json())
           ])
       if (!useCachedTotals) {

@@ -59,16 +59,12 @@ export default (api_url, queryParams, parent, lineages, gene, filter = '', dates
     loading: null
   })
 
-  const queryLineages = useMemo(() =>
-    lineages.filter(l => !(l === parent || l.startsWith(`${parent}+`))).concat(parent)
-  , [parent, lineages])
-
   const loadMoreItems = async (startIndex = 0, stopIndex, currentRows = state.rows) => {
     if (stopIndex < currentRows.length) return Promise.resolve()
 
     const query = {
       parent,
-      lineages: queryLineages,
+      lineages,
       gene,
       filter,
       sort: sortColumn,

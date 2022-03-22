@@ -49,14 +49,14 @@ const MutationsList = props => {
     filter,
     gene,
     isLarge,
+    lineagesForApi,
     pangoClade,
     queryParams,
     selected,
-    selectedLineages,
     selectMutation
   } = props
 
-  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, selectedLineages, gene, filter, dates)
+  const [state, actions] = useMutationsList(api_url, queryParams, pangoClade, lineagesForApi, gene, filter, dates)
   const [listSize, setListSize] = useState({ width: 0, height: 0 })
 
   const hasNextPage = state.rows.length < state.total
@@ -89,14 +89,14 @@ const MutationsList = props => {
             {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
           </TableHeader>
           <TableHeader
-            sorted={state.sortColumn === 'freq'}
+            sorted={state.sortColumn === 'prop'}
             className='w-1/4'
             align='right'
-            onClick={() => actions.sortBy('freq')}
+            onClick={() => actions.sortBy('prop')}
           >
-            <TableSort active={state.sortColumn === 'freq'} ascending={state.sortAscending} />
+            <TableSort active={state.sortColumn === 'prop'} ascending={state.sortAscending} />
             <span className='whitespace-nowrap'>
-              Frequency
+              Proportion
             </span>
           </TableHeader>
           <TableHeader

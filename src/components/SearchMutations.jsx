@@ -11,10 +11,10 @@ import Button from './Button'
 import useMutations from '../hooks/useMutations'
 import useDebouncedValue from '../hooks/useDebouncedValue'
 import useQueryAsState from '../hooks/useQueryAsState'
-import { useLineagesForAPI } from '../hooks/useDynamicAPI'
+import { useLineagesForAPI, getExcludedLineages } from '../hooks/useDynamicAPI'
 import { useScreen } from '../hooks/useMediaQuery'
 
-import { expandLineage, getChildLineages } from '../pango'
+import { expandLineage } from '../pango'
 
 const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
   <section
@@ -80,9 +80,14 @@ export const SearchMutations = props => {
   const pangoClade = useMemo(() => expandLineage(lineage), [lineage])
   const genes = useMemo(() => props.genes.sort(), [])
 
-  const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex), [lineageToColourIndex])
-  const { topology, unaliasedToAliased, expandedLineages } = useLineagesForAPI(selectedLineages)
-  const childrenOfSelected = useMemo(() => getChildLineages(topology, pangoClade), [topology, pangoClade])
+  const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
+  const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
+  const excludedLineages = useMemo(() => getExcludedLineages(expandedLineages, topology, pangoClade), [selectedLineages])
+  const lineagesForApi = useMemo(() => Array.from(new Set([
+    ...denominatorLineages,
+    ...excludedLineages,
+    pangoClade
+  ])), [selectedLineages])
 
   const { lineageToMutations, getMutationQueryUpdate } = useMutations()
 
@@ -136,13 +141,17 @@ export const SearchMutations = props => {
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
   const debouncedfilter = useDebouncedValue(mutationFilter, 250)
 
+  const displayExcluded = useMemo(() => {
+    return excludedLineages.filter(l => !(l.startsWith(`${pangoClade}+`)))
+  }, [excludedLineages])
+
   const excludedLineageString = useMemo(() => {
-    return childrenOfSelected.map(l => unaliasedToAliased[l]).join(', ')
-  }, [childrenOfSelected])
+    return displayExcluded.map(l => unaliasedToAliased[l]).join(', ')
+  }, [displayExcluded])
 
   const excludedTitle = useMemo(() => {
-    return childrenOfSelected.length > 1 ? excludedLineageString : null
-  }, [childrenOfSelected])
+    return displayExcluded.length > 1 || excludedLineageString.includes('+') ? excludedLineageString : null
+  }, [displayExcluded])
 
   return (
     <>
@@ -150,12 +159,12 @@ export const SearchMutations = props => {
         <Heading className='truncate flex-shrink-0'>
           Mutations in {lineage}
         </Heading>
-        { childrenOfSelected.length > 0 &&
-          <p className={classNames('text-sm text-subheading truncate md:ml-2', { 'cursor-help': excludedTitle })} title={excludedTitle}>
-            excluding { childrenOfSelected.length === 1 ? excludedLineageString : `${childrenOfSelected.length} sublineages` }
+        { displayExcluded.length > 0 &&
+          <p className={classNames('text-sm text-subheading truncate mr-1.5 md:ml-2', { 'cursor-help': excludedTitle })} title={excludedTitle}>
+            excluding { displayExcluded.length === 1 ? excludedLineageString : `${displayExcluded.length} sublineages` }
           </p> }
         { isLarge
-          ? <Button className='h-6 px-2 ml-auto flex items-center' onClick={onClose}>
+          ? <Button className='h-6 px-2 ml-auto flex items-center whitespace-nowrap' onClick={onClose}>
               Back to Lineages
             </Button>
           : <button
@@ -201,10 +210,10 @@ export const SearchMutations = props => {
         filter={debouncedfilter}
         gene={gene}
         isLarge={isLarge}
+        lineagesForApi={lineagesForApi}
         pangoClade={maybeFirstMut.pangoClade}
         queryParams={queryParams}
         selected={splitMuts}
-        selectedLineages={expandedLineages}
         selectMutation={selectMutation}
       />
     </>
