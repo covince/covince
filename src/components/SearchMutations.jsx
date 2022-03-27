@@ -16,7 +16,7 @@ import { useScreen } from '../hooks/useMediaQuery'
 
 import { expandLineage } from '../pango'
 
-const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
+const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, removeMutation }) => (
   <section
     className={`
       flex items-baseline space-x-2 max-w-max text-sm leading-6 h-10
@@ -26,19 +26,32 @@ const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
     <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6 hidden md:block'>
       Selected:
     </h3>
-    { muts.length === 0
-      ? <p className='text-subheading pr-1.5'>none</p>
-      : <>
-          <span>{muts[0]}</span>
-          { secondMut
-            ? <BsPlus className='text-subheading h-5 w-5 self-center' />
-            : <Button
-                className='py-0.5 px-1 self-center'
-                onClick={removeMutation}
-                title='Remove mutation'
-              >
-                <RemoveIcon className='w-5 h-5' />
-              </Button> }
+    { muts.length === 0 && <p className='text-subheading pr-1.5'>none</p> }
+    { muts.length > 0
+      ? mode === 'multi'
+        ? <span>(TODO multi-mut mgmt)</span>
+        : <>
+            <span>{muts[0]}</span>
+            <Button
+              className='py-0.5 px-1.5 self-center'
+              onClick={removeMutation}
+              title='Remove mutation'
+            >
+              Remove
+            </Button>
+          </>
+      : null }
+      {/* <span>{muts[0]}</span> */}
+      {/* TODO: multi-mut UI */ }
+      {/* { secondMut
+        ? <BsPlus className='text-subheading h-5 w-5 self-center' />
+        : <Button
+            className='py-0.5 px-1 self-center'
+            onClick={removeMutation}
+            title='Remove mutation'
+          >
+            <RemoveIcon className='w-5 h-5' />
+          </Button> }
           { muts[1]
             ? <>
                 <span>{muts[1]}</span>
@@ -52,17 +65,9 @@ const ManageSelection = ({ muts, secondMut, setSecondMut, removeMutation }) => (
               </>
             : <Button className='py-0.5 px-2 whitespace-nowrap -mr-3 self-center' onClick={() => setSecondMut(!secondMut)}>
                 { secondMut ? 'cancel' : 'Add' } 2nd mut.
-              </Button> }
-        </> }
+              </Button> } */}
   </section>
 )
-
-const getNextMuts = (mutsArray, newMut, secondMutMode) => {
-  if (mutsArray.length > 0 && secondMutMode) {
-    return [mutsArray[0], newMut].join('+')
-  }
-  return newMut
-}
 
 export const SearchMutations = props => {
   const {
@@ -85,29 +90,24 @@ export const SearchMutations = props => {
   const currentMuts = lineageToMutations[lineage]
   const splitMuts = currentMuts ? currentMuts.split('+') : []
 
-  const [secondMutMode, setSecondMutMode] = useState(splitMuts.length > 1)
+  const [addingMut, setAddingMut] = useState()
 
-  const maybeFirstMut = useMemo(() =>
-    splitMuts.length > 0 && secondMutMode
-      ? {
-          lineage: `${lineage}+${splitMuts[0]}`,
-          pangoClade: `${pangoClade}+${splitMuts[0]}`
-        }
-      : {
-          lineage,
-          pangoClade
-        }
-  , [lineage, secondMutMode, currentMuts])
+  const pangoCladeForApi = useMemo(() =>
+    splitMuts.length > 0 && addingMut
+      ? `${pangoClade}+${currentMuts}`
+      : [pangoClade, ...splitMuts.slice(0, -1)].join('+')
+  , [lineage, addingMut, currentMuts])
 
   const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
   const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
-  const excludedLineages = useMemo(() => getExcludedLineages(expandedLineages, topology, pangoClade), [selectedLineages])
+  const excludedLineages = useMemo(() =>
+    getExcludedLineages(expandedLineages, topology, pangoClade).filter(l => !(l.startsWith(`${pangoClade}+`)))
+  , [selectedLineages])
   const lineagesForApi = useMemo(() => Array.from(new Set([
     ...denominatorLineages,
-    ...excludedLineages.filter(l => !(l.startsWith(`${pangoClade}+`))),
-    // pangoClade,
-    maybeFirstMut.pangoClade
-  ])), [selectedLineages, maybeFirstMut])
+    ...excludedLineages,
+    pangoCladeForApi
+  ])), [selectedLineages, pangoCladeForApi])
 
   const applyMutations = React.useCallback((nextMuts) => {
     const mutationUpdate = getMutationQueryUpdate(lineage, nextMuts)
@@ -127,32 +127,29 @@ export const SearchMutations = props => {
 
   const removeMutation = React.useCallback(() => {
     applyMutations(splitMuts.slice(0, -1).join('+'))
-    // setSecondMutMode(false)
   }, [currentMuts])
 
   const selectMutation = React.useCallback((mut) => {
     if (splitMuts.includes(mut)) {
       applyMutations(splitMuts.filter(m => m !== mut).join('+'))
     } else {
-      const nextMuts = getNextMuts(splitMuts, mut, secondMutMode)
-      applyMutations(nextMuts)
+      applyMutations([
+        ...(addingMut ? splitMuts : splitMuts.slice(0, -1)),
+        mut
+      ].join('+'))
     }
-  }, [currentMuts, secondMutMode])
+  }, [currentMuts, addingMut])
 
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
   const debouncedfilter = useDebouncedValue(mutationFilter, 250)
 
-  const displayExcluded = useMemo(() => {
-    return excludedLineages.filter(l => !(l.startsWith(`${pangoClade}+`)))
+  const excludedLineageString = useMemo(() => {
+    return excludedLineages.map(l => unaliasedToAliased[l]).join(', ')
   }, [excludedLineages])
 
-  const excludedLineageString = useMemo(() => {
-    return displayExcluded.map(l => unaliasedToAliased[l]).join(', ')
-  }, [displayExcluded])
-
   const excludedTitle = useMemo(() => {
-    return displayExcluded.length > 1 || excludedLineageString.includes('+') ? excludedLineageString : null
-  }, [displayExcluded])
+    return excludedLineages.length > 1 || excludedLineageString.includes('+') ? excludedLineageString : null
+  }, [excludedLineages])
 
   return (
     <>
@@ -160,9 +157,9 @@ export const SearchMutations = props => {
         <Heading className='truncate flex-shrink-0'>
           Mutations in {lineage}
         </Heading>
-        { displayExcluded.length > 0 &&
+        { excludedLineages.length > 0 &&
           <p className={classNames('text-sm text-subheading truncate mr-1.5 md:ml-2', { 'cursor-help': excludedTitle })} title={excludedTitle}>
-            excluding { displayExcluded.length === 1 ? excludedLineageString : `${displayExcluded.length} sublineages` }
+            excluding { excludedLineages.length === 1 ? excludedLineageString : `${excludedLineages.length} sublineages` }
           </p> }
         { isLarge
           ? <Button className='h-6 px-2 ml-auto flex items-center whitespace-nowrap' onClick={onClose}>
@@ -178,8 +175,9 @@ export const SearchMutations = props => {
       <div className='px-3 md:px-0 big:flex flex-row-reverse justify-end'>
         <ManageSelection
           muts={splitMuts}
-          secondMut={secondMutMode}
-          setSecondMut={setSecondMutMode}
+          mode={props.mutationMode}
+          addingMut={addingMut}
+          setAddingMut={setAddingMut}
           removeMutation={removeMutation}
         />
         <form className='mt-3 mb-1.5 big:mr-3' onSubmit={e => e.preventDefault()}>
@@ -212,7 +210,7 @@ export const SearchMutations = props => {
         gene={gene}
         isLarge={isLarge}
         lineagesForApi={lineagesForApi}
-        pangoClade={maybeFirstMut.pangoClade}
+        pangoClade={pangoCladeForApi}
         queryParams={queryParams}
         selected={splitMuts}
         selectMutation={selectMutation}

@@ -70,7 +70,7 @@ const DynamicUI = ({
   const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
 
   const showLineageView = React.useMemo(() => !!lineageView, [lineageView])
-  const mutationsEnabled = React.useMemo(() => config.dynamic_mode.mutations, [config])
+  const mutationMode = React.useMemo(() => config.dynamic_mode.mutations, [config])
 
   const queryParams = React.useMemo(() => ({
     area,
@@ -82,7 +82,7 @@ const DynamicUI = ({
     api_url,
     colourPalette,
     lineageToColourIndex,
-    mutationsEnabled,
+    mutationMode,
     preset: lineageFilter,
     queryParams,
     setPreset: setLineageFilter,

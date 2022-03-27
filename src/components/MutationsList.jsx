@@ -39,7 +39,9 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
 
 const formatFrequency = f => {
   const _f = (f * 100).toPrecision(3)
-  return _f.startsWith('0.000') ? '> 0.001' : _f
+  if (_f.startsWith('0.000')) return '> 0.001'
+  if (_f.startsWith('-0.000')) return '< -0.001'
+  return _f
 }
 
 const MutationsList = props => {

@@ -22,7 +22,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `dynamic_mode [object]` (required for dynamic builds)
   * `initial_lineages [array|object]` list of lineages, or an object mapping lineages to a numerical index in the colour palette. Numbers must be 0-8 for the built-in palette.
   * `colour_palette [array]` (optional) list of color definitions or ordered colours. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
-  * `mutations [boolean]` (optional) enable mutation features, defaults to false
+  * `mutations ['single'|'multi']` (optional) enable mutation features, and whether multiple mutations can be selected
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
   * [`settings [object]`](#map-settings) (optional)

@@ -91,7 +91,7 @@ export default ({
   colourPalette,
   preset,
   lineageToColourIndex,
-  mutationsEnabled,
+  mutationMode,
   queryParams,
   setPreset,
   showLineageView
@@ -207,10 +207,11 @@ export default ({
 
   return useMemo(() => ({
     // props
-    colourPalette,
-    TreeComponent: mutationsEnabled ? LineageTreeWithMutations : LineageTree,
-    queryParams,
     api_url,
+    colourPalette,
+    mutationMode,
+    queryParams,
+    TreeComponent: mutationMode ? LineageTreeWithMutations : LineageTree,
 
     // state
     ...state,
