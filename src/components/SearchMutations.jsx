@@ -16,58 +16,72 @@ import { useScreen } from '../hooks/useMediaQuery'
 
 import { expandLineage } from '../pango'
 
-const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, removeMutation }) => (
-  <section
-    className={`
-      flex items-baseline space-x-2 max-w-max text-sm leading-6 h-10
-      mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500
-    `}
-  >
-    <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6 hidden md:block'>
-      Selected:
-    </h3>
-    { muts.length === 0 && <p className='text-subheading pr-1.5'>none</p> }
-    { muts.length > 0
-      ? mode === 'multi'
-        ? <span>(TODO multi-mut mgmt)</span>
-        : <>
-            <span>{muts[0]}</span>
-            <Button
-              className='py-0.5 px-1.5 self-center'
-              onClick={removeMutation}
-              title='Remove mutation'
-            >
-              Remove
-            </Button>
-          </>
-      : null }
-      {/* <span>{muts[0]}</span> */}
-      {/* TODO: multi-mut UI */ }
-      {/* { secondMut
-        ? <BsPlus className='text-subheading h-5 w-5 self-center' />
-        : <Button
-            className='py-0.5 px-1 self-center'
-            onClick={removeMutation}
-            title='Remove mutation'
-          >
-            <RemoveIcon className='w-5 h-5' />
-          </Button> }
-          { muts[1]
-            ? <>
-                <span>{muts[1]}</span>
-                <Button
-                  className='py-0.5 px-1 self-center'
-                  onClick={removeMutation}
-                  title='Remove mutation'
-                >
-                  <RemoveIcon className='w-5 h-5' />
-                </Button>
-              </>
-            : <Button className='py-0.5 px-2 whitespace-nowrap -mr-3 self-center' onClick={() => setSecondMut(!secondMut)}>
-                { secondMut ? 'cancel' : 'Add' } 2nd mut.
-              </Button> } */}
-  </section>
-)
+const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, removeMutation }) => {
+  let content
+  if (muts.length === 0) {
+    content = <p className='text-subheading pr-1.5'>none</p>
+  } else if (mode === 'multi') {
+    content = (
+      <>
+        { muts.length > 1 &&
+          <>
+            { muts.length > 2
+              ? <span title={muts.slice(0, -1).join(', ')} className='cursor-help'>
+                  {muts.length - 1} mutations
+                </span>
+              : <span>{muts[0]}</span>}
+            <BsPlus className='text-subheading h-5 w-5 self-center' />
+          </> }
+        <span>{muts[muts.length - 1]}</span>
+        <Button
+          className='py-0.5 px-1 self-center'
+          onClick={removeMutation}
+          title='Remove mutation'
+        >
+          <RemoveIcon className='w-5 h-5' />
+        </Button>
+        <Button
+          className={classNames(
+            'py-0.5 px-1 whitespace-nowrap -mr-3 self-center',
+            { '!bg-gray-200 dark:!bg-gray-700': addingMut }
+          )}
+          onClick={() => setAddingMut(!addingMut)}
+          title={addingMut ? 'Cancel next mutation' : 'Add next mutation'}
+        >
+          <BsPlus className='w-5 h-5' />
+          {/* { addingMut ? 'cancel' : 'Add' } next mut. */}
+        </Button>
+      </>
+    )
+  } else {
+    content = (
+      <>
+        <span>{muts[0]}</span>
+        <Button
+          className='py-0.5 px-1.5 self-center'
+          onClick={removeMutation}
+          title='Remove mutation'
+        >
+          remove
+        </Button>
+      </>
+    )
+  }
+
+  return (
+    <section
+      className={`
+        flex items-baseline space-x-2 max-w-max text-sm leading-6 h-10
+        mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500
+      `}
+    >
+      <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6 hidden md:block'>
+        Selected:
+      </h3>
+      {content}
+    </section>
+  )
+}
 
 export const SearchMutations = props => {
   const {
@@ -123,6 +137,7 @@ export const SearchMutations = props => {
       lineageUpdate[newKey] = nextColourIndex
     }
     submit(lineageUpdate, mutationUpdate)
+    setAddingMut(false)
   }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const removeMutation = React.useCallback(() => {
@@ -168,6 +183,7 @@ export const SearchMutations = props => {
           : <button
               className='!p-0 absolute border border-transparent focus:primary-ring rounded -top-0.5 right-2 md:right-0'
               onClick={onClose}
+              title='Back to Lineages'
             >
               <BsX className='h-7 w-7' />
             </button> }
