@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import classNames from 'classnames'
-import { BsPlus, BsX, BsDash as RemoveIcon } from 'react-icons/bs'
+import { BsX, BsCaretDownFill } from 'react-icons/bs'
+import { Popover, Transition } from '@headlessui/react'
 
 import Select from './Select'
 import Input from './TextInput'
@@ -18,41 +19,78 @@ import { expandLineage } from '../pango'
 
 const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, removeMutation }) => {
   let content
-  if (muts.length === 0) {
-    content = <p className='text-subheading pr-1.5'>none</p>
-  } else if (mode === 'multi') {
+  if (mode === 'multi') {
+    const buttonRef = React.useRef()
     content = (
       <>
-        { muts.length > 1 &&
-          <>
-            { muts.length > 2
-              ? <span title={muts.slice(0, -1).join(', ')} className='cursor-help'>
-                  {muts.length - 1} mutations
-                </span>
-              : <span>{muts[0]}</span>}
-            <BsPlus className='text-subheading h-5 w-5 self-center' />
-          </> }
-        <span>{muts[muts.length - 1]}</span>
-        <Button
-          className='py-0.5 px-1 self-center'
-          onClick={removeMutation}
-          title='Remove mutation'
-        >
-          <RemoveIcon className='w-5 h-5' />
-        </Button>
-        <Button
-          className={classNames(
-            'py-0.5 px-1 whitespace-nowrap -mr-3 self-center',
-            { '!bg-gray-200 dark:!bg-gray-700': addingMut }
+        <Popover>
+          {({ open }) => (
+            <>
+              <Popover.Button
+                ref={buttonRef}
+                className={`
+                  inline-flex items-center justify-center px-3
+                  border-2 border-solid border-transparent transition-colors
+                  hover:border-gray-400 hover:border-opacity-70 focus:outline-none focus:border-gray-400
+                  rounded-full font-bold
+                `}
+              >
+                {muts.length} mutation{muts.length === 1 ? '' : 's'}
+                <BsCaretDownFill className='ml-2 h-3.5 w-3.5' />
+              </Popover.Button>
+              <Transition
+                show={open}
+                as={React.Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Popover.Panel
+                  static
+                  focus
+                  className={`
+                    absolute z-20 top-full _left-0 mt-2 origin-top-left font-medium
+                    bg-white rounded shadow-xl ring-1 ring-black ring-opacity-5
+                    focus:outline-none dark:bg-gray-600 dark:text-white dark:ring-gray-500
+                  `}
+                  as='ul'
+                >
+                  {muts.map((mut, idx) =>
+                    <li
+                      key={mut}
+                      className='p-2 pl-4 flex items-center'
+                      onClick={() => buttonRef.current.focus()}
+                    >
+                      {mut}
+                      <button
+                        className='rounded border border-transparent focus:primary-ring text-subheading ml-1.5'
+                        title='Remove mutation'
+                        onClick={() => removeMutation(mut)}
+                      >
+                        <BsX className='h-5 w-5' />
+                      </button>
+                    </li>
+                  )}
+                </Popover.Panel>
+              </Transition>
+            </>
           )}
+        </Popover>
+        <Button
+          className='py-0.5 px-1.5 whitespace-nowrap -mr-3 self-center'
           onClick={() => setAddingMut(!addingMut)}
           title={addingMut ? 'Cancel next mutation' : 'Add next mutation'}
         >
-          <BsPlus className='w-5 h-5' />
-          {/* { addingMut ? 'cancel' : 'Add' } next mut. */}
+          {/* <BsPlus className='w-5 h-5 fill-current' /> */}
+          { addingMut ? 'cancel' : 'Add' } next mut.
         </Button>
       </>
     )
+  } else if (muts.length === 0) {
+    content = <p className='text-subheading pr-1.5'>none</p>
   } else {
     content = (
       <>
@@ -73,6 +111,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
       className={`
         flex items-baseline space-x-2 max-w-max text-sm leading-6 h-10
         mt-3 p-1.5 rounded border border-gray-200 dark:border-gray-500
+        relative
       `}
     >
       <h3 className='text-subheading font-bold uppercase text-xs tracking-wider ml-1.5 leading-6 hidden md:block'>
