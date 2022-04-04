@@ -20,7 +20,9 @@
   }
 
   .primary-ring,
-  .focus\:primary-ring:focus {
+  .focus\:primary-ring:focus,
+  .focus-visible\:primary-ring:focus-visible,
+  .active\:primary-ring:active {
     @apply border-dark-primary ring-dark-primary ring-opacity-40;
   }
 
