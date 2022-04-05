@@ -26,8 +26,8 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
       </p>
   } else if (mode === 'multi') {
     content = (
-      <div className='relative flex items-center self-center space-x-2'>
-        <Popover>
+      <div className='flex xl:flex-row-reverse items-center self-center space-x-2 xl:gap-2'>
+        <Popover as='div' className='relative'>
           <Popover.Button
             as={Button}
             className='inline-flex items-center justify-center px-3 h-10 whitespace-nowrap'
@@ -46,7 +46,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
           >
             <Popover.Panel
               className={`
-                absolute z-20 top-full left-0 mt-2 origin-top-left font-medium py-1
+                absolute z-20 top-full left-0 xl:left-auto xl:right-0 mt-2 origin-top-left xl:origin-top-right font-medium py-1
                 bg-white rounded shadow-md ring-1 ring-black ring-opacity-5
                 focus:outline-none dark:bg-gray-600 dark:text-white dark:ring-gray-500
               `}
