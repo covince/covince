@@ -19,14 +19,9 @@ const formatLineage = lineageWithMuts => {
       ? lineage
       : <span className='leading-4'>
           {lineage}
-          {muts.map((mut, i) => (
-            <>
-              <span key={mut} className={classNames('text-xs tracking-wide leading-none text-gray-600 dark:text-gray-200', { block: muts.length === 1 })}>
-                +{mut}
-              </span>
-              {i === 0 && muts.length > 1 && <br className='leading-none'/>}
-            </>
-          ))}
+          <span className='text-xs tracking-wide leading-none text-gray-600 dark:text-gray-200 block'>
+            + {muts.length === 1 ? muts[0] : `${muts.length} muts.`}
+          </span>
         </span>
   )
 }

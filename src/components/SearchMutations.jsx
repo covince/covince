@@ -26,7 +26,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
       </p>
   } else if (mode === 'multi') {
     content = (
-      <div className='relative flex items-center self-center space-x-1.5'>
+      <div className='relative flex items-center self-center space-x-2'>
         <Popover>
           <Popover.Button
             as={Button}

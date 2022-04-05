@@ -18,18 +18,25 @@ export default (uniqueLineages = [], loadedLineages = uniqueLineages, { colors }
       const colour = colors[Array.isArray(colors) ? index : lineage]
       const mutsIndex = lineage.indexOf('+')
       const hasMuts = mutsIndex !== -1
+      const muts = hasMuts ? lineage.slice(mutsIndex).split('+').slice(1) : null
+      const mutsLabel = hasMuts
+        ? muts.length === 1 ? `+ ${muts[0]}` : `+ ${muts.length} muts.`
+        : null
       const pango = hasMuts ? lineage.slice(0, mutsIndex) : lineage
       const altName = hasMuts ? null : nomenclatureLookup[lineage]
       memo[lineage] = {
         active: queryLineages.has(lineage),
         altName,
         colour: typeof colour === 'object' ? colour[darkMode ? 'dark' : 'light'] : colour,
-        label: altName ? `${altName} (${lineage})` : lineage,
+        label: altName
+          ? `${altName} (${lineage})`
+          : (mutsLabel ? `${pango} ${mutsLabel}` : lineage),
         lineage,
         nomenclatureIndex: nomenclature.findIndex(_ => _.lineage === pango),
         pango,
         primaryText: hasMuts ? pango : altName,
-        secondaryText: hasMuts ? lineage.slice(mutsIndex) : lineage
+        secondaryText: mutsLabel || lineage,
+        title: hasMuts ? muts.join(', ') : undefined
       }
       return memo
     }, {})

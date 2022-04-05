@@ -24,11 +24,12 @@ const Branch = memo(props => {
 
   const { lineage } = node
 
-  const muts = lineageToMutations[lineage]
+  const muts = lineageToMutations[lineage] || ''
   const lineageWithMuts = `${lineage}+${muts}`
   const mutsChecked = lineageWithMuts in values
   const mutsInSearch = muts && search.length ? lineageWithMuts.toLowerCase().includes(search) : false
   const mutsColour = values[lineageWithMuts]
+  const splitMuts = muts.split('+')
 
   let childBranches = []
   for (const child of node.children) {
@@ -61,7 +62,7 @@ const Branch = memo(props => {
             id={`lineage_selector_${lineageWithMuts}`}
             label={
               <span className='text-gray-700 dark:text-gray-100 leading-5'>
-                {lineage}<span className='text-xs tracking-wide pl-1'>+{muts}</span>
+                {lineage}<span className='text-xs tracking-wide pl-1' title={splitMuts.join(', ')}>+ {splitMuts.length === 1 ? muts : `${splitMuts.length} muts.`}</span>
               </span>}
             menu={
               <LineageMenu>
