@@ -21,8 +21,8 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
   let content
   if (muts.length === 0) {
     content =
-      <p className='text-subheading italic text-sm flex items-center h-10 border border-gray-200 dark:border-gray-500 rounded px-3'>
-        (none selected)
+      <p className='text-subheading text-sm flex items-center h-10 border border-gray-200 dark:border-gray-500 rounded px-3'>
+        select mutation below
       </p>
   } else if (mode === 'multi') {
     content = (

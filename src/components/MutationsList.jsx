@@ -129,66 +129,68 @@ const MutationsList = props => {
       >
         {({ measureRef }) => (
           <div ref={measureRef} className='flex-grow relative'>
-            <InfiniteLoader
-              ref={loaderRef}
-              isItemLoaded={isItemLoaded}
-              itemCount={itemCount}
-              loadMoreItems={actions.loadMoreItems}
-              threshold={state.rows.length ? 0 : undefined}
-            >
-              {({ onItemsRendered, ref }) => (
-                <List
-                  className='!overflow-y-scroll heron-styled-scrollbars'
-                  height={listSize.height}
-                  itemCount={itemCount}
-                  itemSize={36}
-                  onItemsRendered={onItemsRendered}
-                  ref={ref}
-                  width={listSize.width}
-                >
-                  {({ index, style }) => {
-                    if (index < state.rows.length) {
-                      const row = state.rows[index]
-                      const isSelected = selected.includes(row.mutation)
-                      // const previous = state.rows[index - 1]
-                      return (
-                        <div
-                          style={style}
-                          className={classNames(
-                            'px-4 space-x-4 lg:px-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
-                            { 'font-bold': isSelected }
-                          )}
-                          onClick={() => selectMutation(row.mutation)}
-                        >
-                          { row &&
-                            <>
-                              <span className='flex-grow flex items-baseline'>
-                                <span>{row.mutation}</span>
-                                { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
-                              </span>
-                              <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
-                                { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
-                                {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
-                              </span>
-                              <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
-                                {`${formatFrequency(row.growth)}%`}
-                              </span>
-                            </> }
-                        </div>
-                      )
-                    }
-                    if (state.rows.length > 0 && hasNextPage) {
-                      return (
-                        <div style={style} className='grid place-items-center'>
-                          <Spinner className='block h-5 w-5 text-gray-600 dark:text-gray-300' />
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                </List>
-              )}
-            </InfiniteLoader>
+            <div className='absolute w-full' style={{ height: listSize.height }}>
+              <InfiniteLoader
+                ref={loaderRef}
+                isItemLoaded={isItemLoaded}
+                itemCount={itemCount}
+                loadMoreItems={actions.loadMoreItems}
+                threshold={state.rows.length ? 0 : undefined}
+              >
+                {({ onItemsRendered, ref }) => (
+                  <List
+                    className='!overflow-y-scroll heron-styled-scrollbars'
+                    height={listSize.height}
+                    itemCount={itemCount}
+                    itemSize={36}
+                    onItemsRendered={onItemsRendered}
+                    ref={ref}
+                    width={listSize.width}
+                  >
+                    {({ index, style }) => {
+                      if (index < state.rows.length) {
+                        const row = state.rows[index]
+                        const isSelected = selected.includes(row.mutation)
+                        // const previous = state.rows[index - 1]
+                        return (
+                          <div
+                            style={style}
+                            className={classNames(
+                              'px-4 space-x-4 lg:px-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                              { 'font-bold': isSelected }
+                            )}
+                            onClick={() => selectMutation(row.mutation)}
+                          >
+                            { row &&
+                              <>
+                                <span className='flex-grow flex items-baseline'>
+                                  <span>{row.mutation}</span>
+                                  { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
+                                </span>
+                                <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
+                                  { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
+                                  {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
+                                </span>
+                                <span className='w-1/4 lg:w-1/5 text-right whitespace-nowrap'>
+                                  {`${formatFrequency(row.growth)}%`}
+                                </span>
+                              </> }
+                          </div>
+                        )
+                      }
+                      if (state.rows.length > 0 && hasNextPage) {
+                        return (
+                          <div style={style} className='grid place-items-center'>
+                            <Spinner className='block h-5 w-5 text-gray-600 dark:text-gray-300' />
+                          </div>
+                        )
+                      }
+                      return null
+                    }}
+                  </List>
+                )}
+              </InfiniteLoader>
+            </div>
             <FadeTransition in={state.loading === 'LIST'}>
               <div className='absolute inset-0 z-10 flex justify-center items-center bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50'>
                 <Spinner className='block h-6 w-6 text-gray-600 dark:text-gray-300' />
