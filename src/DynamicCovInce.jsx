@@ -24,6 +24,7 @@ const DynamicUI = ({
   config_url = './data/config.json',
   confidence,
   avg,
+  smoothing,
   useAPIImpl = useDynamicAPI,
   ...props
 }) => {
@@ -60,7 +61,7 @@ const DynamicUI = ({
     submit
   } = useDynamicLineages(staticConfig)
 
-  const api = useAPIImpl({ api_url, lineages, info, confidence, avg })
+  const api = useAPIImpl({ api_url, lineages, info, confidence, avg, smoothing })
 
   const config = useDynamicConfig({ colourPalette, lineages, lineageToColourIndex, staticConfig })
 

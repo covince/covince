@@ -3,20 +3,34 @@ import wilson from 'wilson-score-interval'
 import { expandLineage, getChildLineages, topologise } from '../pango'
 import useAPI from '../api'
 
-export const indexMapResults = (index, results, key, valueKey = 'sum') => {
-  let _results = results
-  // handle backend v2 response
-  if (!Array.isArray(results)) {
-    _results = []
-    for (const [date, data] of Object.entries(results)) {
-      for (const [area, count] of Object.entries(data)) {
-        _results.push({ date, area, [valueKey]: count })
+const v2Compat = (data, dates, { key = 'key', countKey = 'sum', smoothing = 1 } = {}) => {
+  if (!Array.isArray(data)) { // is v2 backend response
+    const _data = []
+    const entries = Object.entries(data)
+    for (const [date, counts] of entries) {
+      const dateIndex = dates.indexOf(date)
+      for (const [k, count] of Object.entries(counts)) {
+        let period_count = 0
+        if (dateIndex === -1 || smoothing === 1) {
+          period_count = count
+        } else {
+          const periodDates = dates.slice(Math.max(0, dateIndex - (smoothing - 1)), dateIndex + 1)
+          for (const date of periodDates) {
+            const counts = data[date]
+            period_count += counts ? counts[k] || 0 : 0
+          }
+        }
+        _data.push({ date, [key]: k, [countKey]: period_count })
       }
     }
+    return _data
   }
+  return data
+}
 
-  for (const row of _results) {
-    const { area, date, [valueKey]: value } = row
+export const indexMapResults = (index, results, key) => {
+  for (const row of results) {
+    const { area, date, sum: value } = row
     if (area in index) {
       const dates = index[area]
       if (date in dates) {
@@ -65,8 +79,6 @@ export const defaultConfidence = (count, total) => {
   return [Math.abs(left), Math.min(Math.abs(right), 1)]
 }
 
-const defaultAvg = count => count / 2
-
 const queryStringify = query => new URLSearchParams(query).toString()
 
 export const useLineagesForAPI = (lineages) => {
@@ -106,7 +118,14 @@ export const getExcludedLineages = (expandedLineages, topology, lineage) => {
       ]
 }
 
-export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
+export default ({
+  api_url,
+  lineages,
+  info,
+  confidence = defaultConfidence,
+  smoothing = 1,
+  avg = count => count / smoothing
+}) => {
   const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(lineages)
 
   const cachedTotals = React.useRef({ key: null, value: [] })
@@ -125,17 +144,9 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       }
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
       let json = await response.json()
-
-      // handle backend v2 response
-      if (!Array.isArray(json)) {
-        const flattenedJson = []
-        for (const [date, data] of Object.entries(json)) {
-          for (const [key, period_count] of Object.entries(data)) {
-            flattenedJson.push({ date, key, period_count })
-          }
-        }
-        json = flattenedJson
-      }
+      const start = Date.now()
+      json = v2Compat(json, info.dates, { countKey: 'period_count', smoothing })
+      console.log('Compat took', (Date.now() - start).toLocaleString(), 'ms')
 
       const lineageZeroes = Object.fromEntries(expandedLineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
@@ -181,8 +192,11 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         cachedTotals.current = { key: lineages, value: totalJson }
       }
       const index = {}
-      indexMapResults(index, totalJson, 'total')
-      indexMapResults(index, lineageJson, 'value')
+
+      const start = Date.now()
+      indexMapResults(index, v2Compat(totalJson, info.dates, { key: 'area', smoothing }), 'total')
+      indexMapResults(index, v2Compat(lineageJson, info.dates, { key: 'area', smoothing }), 'value')
+      console.log('Indexing took', (Date.now() - start).toLocaleString(), 'ms with smoothing =', smoothing)
 
       const uniqueDates = info.dates
       const uniqueAreas = info.areas
