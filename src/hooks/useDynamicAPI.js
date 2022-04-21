@@ -5,9 +5,30 @@ import useAPI from '../api'
 
 const v2Compat = (data, dates, { key = 'key', countKey = 'sum', smoothing = 1 } = {}) => {
   if (!Array.isArray(data)) { // is v2 backend response
+    let tmp
+    if (smoothing > 1) {
+      tmp = {}
+      for (const [date, counts] of Object.entries(data)) {
+        tmp[date] = tmp[date] || {}
+        const dateIndex = dates.indexOf(date)
+        const forwardDates = dates.slice(dateIndex + 1, dateIndex + smoothing)
+        for (const [k, count] of Object.entries(counts)) {
+          tmp[date][k] = count
+          for (const d of forwardDates) {
+            if (d in tmp) {
+              tmp[d][k] = 0
+            } else {
+              tmp[d] = { [k]: 0 }
+            }
+          }
+        }
+      }
+    } else {
+      tmp = data
+    }
+
     const _data = []
-    const entries = Object.entries(data)
-    for (const [date, counts] of entries) {
+    for (const [date, counts] of Object.entries(tmp)) {
       const dateIndex = dates.indexOf(date)
       for (const [k, count] of Object.entries(counts)) {
         let period_count = 0
@@ -16,7 +37,7 @@ const v2Compat = (data, dates, { key = 'key', countKey = 'sum', smoothing = 1 } 
         } else {
           const periodDates = dates.slice(Math.max(0, dateIndex - (smoothing - 1)), dateIndex + 1)
           for (const date of periodDates) {
-            const counts = data[date]
+            const counts = tmp[date]
             period_count += counts ? counts[k] || 0 : 0
           }
         }
@@ -144,9 +165,7 @@ export default ({
       }
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
       let json = await response.json()
-      const start = Date.now()
       json = v2Compat(json, info.dates, { countKey: 'period_count', smoothing })
-      console.log('Compat took', (Date.now() - start).toLocaleString(), 'ms')
 
       const lineageZeroes = Object.fromEntries(expandedLineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
@@ -182,21 +201,23 @@ export default ({
           : await Promise.all([
             useCachedTotals
               ? Promise.resolve(cachedTotals.current.value)
-              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: denominatorLineages })}`).then(_ => _.json()),
+              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: denominatorLineages })}`)
+                .then(_ => _.json())
+                .then(_ => v2Compat(_, info.dates, { key: 'area', smoothing })),
             fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
               lineage,
               excluding: getExcludedLineages(expandedLineages, topology, lineage)
-            })}`).then(_ => _.json())
+            })}`)
+              .then(_ => _.json())
+              .then(_ => v2Compat(_, info.dates, { key: 'area', smoothing }))
           ])
       if (!useCachedTotals) {
         cachedTotals.current = { key: lineages, value: totalJson }
       }
       const index = {}
 
-      const start = Date.now()
-      indexMapResults(index, v2Compat(totalJson, info.dates, { key: 'area', smoothing }), 'total')
-      indexMapResults(index, v2Compat(lineageJson, info.dates, { key: 'area', smoothing }), 'value')
-      console.log('Indexing took', (Date.now() - start).toLocaleString(), 'ms with smoothing =', smoothing)
+      indexMapResults(index, totalJson, 'total')
+      indexMapResults(index, lineageJson, 'value')
 
       const uniqueDates = info.dates
       const uniqueAreas = info.areas
