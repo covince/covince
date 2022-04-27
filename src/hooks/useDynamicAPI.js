@@ -1,11 +1,57 @@
 import React from 'react'
 import wilson from 'wilson-score-interval'
-import { expandLineage, topologise } from 'pango-utils'
+import { expandLineage, getChildLineages, topologise } from '../pango'
 import useAPI from '../api'
 
-export const indexMapResults = (index, results, key, valueKey = 'sum') => {
+const v2Compat = (data, dates, { key = 'key', countKey = 'sum', smoothing = 1 } = {}) => {
+  if (!Array.isArray(data)) { // is v2 backend response
+    let tmp
+    if (smoothing > 1) {
+      tmp = {}
+      for (const [date, counts] of Object.entries(data)) {
+        tmp[date] = tmp[date] || {}
+        const dateIndex = dates.indexOf(date)
+        const forwardDates = dates.slice(dateIndex + 1, dateIndex + smoothing)
+        for (const [k, count] of Object.entries(counts)) {
+          tmp[date][k] = count
+          for (const d of forwardDates) {
+            if (d in tmp) {
+              tmp[d][k] = 0
+            } else {
+              tmp[d] = { [k]: 0 }
+            }
+          }
+        }
+      }
+    } else {
+      tmp = data
+    }
+
+    const _data = []
+    for (const [date, counts] of Object.entries(tmp)) {
+      const dateIndex = dates.indexOf(date)
+      for (const [k, count] of Object.entries(counts)) {
+        let period_count = 0
+        if (dateIndex === -1 || smoothing === 1) {
+          period_count = count
+        } else {
+          const periodDates = dates.slice(Math.max(0, dateIndex - (smoothing - 1)), dateIndex + 1)
+          for (const date of periodDates) {
+            const counts = tmp[date]
+            period_count += counts ? counts[k] || 0 : 0
+          }
+        }
+        _data.push({ date, [key]: k, [countKey]: period_count })
+      }
+    }
+    return _data
+  }
+  return data
+}
+
+export const indexMapResults = (index, results, key) => {
   for (const row of results) {
-    const { area, date, [valueKey]: value } = row
+    const { area, date, sum: value } = row
     if (area in index) {
       const dates = index[area]
       if (date in dates) {
@@ -54,25 +100,63 @@ export const defaultConfidence = (count, total) => {
   return [Math.abs(left), Math.min(Math.abs(right), 1)]
 }
 
-const defaultAvg = count => count / 2
-
 const queryStringify = query => new URLSearchParams(query).toString()
 
-export default ({ api_url, lineages, info, confidence = defaultConfidence, avg = defaultAvg }) => {
-  const [unaliasedToAliased, expandedLineages, topology] = React.useMemo(() => {
+export const useLineagesForAPI = (lineages) => {
+  return React.useMemo(() => {
     const memo = {}
     for (const l of lineages) {
       const expanded = expandLineage(l)
       memo[expanded] = l
     }
-    const expandedLineages = Object.keys(memo).sort()
-    return [memo, expandedLineages, topologise(expandedLineages)]
+    const expandedLineages = Object.keys(memo)
+    const topology = topologise(expandedLineages.filter(_ => !_.includes('+')))
+    const rootLineages = topology.map(_ => _.name)
+    return {
+      expandedLineages,
+      topology,
+      unaliasedToAliased: memo,
+      denominatorLineages: [
+        ...rootLineages,
+        ...expandedLineages.filter(l => l.includes('+') && !rootLineages.some(r => l.startsWith(r)))
+      ]
+    }
   }, [lineages])
+}
+
+export const getExcludedLineages = (expandedLineages, topology, lineage) => {
+  const lineageWithoutMut =
+    lineage.includes('+')
+      ? lineage.slice(0, lineage.indexOf('+'))
+      : lineage
+  return lineage.includes('+')
+    ? topologise(
+      expandedLineages.filter(l => l !== lineage && l !== lineageWithoutMut && `${l}.`.startsWith(`${lineageWithoutMut}.`))
+    ).map(_ => _.name)
+    : [
+        ...expandedLineages.filter(l => l !== lineage && l.startsWith(`${lineageWithoutMut}+`)),
+        ...getChildLineages(topology, lineageWithoutMut)
+      ]
+}
+
+export default ({
+  api_url,
+  lineages,
+  info,
+  confidence = defaultConfidence,
+  smoothing = 1,
+  avg = count => count / smoothing
+}) => {
+  const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(lineages)
 
   const cachedTotals = React.useRef({ key: null, value: [] })
 
   const impl = React.useMemo(() => ({
     async fetchChartData (area) {
+      if (lineages.length === 0) {
+        return []
+      }
+
       const query = new URLSearchParams({
         lineages: expandedLineages
       })
@@ -80,7 +164,8 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
         query.append('area', area)
       }
       const response = await fetch(`${api_url}/frequency?${query.toString()}`)
-      const json = await response.json()
+      let json = await response.json()
+      json = v2Compat(json, info.dates, { countKey: 'period_count', smoothing })
 
       const lineageZeroes = Object.fromEntries(expandedLineages.map(l => [l, 0]))
       const index = Object.fromEntries(info.dates.map(d => [d, { ...lineageZeroes, total: 0 }]))
@@ -107,23 +192,30 @@ export default ({ api_url, lineages, info, confidence = defaultConfidence, avg =
       }
       return data
     },
-    async fetchMapData (aliased, parameter) {
+    async fetchMapData (aliased = '', parameter) {
       const lineage = expandLineage(aliased)
-      const useCachedTotals = cachedTotals.current.key === lineage
-      const [totalJson, lineageJson] = await Promise.all([
-        useCachedTotals
-          ? Promise.resolve(cachedTotals.current.value)
-          : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: topology.map(_ => _.name).sort() })}`)
-            .then(_ => _.json()),
-        fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
-          lineage,
-          excluding: Object.keys(unaliasedToAliased).filter(l => l.startsWith(`${lineage}.`)).sort()
-        })}`).then(_ => _.json())
-      ])
+      const useCachedTotals = cachedTotals.current.key === lineages
+      const [totalJson, lineageJson] =
+        lineages.length === 0
+          ? [{}, {}]
+          : await Promise.all([
+            useCachedTotals
+              ? Promise.resolve(cachedTotals.current.value)
+              : fetch(`${api_url}/spatiotemporal/total?${queryStringify({ lineages: denominatorLineages })}`)
+                .then(_ => _.json())
+                .then(_ => v2Compat(_, info.dates, { key: 'area', smoothing })),
+            fetch(`${api_url}/spatiotemporal/lineage?${queryStringify({
+              lineage,
+              excluding: getExcludedLineages(expandedLineages, topology, lineage)
+            })}`)
+              .then(_ => _.json())
+              .then(_ => v2Compat(_, info.dates, { key: 'area', smoothing }))
+          ])
       if (!useCachedTotals) {
         cachedTotals.current = { key: lineages, value: totalJson }
       }
       const index = {}
+
       indexMapResults(index, totalJson, 'total')
       indexMapResults(index, lineageJson, 'value')
 

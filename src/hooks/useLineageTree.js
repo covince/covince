@@ -1,5 +1,10 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react'
-import { toAlias, buildFullTopology, whoVariants } from 'pango-utils'
+
+import LineageTree from '../components/LineageTree'
+import LineageTreeWithMutations from '../components/LineageTreeWithMutations'
+
+import { buildFullTopology, whoVariants } from '../pango'
+import useReverseAliasLookup from './useReverseAliasLookup'
 
 const whoVariantsOrder = Object.keys(whoVariants)
 
@@ -14,7 +19,7 @@ const sortByCladeSize = (a, b) => {
   return 0
 }
 
-const constructLineage = name => {
+const constructLineage = (name, toAlias) => {
   let remaining = name
   while (remaining.includes('.')) {
     remaining = remaining.slice(0, remaining.lastIndexOf('.'))
@@ -26,13 +31,13 @@ const constructLineage = name => {
 }
 
 const createNodeWithState = (node, state, parentWho) => {
-  const { nodeIndex, preset, lineageToColourIndex } = state
+  const { nodeIndex, preset, selectedLineages } = state
   const {
-    lineage = constructLineage(node.name),
+    lineage = constructLineage(node.name, state.toAlias),
     sum = 0,
-    selected = lineage in lineageToColourIndex
+    selected = selectedLineages.includes(lineage)
   } = nodeIndex[node.name] || {}
-  const alias = toAlias[node.name]
+  const alias = state.toAlias[node.name]
   const who = whoVariants[node.name]
 
   let childrenWithState = []
@@ -47,7 +52,7 @@ const createNodeWithState = (node, state, parentWho) => {
   }
 
   let sumOfClade = 0
-  let childIsSelected = false
+  let childIsSelected = selectedLineages.some(l => l.startsWith(`${lineage}+`))
   for (const child of childrenWithState) {
     sumOfClade += child.sumOfClade + child.sum
     childIsSelected = childIsSelected || child.childIsSelected || child.selected
@@ -57,7 +62,7 @@ const createNodeWithState = (node, state, parentWho) => {
     altName: who || alias,
     childIsSelected,
     children: preset === 'selected' && (selected && !childIsSelected) ? [] : childrenWithState,
-    label: lineage,
+    lineage,
     name: node.name,
     searchText: [node.name, lineage, who || parentWho, alias].join('|').toLowerCase(),
     selected,
@@ -83,24 +88,31 @@ const mapStateToNodes = (nodes, state) => {
 
 export default ({
   api_url,
-  area,
   colourPalette,
-  fromDate,
+  preset,
   lineageToColourIndex,
-  showLineageView,
-  toDate
+  mutationMode,
+  queryParams,
+  setPreset,
+  showLineageView
 }) => {
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'QUEUE_REFETCH':
         return { ...state, loadedProps: null }
+      case 'LOADING':
+        return { ...state, loading: action.payload.props }
       case 'FETCHED': {
-        const nodeIndex = action.payload.index
+        const { props, index } = action.payload
+        if (Object.entries(state.loading).some(([k, v]) => props[k] !== v)) {
+          return state
+        }
         return {
           ...state,
-          nodeIndex,
+          nodeIndex: index,
+          loading: null,
           loadedProps: action.payload.props,
-          topology: buildFullTopology(Object.keys(nodeIndex))
+          topology: buildFullTopology(Object.keys(index))
         }
       }
       case 'ERROR': {
@@ -123,8 +135,6 @@ export default ({
         return { ...state, scrollPosition: action.payload }
       case 'SEARCH':
         return { ...state, search: action.payload }
-      case 'PRESET':
-        return { ...state, preset: action.payload }
       default:
         return state
     }
@@ -133,29 +143,38 @@ export default ({
     loadedProps: null,
     nodeIndex: null,
     topology: [],
-    scrollPosition: null,
-    preset: 'all'
+    scrollPosition: null
   })
 
   const { loadedProps } = state
 
   useEffect(() => {
-    if (
-      showLineageView && loadedProps !== null && (
-        loadedProps.area !== area ||
-        loadedProps.fromDate !== fromDate ||
-        loadedProps.toDate !== toDate
-      )) {
+    if (showLineageView && loadedProps !== queryParams) {
       dispatch({ type: 'QUEUE_REFETCH' })
     }
   }, [showLineageView])
 
-  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [area, fromDate, toDate])
+  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [queryParams])
+
+  const toAlias = useReverseAliasLookup()
 
   useEffect(async () => {
     if (!showLineageView || loadedProps !== null) return
     try {
-      const lineageData = await fetchLineages(api_url, { area, fromDate, toDate })
+      const props = queryParams
+      dispatch({ type: 'LOADING', payload: { props } })
+      let lineageData = await fetchLineages(api_url, props)
+
+      // handle backend v2 response
+      if (!Array.isArray(lineageData)) {
+        lineageData = Object.entries(lineageData)
+          .map(([pango_clade, sum]) => ({
+            pango_clade,
+            sum
+            // lineage: ?
+          }))
+      }
+
       const index = Object.fromEntries(
         lineageData.map(l => {
           const expanded = l.pango_clade.slice(0, -1)
@@ -165,7 +184,7 @@ export default ({
           ]
         })
       )
-      dispatch({ type: 'FETCHED', payload: { index, props: { area, fromDate, toDate } } })
+      dispatch({ type: 'FETCHED', payload: { index, props } })
     } catch (e) {
       dispatch({ type: 'ERROR', payload: e })
     }
@@ -175,18 +194,28 @@ export default ({
     dispatch({ type: 'TOGGLE_OPEN', payload: { nodeName, isOpen } })
   }, [dispatch])
 
-  const numberSelected = useMemo(() => Object.keys(lineageToColourIndex).length, [lineageToColourIndex])
+  const selectedLineages = useMemo(
+    () => Object.keys(lineageToColourIndex),
+    [lineageToColourIndex]
+  )
+  const numberSelected = selectedLineages.length
 
   const topology = useMemo(() => {
     const { topology, ...rest } = state
-    return mapStateToNodes(topology, { ...rest, lineageToColourIndex })
-  }, [state.topology, state.preset])
+    return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias, preset })
+  }, [state.topology, preset, toAlias])
 
   return useMemo(() => ({
+    // props
+    api_url,
     colourPalette,
+    mutationMode,
+    queryParams,
+    TreeComponent: mutationMode ? LineageTreeWithMutations : LineageTree,
 
     // state
     ...state,
+    preset,
     isLoading: loadedProps === null,
     numberSelected,
     topology,
@@ -194,7 +223,7 @@ export default ({
     // actions
     setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
     setSearch: text => dispatch({ type: 'SEARCH', payload: text }),
-    setPreset: preset => dispatch({ type: 'PRESET', payload: preset }),
+    setPreset,
     toggleOpen
   }), [state, numberSelected, topology, colourPalette])
 }

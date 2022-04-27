@@ -12,6 +12,20 @@ const formatNumber = (number, percentage, precision = percentage ? 1 : 2) => {
   return parseFloat(fixed).toLocaleString(undefined, { minimumFractionDigits: precision })
 }
 
+const formatLineage = lineageWithMuts => {
+  const [lineage, ...muts] = lineageWithMuts.split('+')
+  return (
+    muts.length === 0
+      ? lineage
+      : <span className='leading-4'>
+          {lineage}
+          <span className='text-xs tracking-wide leading-none text-gray-600 dark:text-gray-200 block'>
+            + {muts.length === 1 ? muts[0] : `${muts.length} muts.`}
+          </span>
+        </span>
+  )
+}
+
 const UncertaintyRange = ({ item, percentage, precision }) => {
   const range = item.payload[`${item.name}_range`]
   if (range && range[0] !== null && range[1] !== null) {
@@ -49,7 +63,12 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
     const { timeline, chart } = config
     const { tooltip } = chart.settings
     return (
-      <div className='p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5 ring-1 ring-black dark:ring-gray-500 ring-opacity-5'>
+      <div
+        className={`
+          p-3 bg-white dark:bg-gray-600 shadow-md rounded-md text-sm leading-5
+          ring-1 ring-black dark:ring-gray-500 ring-opacity-5
+        `}
+      >
         <h4 className='text-center text-gray-700 dark:text-gray-300 font-bold mb-1'>
           {format(new Date(dates[label]), timeline.date_format.chart_tooltip)}
         </h4>
@@ -65,7 +84,10 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
             </tr>
           </thead>
           <tbody>
-          {_payload.length === 0 && <tr><td colSpan={3} className='text-center text-gray-700 dark:text-gray-300'>No data</td></tr>}
+          {_payload.length === 0 &&
+            <tr>
+              <td colSpan={3} className='text-center text-gray-700 dark:text-gray-300'>No data</td>
+            </tr>}
           {_payload.map(item => {
             if (item.name === '_range') {
               return null
@@ -75,10 +97,12 @@ const ChartTooltip = ({ active, payload, label, percentage, precision = {}, date
                 <td>
                   <i className='block rounded-full h-3 w-3' style={{ backgroundColor: item.stroke }} />
                 </td>
-                <td className='px-3'>
-                  {tooltip.use_nomenclature
-                    ? nomenclatureLookup[item.name] || item.name
-                    : item.name}
+                <td className='px-3 leading-none'>
+                  {formatLineage(
+                    tooltip.use_nomenclature
+                      ? nomenclatureLookup[item.name] || item.name
+                      : item.name
+                  )}
                 </td>
                 <td className='text-right'>
                   {formatNumber(item.value, percentage, precision.mean)}

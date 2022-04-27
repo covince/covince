@@ -140,7 +140,7 @@ const LineageFilter = (props) => {
           ref={scrollContainer}
           className={classNames(
             'overflow-auto hide-scrollbars flex-grow -mx-4 md:-mx-2 flex md:flex-col md:h-16',
-            { 'lg:-mx-1': fixedLayout }
+            { 'md:-mx-1': fixedLayout }
           )}
           style={{ scrollSnapType: isMobile ? 'x mandatory' : 'y mandatory' }}
         >
@@ -150,37 +150,37 @@ const LineageFilter = (props) => {
               ref={el => { sectionRefs.current[i] = el }}
               className={classNames(
                 'w-full h-full flex-shrink-0 flex flex-wrap content-start px-4 md:px-0 md:grid md:gap-0.5 relative',
-                { 'lg:px-1': fixedLayout }
+                { 'md:px-1': fixedLayout }
               )}
               style={gridStyle}
             >
               { lineages.length > 0
-                ? lineages.map(({ lineage, active, colour, altName }) => (
+                ? lineages.map(({ lineage, active, colour, title = lineage, primaryText, secondaryText = lineage }) => (
                   <Checkbox
                     key={lineage}
                     className={classNames(
-                      'w-1/3 my-1 h-7 md:w-auto md:my-0 md:mx-2',
+                      'w-1/3 my-1 h-7 md:my-0',
+                      fixedLayout ? 'md:w-24 md:mx-0.5' : 'md:w-auto md:mx-2',
                       {
-                        'md:mb-1': isScrolling && nomenclature.length === 0,
-                        'lg:w-24 lg:mx-0.5': fixedLayout
+                        'md:mb-1': isScrolling && nomenclature.length === 0
                       }
                     )}
+                    title={title}
                     style={{ color: colour }}
                     id={`lineage_filter_${lineage}`}
                     checked={active}
                     onChange={() => toggleLineage(lineage)}
                   >
-                    {altName ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{altName}</span> : null}
-                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': altName })}>{lineage}</span>
+                    {primaryText ? <span className={classNames('block text-gray-700 dark:text-gray-100')}>{primaryText}</span> : null}
+                    <span className={classNames({ 'text-xs tracking-wide leading-none text-gray-500 dark:text-gray-300': primaryText })}>{secondaryText}</span>
                   </Checkbox>
                 ))
-                : (
-                  <>
+                : <>
                     <div className={classNames({ 'lg:w-24 lg:mx-0.5': fixedLayout })} />
                     <div className='absolute inset-0 flex items-center justify-center'>
                       {emptyMessage}
                     </div>
-                  </>) }
+                  </> }
             </section>
           ))}
         </form>

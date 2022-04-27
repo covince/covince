@@ -250,6 +250,7 @@ const MultiLinePlot = props => {
     className,
     darkMode,
     date,
+    groupStackedColours = true,
     height = 120,
     parameter,
     preset: deprecatedPreset,
@@ -314,18 +315,23 @@ const MultiLinePlot = props => {
     }
 
     const ordered = orderBy(lineages, 'average', 'asc')
-    const sorted = []
-    // group colours together
-    while (ordered.length > 0) {
-      const [item] = ordered.splice(0, 1)
-      if (sorted.includes(item)) continue
-      sorted.push(item)
-      for (let i = 0; i < ordered.length; i++) {
-        const other = ordered[i]
-        if (item.colour === other.colour) {
-          sorted.push(other)
+    let sorted
+
+    if (groupStackedColours) {
+      sorted = []
+      while (ordered.length > 0) {
+        const [item] = ordered.splice(0, 1)
+        if (sorted.includes(item)) continue
+        sorted.push(item)
+        for (let i = 0; i < ordered.length; i++) {
+          const other = ordered[i]
+          if (item.colour === other.colour) {
+            sorted.push(other)
+          }
         }
       }
+    } else {
+      sorted = ordered
     }
 
     return {
@@ -333,7 +339,7 @@ const MultiLinePlot = props => {
       data,
       dates
     }
-  }, [area_data, activeLineages])
+  }, [area_data, activeLineages, groupStackedColours])
 
   const { data, dates } = chart
 

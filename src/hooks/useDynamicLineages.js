@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import useQueryAsState from './useQueryAsState'
 
@@ -50,22 +50,29 @@ const initialise = ({ dynamic_mode }) => {
   }
 }
 
+export const getNextColourIndex = (lineageToColourIndex, colourPalette) => {
+  const colours = Object.values(lineageToColourIndex)
+  const unique = new Set(colours)
+  for (let i = 0; i < colourPalette.length; i++) {
+    if (unique.has(i.toString())) continue
+    return i.toString()
+  }
+  return colours.length % colourPalette.length
+}
+
+const updateShow = (show, lineages, nextLineages) => {
+  const newLineages = nextLineages.filter(l => !lineages.includes(l))
+  const nextShow = new Set(
+    show.split(',')
+      .filter(l => nextLineages.includes(l))
+      .concat(newLineages)
+  )
+  return Array.from(nextShow).join(',')
+}
+
 export default (config) => {
   const { initial, colourPalette } = useMemo(() => config ? initialise(config) : {}, [config])
-  const [{ lineages, colours }, updateQuery] = useQueryAsState(initial)
-
-  const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
-    const entries = Object.entries(lineageToColourIndexes)
-    const nextLineages = entries.map(_ => _[0]).join(',')
-    const nextColours = entries.map(_ => _[1]).join(',')
-    const nextQuery = {
-      ...extraQueryUpdates,
-      lineages: nextLineages || '',
-      colours: nextColours || ''
-    }
-    if (nextLineages !== lineages) nextQuery.show = undefined
-    updateQuery(nextQuery)
-  }, [])
+  const [{ lineages, colours, show }, updateQuery] = useQueryAsState(initial)
 
   const parsedLineages = useMemo(() => lineages.length ? lineages.split(',') : [], [lineages])
   const parsedColourIndexes = useMemo(() => colours.length ? colours.split(',') : [], [colours])
@@ -78,11 +85,34 @@ export default (config) => {
     return pairs
   }, [parsedLineages, parsedColourIndexes])
 
+  const nextColourIndex = useMemo(() =>
+    getNextColourIndex(lineageToColourIndex, colourPalette)
+  , [lineageToColourIndex])
+
+  // hack this because the memo trail is too long
+  const submitRef = useRef({})
+  submitRef.current.show = show
+  submitRef.current.parsedLineages = parsedLineages
+
+  const submit = useCallback((lineageToColourIndexes, extraQueryUpdates) => {
+    const { show, parsedLineages } = submitRef.current
+    const nextLineages = Object.keys(lineageToColourIndexes)
+    const nextColours = Object.values(lineageToColourIndexes)
+    const nextQuery = {
+      ...extraQueryUpdates,
+      lineages: nextLineages.join(',') || '',
+      colours: nextColours.join(',') || '',
+      show: show !== undefined ? updateShow(show, parsedLineages, nextLineages) : undefined
+    }
+    updateQuery(nextQuery)
+  }, [])
+
   return {
     colourPalette,
     colourIndexes: parsedColourIndexes,
     lineages: parsedLineages,
     lineageToColourIndex,
+    nextColourIndex,
     submit
   }
 }

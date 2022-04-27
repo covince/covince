@@ -22,6 +22,7 @@ Demo of the code in this repository (with old static data): http://covince.verce
 * `dynamic_mode [object]` (required for dynamic builds)
   * `initial_lineages [array|object]` list of lineages, or an object mapping lineages to a numerical index in the colour palette. Numbers must be 0-8 for the built-in palette.
   * `colour_palette [array]` (optional) list of color definitions or ordered colours. Optionally provide dark mode alternatives in the format `{ "light": "...", "dark": "..." }`
+  * `mutations ['single'|'multi']` (optional) enable mutation features, and whether multiple mutations can be selected
 * `map [object]`
   * `fade_uncertainty [{[parameter_id]: boolean}]` (optional) enable fade uncertainty for specific parameters
   * [`settings [object]`](#map-settings) (optional)
@@ -39,9 +40,10 @@ Demo of the code in this repository (with old static data): http://covince.verce
 
 ### Chart settings
 
-* `csv_download [boolean]` defaults to true
-* `tooltip [object]`
+* `csv_download [boolean]` (optional) defaults to true
+* `tooltip [object]` (optional)
   * `use_nomenclature [boolean]` defaults to true
+* `group_stacked_colors [boolean]` (optional) reorder stacked areas to group colours together, defaults to true
 
 ### Chart
 

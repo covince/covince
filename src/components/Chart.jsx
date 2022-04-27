@@ -51,7 +51,7 @@ const Chart = (props) => {
   const { area_data, activeLineages, chartZoom } = props
 
   const config = useConfig()
-  const { csv_download } = config.chart.settings
+  const { csv_download, group_stacked_colors } = config.chart.settings
 
   const [downloadURL, fileName] = useMemo(() => {
     if (!csv_download) return []
@@ -86,13 +86,13 @@ const Chart = (props) => {
         <span className='divide-x-2 divide-dotted divide-gray-300 dark:divide-gray-400 inline-flex items-center'>
           { !!csv_download &&
             <a
-              className='mr-1.5 text-xs tracking-wider font-normal text-subheading md:opacity-70 hover:opacity-100 whitespace-nowrap'
+              className='mr-1.5 text-xs tracking-wider font-normal text-heading md:opacity-70 hover:opacity-100 whitespace-nowrap'
               href={downloadURL}
               download={fileName}
               title='Download as CSV'
             >
               <span className='sr-only'>{heading} as CSV</span>
-              <DownloadIcon className='h-5 w-5' />
+              <DownloadIcon className='h-4 w-4' />
             </a> }
           { allowStack &&
             <Checkbox
@@ -111,6 +111,7 @@ const Chart = (props) => {
         className='-mt-1 md:m-0'
         type={query[line_type_accessor]}
         parameter={parameterConfig}
+        groupStackedColours={group_stacked_colors}
       />
     </>
   )

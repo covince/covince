@@ -4,27 +4,52 @@ import { Menu, Transition } from '@headlessui/react'
 import { BsThreeDotsVertical, BsCheckCircle } from 'react-icons/bs'
 
 import Button, { PrimaryPillButton } from './Button'
-import LineageTree from './LineageTree'
 
 import { LineageLimit, lineagePresets } from '../hooks/useDynamicComponents'
+import useQueryAsState from '../hooks/useQueryAsState'
+import { getNextColourIndex } from '../hooks/useDynamicLineages'
 
-const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
+const MobileLineageTree = (props) => {
+  const {
+    darkMode,
+    info,
+    initialValues,
+    lineageTree,
+    // nextColourIndex,
+    onClose
+  } = props
+
   const [tempValues, setTempValues] = React.useState(initialValues)
+  const [, updateQuery] = useQueryAsState()
+
   const numberSelected = React.useMemo(() => Object.keys(tempValues).length, [tempValues])
+  const submit = React.useCallback((lineages, queryUpdate) => {
+    updateQuery(queryUpdate)
+    setTempValues(lineages)
+  }, [tempValues])
+
+  const nextColourIndex = React.useMemo(() =>
+    getNextColourIndex(tempValues, lineageTree.colourPalette)
+  , [tempValues])
+
   return (
     <>
-      <LineageTree
-        className='flex-grow pr-1.5'
+    { <lineageTree.TreeComponent
+        className='flex-grow px-3'
         lineageToColourIndex={tempValues}
-        submit={setTempValues}
-        {...props}
+        submit={submit}
+        maxLineages={info.maxLineages}
+        nextColourIndex={nextColourIndex}
+        {...lineageTree}
+        darkMode={darkMode}
+        isMobile
         numberSelected={numberSelected}
         action={
-          <div className='space-x-3 px-1.5 flex items-center'>
+          <div className='space-x-3 flex items-center'>
             <LineageLimit
               className='text-base my-2.5'
               numberSelected={numberSelected}
-              maxLineages={props.maxLineages}
+              maxLineages={info.maxLineages}
             />
             <Menu as='div' className='relative z-10'>
               <Menu.Button as={Button} className='!p-2'>
@@ -55,11 +80,11 @@ const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
                           className={classNames(
                             'px-4 py-2 whitespace-nowrap w-full text-right flex items-center justify-end',
                             'no-webkit-tap focus:outline-none active:bg-gray-100 dark:active:bg-gray-700',
-                            { 'font-bold': value === props.preset }
+                            { 'font-bold': value === lineageTree.preset }
                           )}
-                          onClick={() => props.setPreset(value)}
+                          onClick={() => lineageTree.setPreset(value)}
                         >
-                          { value === props.preset &&
+                          { value === lineageTree.preset &&
                             <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-5 h-5 mr-2' /> }
                           {label}
                         </button>
@@ -84,7 +109,7 @@ const MobileLineageTree = ({ onClose, initialValues, ...props }) => {
             </Menu>
           </div>
         }
-      />
+      /> }
       <footer className='absolute bottom-4 right-3'>
         <PrimaryPillButton className='shadow-lg' onClick={() => onClose(tempValues)}>Continue</PrimaryPillButton>
       </footer>
