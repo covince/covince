@@ -17,22 +17,27 @@ const useLineages = (api, options, lineages) => {
     lineage: options.default_lineage || lineages[0],
     colorBy: options.default_color_by
   })
-  const [{ current, status, data }, dispatch] = useReducer((state, action) => {
+
+  const lineagesKey = useMemo(() => [...lineages].sort().join(','), [lineages])
+
+  const [{ current, status, queued, data }, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'QUEUE_REFETCH':
         return {
           ...state,
-          status: 'QUEUED'
+          status: 'QUEUED',
+          queued: action.payload.props
         }
       case 'LOADING':
         return {
           ...state,
           status: 'LOADING',
-          loading: action.payload.props
+          queued: null,
+          loading: state.queued
         }
       case 'FETCHED': {
         const { props, data } = action.payload
-        if (Object.entries(state.loading).some(([k, v]) => props[k] !== v)) {
+        if (props !== state.loading) {
           return state
         }
         return {
@@ -48,13 +53,12 @@ const useLineages = (api, options, lineages) => {
       }
     }
   }, {
-    status: 'QUEUED',
-    current: { lineage: null, colorBy: null, lineagesKey: null },
+    status: 'INIT',
+    queued: null,
     loading: null,
+    current: { lineage: null, colorBy: null, lineagesKey: null },
     data: null
   })
-
-  const lineagesKey = useMemo(() => [...lineages].sort().join(','), [lineages])
 
   useEffect(() => {
     if (
@@ -68,25 +72,26 @@ const useLineages = (api, options, lineages) => {
     }
   }, [lineageView])
 
-  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH' }) }, [lineage, colorBy, lineagesKey])
+  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH', payload: { props: { lineage, colorBy, lineagesKey } } }) }, [lineage, colorBy, lineagesKey])
 
   useEffect(async () => {
     // does not skip on initial load
     if ((current.lineage !== null && lineageView) || status !== 'QUEUED') {
       return
     }
+    const { lineage, colorBy } = queued
     if (lineages.length && !lineages.includes(lineage)) {
       updateQuery({ lineage: lineages[0] })
       return
     }
-    dispatch({ type: 'LOADING', payload: { props: { lineage, colorBy, lineagesKey } } })
+    dispatch({ type: 'LOADING' })
     try {
       const data = await api.fetchMapData(lineage, colorBy)
-      dispatch({ type: 'FETCHED', payload: { data, props: { lineage, colorBy, lineagesKey } } })
+      dispatch({ type: 'FETCHED', payload: { data, props: queued } })
     } catch (e) {
       dispatch({ type: 'ERROR', payload: e })
     }
-  }, [lineageView, status])
+  }, [lineageView, queued])
 
   const actions = {
     setLineage: lineage => updateQuery({ lineage }),
