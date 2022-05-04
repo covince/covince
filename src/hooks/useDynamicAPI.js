@@ -49,9 +49,9 @@ const v2Compat = (data, dates, { key = 'key', countKey = 'sum', smoothing = 1 } 
   return data
 }
 
-export const indexMapResults = (index, results, key) => {
+export const indexMapResults = (index, results, key, countKey = 'sum') => {
   for (const row of results) {
-    const { area, date, sum: value } = row
+    const { area, date, [countKey]: value } = row
     if (area in index) {
       const dates = index[area]
       if (date in dates) {
