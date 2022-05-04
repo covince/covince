@@ -197,7 +197,7 @@ export default ({
       const useCachedTotals = cachedTotals.current.key === lineages
       const [totalJson, lineageJson] =
         lineages.length === 0
-          ? [{}, {}]
+          ? [[], []]
           : await Promise.all([
             useCachedTotals
               ? Promise.resolve(cachedTotals.current.value)
