@@ -68,11 +68,13 @@ const useLineages = (api, options, lineages) => {
         current.colorBy !== colorBy ||
         current.lineagesKey !== lineagesKey
       )) {
-      dispatch({ type: 'QUEUE_REFETCH' })
+      dispatch({ type: 'QUEUE_REFETCH', payload: { props: { lineage, colorBy, lineagesKey } } })
     }
   }, [lineageView])
 
-  useEffect(() => { dispatch({ type: 'QUEUE_REFETCH', payload: { props: { lineage, colorBy, lineagesKey } } }) }, [lineage, colorBy, lineagesKey])
+  useEffect(() => {
+    dispatch({ type: 'QUEUE_REFETCH', payload: { props: { lineage, colorBy, lineagesKey } } })
+  }, [lineage, colorBy, lineagesKey])
 
   useEffect(async () => {
     // does not skip on initial load
