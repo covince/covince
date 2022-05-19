@@ -18,8 +18,7 @@ import { setAliases } from './pango'
 const UI = memo(lazy(() => import('./components/UI')))
 
 const DynamicUI = ({
-  // aliases_url = 'https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json',
-  aliases_url = './alias_key.json',
+  aliases_url = 'https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json',
   api_url = './api',
   tiles_url = './tiles/Local_Authority_Districts__December_2019__Boundaries_UK_BUC.json',
   config_url = './data/config.json',
