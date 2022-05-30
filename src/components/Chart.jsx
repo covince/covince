@@ -106,7 +106,7 @@ const Chart = (props) => {
         </span>
       </header>
       <MultiLinePlot
-        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, props.width * (1 / numCharts), 168)}
+        height={isMobile ? props.width * (1 / 2) : Math.max(height - 24, 168)}
         {...plot}
         className='-mt-1 md:m-0'
         type={query[line_type_accessor]}
