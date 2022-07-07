@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import classNames from 'classnames'
-import { BsX, BsChevronDoubleDown, BsPlus } from 'react-icons/bs'
+import { BsX, BsChevronDoubleDown } from 'react-icons/bs'
 import { Popover, Transition } from '@headlessui/react'
 
 import Select from './Select'
@@ -22,7 +22,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
   if (muts.length === 0) {
     content =
       <p className='text-subheading text-sm flex items-center h-10 border border-gray-200 dark:border-gray-500 rounded px-3'>
-        select mutation below
+        select mutation{mode === 'multi' ? 's' : ''} below
       </p>
   } else if (mode === 'multi') {
     content = (
@@ -77,7 +77,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
             </Popover.Panel>
           </Transition>
         </Popover>
-        <Button
+        {/* <Button
           className='pl-3 pr-1.5 self-center flex items-center h-10'
           onClick={() => setAddingMut(!addingMut)}
           title={addingMut ? 'Cancel next mutation' : 'Add next mutation'}
@@ -86,7 +86,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
           { addingMut
             ? <BsX className='w-5 h-5 opacity-70' />
             : <BsPlus className='w-5 h-5' /> }
-        </Button>
+        </Button> */}
       </div>
     )
   } else {
@@ -120,6 +120,7 @@ export const SearchMutations = props => {
   const {
     api_url,
     lineageToColourIndex,
+    mutationMode,
     nextColourIndex,
     onClose,
     queryParams,
@@ -137,13 +138,13 @@ export const SearchMutations = props => {
   const currentMuts = lineageToMutations[lineage]
   const splitMuts = currentMuts ? currentMuts.split('+') : []
 
-  const [addingMut, setAddingMut] = useState()
+  // const [addingMut, setAddingMut] = useState()
 
   const pangoCladeForApi = useMemo(() =>
-    splitMuts.length > 0 && addingMut
+    splitMuts.length > 0
       ? `${pangoClade}+${currentMuts}`
-      : [pangoClade, ...splitMuts.slice(0, -1)].join('+')
-  , [lineage, addingMut, currentMuts])
+      : pangoClade
+  , [lineage, currentMuts])
 
   const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
   const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
@@ -170,7 +171,7 @@ export const SearchMutations = props => {
       lineageUpdate[newKey] = nextColourIndex
     }
     submit(lineageUpdate, mutationUpdate)
-    setAddingMut(false)
+    // setAddingMut(false)
   }, [getMutationQueryUpdate, lineageToColourIndex])
 
   const removeMutation = React.useCallback((idx = splitMuts.length - 1) => {
@@ -183,12 +184,9 @@ export const SearchMutations = props => {
     if (splitMuts.includes(mut)) {
       applyMutations(splitMuts.filter(m => m !== mut).join('+'))
     } else {
-      applyMutations([
-        ...(addingMut ? splitMuts : splitMuts.slice(0, -1)),
-        mut
-      ].join('+'))
+      applyMutations([...splitMuts, mut].join('+'))
     }
-  }, [currentMuts, addingMut])
+  }, [currentMuts])
 
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
   const debouncedfilter = useDebouncedValue(mutationFilter, 250)
@@ -233,9 +231,9 @@ export const SearchMutations = props => {
       <div className='px-3 md:px-0 mt-3 mb-1.5 space-y-3 xl:space-y-0 xl:flex flex-row-reverse items-center xl:justify-between'>
         <ManageSelection
           muts={splitMuts}
-          mode={props.mutationMode}
-          addingMut={addingMut}
-          setAddingMut={setAddingMut}
+          mode={mutationMode}
+          // addingMut={addingMut}
+          // setAddingMut={setAddingMut}
           removeMutation={removeMutation}
         />
         <form className='lg:mr-3' onSubmit={e => e.preventDefault()}>
@@ -269,6 +267,7 @@ export const SearchMutations = props => {
         gene={gene}
         isLarge={isLarge}
         lineagesForApi={lineagesForApi}
+        mode={mutationMode}
         pangoClade={pangoCladeForApi}
         queryParams={queryParams}
         selected={splitMuts}

@@ -7,6 +7,7 @@ import Measure from 'react-measure'
 
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
+import Checkbox from './Checkbox'
 
 import useMutationsList from '../hooks/useMutationsList'
 
@@ -52,6 +53,7 @@ const MutationsList = props => {
     gene,
     isLarge,
     lineagesForApi,
+    mode,
     pangoClade,
     queryParams,
     selected,
@@ -77,13 +79,15 @@ const MutationsList = props => {
     }
   }, [state.loading])
 
+  const FormControl = mode === 'mutli' ? Checkbox : Checkbox
+
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
       <div className='flex border-b border-solid dark:border-gray-500'>
         <div className='flex flex-grow space-x-4 lg:space-x-6 px-4 lg:px-6'>
           <TableHeader
             key='not-searching'
-            className='mr-auto'
+            className='mr-auto pl-4'
             sorted={state.sortColumn === 'name'}
             onClick={() => actions.sortBy('name')}
           >
@@ -153,19 +157,24 @@ const MutationsList = props => {
                         const isSelected = selected.includes(row.mutation)
                         // const previous = state.rows[index - 1]
                         return (
-                          <div
-                            style={style}
+                          <label
                             className={classNames(
-                              'px-4 space-x-4 lg:px-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
-                              { 'font-bold': isSelected }
+                              'pl-2 pr-4 space-x-4 lg:pl-3 lg:pr-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                              { 'font-medium': isSelected }
                             )}
-                            onClick={() => selectMutation(row.mutation)}
+                            style={style}
                           >
                             { row &&
                               <>
                                 <span className='flex-grow flex items-baseline'>
+                                  <FormControl
+                                    className='mr-3 text-primary self-center'
+                                    checked={isSelected}
+                                    id={'mut-select-' + row.mutation}
+                                    onChange={() => selectMutation(row.mutation)}
+                                  />
                                   <span>{row.mutation}</span>
-                                  { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
+                                  {/* { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> } */}
                                 </span>
                                 <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
                                   { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
@@ -175,7 +184,7 @@ const MutationsList = props => {
                                   {`${formatFrequency(row.growth)}%`}
                                 </span>
                               </> }
-                          </div>
+                          </label>
                         )
                       }
                       if (state.rows.length > 0 && hasNextPage) {
