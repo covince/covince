@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react'
-import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc, BsCheckCircle } from 'react-icons/bs'
+import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc } from 'react-icons/bs'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import classNames from 'classnames'
@@ -84,10 +84,10 @@ const MutationsList = props => {
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
       <div className='flex border-b border-solid dark:border-gray-500'>
-        <div className='flex flex-grow space-x-4 lg:space-x-6 px-4 lg:px-6'>
+        <div className='flex flex-grow space-x-4 lg:space-x-6 pl-2 pr-4 lg:pl-3 lg:pr-6'>
           <TableHeader
             key='not-searching'
-            className='mr-auto pl-4'
+            className='mr-auto ml-7'
             sorted={state.sortColumn === 'name'}
             onClick={() => actions.sortBy('name')}
           >
@@ -159,7 +159,7 @@ const MutationsList = props => {
                         return (
                           <label
                             className={classNames(
-                              'pl-2 pr-4 space-x-4 lg:pl-3 lg:pr-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                              'pl-2 pr-4 lg:pl-3 lg:pr-6 space-x-4 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
                               { 'font-medium': isSelected }
                             )}
                             style={style}
