@@ -174,9 +174,8 @@ const MutationsList = props => {
                                     onChange={() => selectMutation(row.mutation)}
                                   />
                                   <span>{row.mutation}</span>
-                                  {/* { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> } */}
                                 </span>
-                                <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
+                                <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge ? `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}` : undefined}>
                                   { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
                                   {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                                 </span>
