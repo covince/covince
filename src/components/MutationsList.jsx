@@ -26,7 +26,7 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
     scope="col"
     className={classNames(
       className,
-      'py-1.5 cursor-pointer sticky top-0 z-0 flex items-center',
+      'py-1 cursor-pointer sticky top-0 z-0 flex items-center',
       { 'justify-end': align === 'right' }
     )}
   >

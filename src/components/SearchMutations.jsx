@@ -20,7 +20,7 @@ import { expandLineage } from '../pango'
 const ListItem = ({ className, ...props }) => (
   <li
     className={classNames(
-      'py-1.5 pl-3 md:pl-4 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700',
+      'py-1.5 pl-4 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700',
       className
     )}
     {...props}
@@ -56,41 +56,46 @@ const ManageSelection = ({ muts, mode = 'single', removeMuts }) => {
           >
             <Popover.Panel
               className={`
-                absolute z-20 top-full left-0 xl:left-auto xl:right-0 mt-2 origin-top-left xl:origin-top-right py-1
+                absolute z-20 top-full left-0 xl:left-auto xl:right-0 mt-2 origin-top-left xl:origin-top-right
                 bg-white rounded shadow-md ring-1 ring-black ring-opacity-5
                 focus:outline-none dark:bg-gray-600 dark:text-white dark:ring-gray-500
               `}
-              as='ul'
             >
-              {muts.map((mut, idx) =>
-                <ListItem key={mut}>
-                  <span className='font-medium mr-3'>{mut}</span>
-                  <button
-                    className={`
-                    text-subheading ml-auto rounded border border-transparent
-                      active:primary-ring active:bg-white dark:active:bg-gray-600
-                      focus:outline-none focus-visible:primary-ring
-                    `}
-                    title='Remove mutation'
-                    onClick={() => removeMuts(idx)}
-                  >
-                    <BsX className='h-5 w-5' />
-                  </button>
-                </ListItem>
-              )}
-              <ListItem onClick={() => removeMuts()} className="cursor-pointer">
-                <span className='mr-3 text-subheading whitespace-nowrap'>Removal all</span>
+              <ul className='py-1.5'>
+                {muts.map((mut, idx) =>
+                  <ListItem key={mut}>
+                    <span className='font-medium mr-3'>{mut}</span>
+                    <button
+                      className={`
+                      text-subheading ml-auto rounded border border-transparent
+                        active:primary-ring active:bg-white dark:active:bg-gray-600
+                        focus:outline-none focus-visible:primary-ring
+                      `}
+                      title='Remove mutation'
+                      onClick={() => removeMuts(idx)}
+                    >
+                      <BsX className='h-5 w-5' />
+                    </button>
+                  </ListItem>
+                )}
+              </ul>
+              <footer
+                className={`
+                  p-2 hover:bg-gray-100 dark:hover:bg-gray-700
+                  cursor-pointer border-t border-gray-200 dark:border-gray-500
+                  rounded-bl rounded-br
+                `}
+                onClick={() => removeMuts()}
+              >
                 <button
                   className={`
-                  text-subheading ml-auto rounded border border-transparent
-                    active:primary-ring active:bg-white dark:active:bg-gray-600
+                  text-subheading whitespace-nowrap px-1.5 rounded border border-transparent
                     focus:outline-none focus-visible:primary-ring
                   `}
-                  title='Remove all'
                 >
-                  <BsX className='h-5 w-5' />
+                  remove all
                 </button>
-              </ListItem>
+              </footer>
             </Popover.Panel>
           </Transition>
         </Popover>
