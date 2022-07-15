@@ -3,7 +3,7 @@ import { useReducer, useEffect, useCallback, useMemo } from 'react'
 import LineageTree from '../components/LineageTree'
 import LineageTreeWithMutations from '../components/LineageTreeWithMutations'
 
-import { buildFullTopology, whoVariants } from '../pango'
+import { buildFullTopology, whoVariants, expandLineage } from '../pango'
 import useReverseAliasLookup from './useReverseAliasLookup'
 
 const whoVariantsOrder = Object.keys(whoVariants)
@@ -64,7 +64,7 @@ const createNodeWithState = (node, state, parentWho) => {
     children: preset === 'selected' && (selected && !childIsSelected) ? [] : childrenWithState,
     lineage,
     name: node.name,
-    searchText: [node.name, lineage, who || parentWho, alias].join('|').toLowerCase(),
+    searchText: [node.name, who || parentWho].join('|').toLowerCase(),
     selected,
     sum,
     sumOfClade
@@ -205,6 +205,15 @@ export default ({
     return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias, preset })
   }, [state.topology, preset, toAlias])
 
+  const lineageFilterText = useMemo(() => {
+    if (state.search.length) {
+      const upper = state.search.toUpperCase()
+      const expanded = expandLineage(upper)
+      if (upper !== expanded) return expanded
+    }
+    return undefined
+  }, [state.search])
+
   return useMemo(() => ({
     // props
     api_url,
@@ -219,6 +228,7 @@ export default ({
     isLoading: loadedProps === null,
     numberSelected,
     topology,
+    lineageFilterText,
 
     // actions
     setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
