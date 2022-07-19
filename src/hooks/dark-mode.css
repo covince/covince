@@ -14,7 +14,7 @@
   .text-heading {
     @apply text-dark-heading;
   }
-  
+
   .text-subheading {
     @apply text-dark-subheading;
   }

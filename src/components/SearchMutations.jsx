@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import classNames from 'classnames'
-import { BsX, BsChevronDoubleDown, BsPlus } from 'react-icons/bs'
+import { BsX, BsChevronDoubleDown } from 'react-icons/bs'
 import { Popover, Transition } from '@headlessui/react'
 
 import Select from './Select'
@@ -17,12 +17,22 @@ import { useScreen } from '../hooks/useMediaQuery'
 
 import { expandLineage } from '../pango'
 
-const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, removeMutation }) => {
+const ListItem = ({ className, ...props }) => (
+  <li
+    className={classNames(
+      'py-1.5 pl-4 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700',
+      className
+    )}
+    {...props}
+  />
+)
+
+const ManageSelection = ({ muts, mode = 'single', removeMuts }) => {
   let content
   if (muts.length === 0) {
     content =
       <p className='text-subheading text-sm flex items-center h-10 border border-gray-200 dark:border-gray-500 rounded px-3'>
-        select mutation below
+        select mutation{mode === 'multi' ? 's' : ''} below
       </p>
   } else if (mode === 'multi') {
     content = (
@@ -46,47 +56,49 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
           >
             <Popover.Panel
               className={`
-                absolute z-20 top-full left-0 xl:left-auto xl:right-0 mt-2 origin-top-left xl:origin-top-right font-medium py-1
+                absolute z-20 top-full left-0 xl:left-auto xl:right-0 mt-2 origin-top-left xl:origin-top-right
                 bg-white rounded shadow-md ring-1 ring-black ring-opacity-5
                 focus:outline-none dark:bg-gray-600 dark:text-white dark:ring-gray-500
               `}
-              as='ul'
             >
-              {muts.map((mut, idx) =>
-                <li
-                  key={mut}
-                  className={classNames(
-                    'py-1.5 pl-3 md:pl-4 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700',
-                    { 'border-t-2 border-dotted border-gray-300 dark:border-gray-400': !addingMut && muts.length > 1 && idx === muts.length - 1 }
-                  )}
+              <ul className='py-1.5'>
+                {muts.map((mut, idx) =>
+                  <ListItem key={mut}>
+                    <span className='font-medium mr-3'>{mut}</span>
+                    <button
+                      className={`
+                      text-subheading ml-auto rounded border border-transparent
+                        active:primary-ring active:bg-white dark:active:bg-gray-600
+                        focus:outline-none focus-visible:primary-ring
+                      `}
+                      title='Remove mutation'
+                      onClick={() => removeMuts(idx)}
+                    >
+                      <BsX className='h-5 w-5' />
+                    </button>
+                  </ListItem>
+                )}
+              </ul>
+              <footer
+                className={`
+                  p-2 hover:bg-gray-100 dark:hover:bg-gray-700
+                  cursor-pointer border-t border-gray-200 dark:border-gray-500
+                  rounded-bl rounded-br
+                `}
+                onClick={() => removeMuts()}
+              >
+                <button
+                  className={`
+                  text-subheading whitespace-nowrap px-1.5 rounded border border-transparent
+                    focus:outline-none focus-visible:primary-ring
+                  `}
                 >
-                  <span className='mr-3'>{mut}</span>
-                  <button
-                    className={`
-                    text-subheading ml-auto rounded border border-transparent
-                      active:primary-ring active:bg-white dark:active:bg-gray-600
-                      focus:outline-none focus-visible:primary-ring
-                    `}
-                    title='Remove mutation'
-                    onClick={() => removeMutation(idx)}
-                  >
-                    <BsX className='h-5 w-5' />
-                  </button>
-                </li>
-              )}
+                  remove all
+                </button>
+              </footer>
             </Popover.Panel>
           </Transition>
         </Popover>
-        <Button
-          className='pl-3 pr-1.5 self-center flex items-center h-10'
-          onClick={() => setAddingMut(!addingMut)}
-          title={addingMut ? 'Cancel next mutation' : 'Add next mutation'}
-        >
-          <span className='pr-0.5'>{ addingMut ? 'cancel' : 'Add' }</span>
-          { addingMut
-            ? <BsX className='w-5 h-5 opacity-70' />
-            : <BsPlus className='w-5 h-5' /> }
-        </Button>
       </div>
     )
   } else {
@@ -95,7 +107,7 @@ const ManageSelection = ({ muts, mode = 'single', addingMut, setAddingMut, remov
         <span className='px-1.5 mr-1.5'>{muts[0]}</span>
         <Button
           className='py-0.5 px-1.5 self-center'
-          onClick={removeMutation}
+          onClick={() => removeMuts()}
           title='Remove mutation'
         >
           remove
@@ -120,6 +132,7 @@ export const SearchMutations = props => {
   const {
     api_url,
     lineageToColourIndex,
+    mutationMode,
     nextColourIndex,
     onClose,
     queryParams,
@@ -137,13 +150,11 @@ export const SearchMutations = props => {
   const currentMuts = lineageToMutations[lineage]
   const splitMuts = currentMuts ? currentMuts.split('+') : []
 
-  const [addingMut, setAddingMut] = useState()
-
   const pangoCladeForApi = useMemo(() =>
-    splitMuts.length > 0 && addingMut
+    mutationMode === 'multi' && splitMuts.length > 0
       ? `${pangoClade}+${currentMuts}`
-      : [pangoClade, ...splitMuts.slice(0, -1)].join('+')
-  , [lineage, addingMut, currentMuts])
+      : pangoClade
+  , [lineage, currentMuts])
 
   const selectedLineages = useMemo(() => Object.keys(lineageToColourIndex).concat(lineage), [lineageToColourIndex])
   const { unaliasedToAliased, expandedLineages, topology, denominatorLineages } = useLineagesForAPI(selectedLineages)
@@ -170,12 +181,15 @@ export const SearchMutations = props => {
       lineageUpdate[newKey] = nextColourIndex
     }
     submit(lineageUpdate, mutationUpdate)
-    setAddingMut(false)
   }, [getMutationQueryUpdate, lineageToColourIndex])
 
-  const removeMutation = React.useCallback((idx = splitMuts.length - 1) => {
+  const removeMuts = React.useCallback((idx) => {
+    if (mutationMode === 'multi' && idx === undefined) {
+      applyMutations('')
+      return
+    }
     const nextMuts = [...splitMuts]
-    nextMuts.splice(idx, 1)
+    nextMuts.splice(idx || splitMuts.length - 1, 1)
     applyMutations(nextMuts.join('+'))
   }, [currentMuts])
 
@@ -183,12 +197,13 @@ export const SearchMutations = props => {
     if (splitMuts.includes(mut)) {
       applyMutations(splitMuts.filter(m => m !== mut).join('+'))
     } else {
-      applyMutations([
-        ...(addingMut ? splitMuts : splitMuts.slice(0, -1)),
-        mut
-      ].join('+'))
+      applyMutations(
+        mutationMode === 'single'
+          ? mut
+          : [...splitMuts, mut].join('+')
+      )
     }
-  }, [currentMuts, addingMut])
+  }, [currentMuts])
 
   const [{ gene = '', mutationFilter = '' }, updateQuery] = useQueryAsState()
   const debouncedfilter = useDebouncedValue(mutationFilter, 250)
@@ -218,25 +233,12 @@ export const SearchMutations = props => {
         >
           <BsX className='h-7 w-7' />
         </button>
-        {/* { isLarge
-          ? <Button className='h-6 px-2 ml-auto flex items-center whitespace-nowrap' onClick={onClose}>
-              Back to Lineages
-            </Button>
-          : <button
-              className='!p-0 absolute border border-transparent focus:primary-ring rounded -top-0.5 right-2 md:right-0'
-              onClick={onClose}
-              title='Back to Lineages'
-            >
-              <BsX className='h-7 w-7' />
-            </button> } */}
       </header>
       <div className='px-3 md:px-0 mt-3 mb-1.5 space-y-3 xl:space-y-0 xl:flex flex-row-reverse items-center xl:justify-between'>
         <ManageSelection
           muts={splitMuts}
-          mode={props.mutationMode}
-          addingMut={addingMut}
-          setAddingMut={setAddingMut}
-          removeMutation={removeMutation}
+          mode={mutationMode}
+          removeMuts={removeMuts}
         />
         <form className='lg:mr-3' onSubmit={e => e.preventDefault()}>
           <div className='flex items-center space-x-1.5'>
@@ -269,6 +271,7 @@ export const SearchMutations = props => {
         gene={gene}
         isLarge={isLarge}
         lineagesForApi={lineagesForApi}
+        mode={mutationMode}
         pangoClade={pangoCladeForApi}
         queryParams={queryParams}
         selected={splitMuts}

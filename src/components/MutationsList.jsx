@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react'
-import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc, BsCheckCircle } from 'react-icons/bs'
+import { BsArrowDownShort as SortDesc, BsArrowUpShort as SortAsc } from 'react-icons/bs'
 import { FixedSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import classNames from 'classnames'
@@ -7,17 +7,17 @@ import Measure from 'react-measure'
 
 import Spinner from './Spinner'
 import FadeTransition from './FadeTransition'
+import Checkbox from './Checkbox'
 
 import useMutationsList from '../hooks/useMutationsList'
 
 const TableSort = ({ active, ascending }) => (
-  <span className='text-primary w-6 h-6 flex-shrink-0'>
-    {active
-      ? ascending
+  active &&
+    <span className='text-primary w-6 h-6 -my-1 flex-shrink-0'>
+      { ascending
         ? <SortAsc className='w-full h-full' />
-        : <SortDesc className='w-full h-full' />
-      : null}
-  </span>
+        : <SortDesc className='w-full h-full' /> }
+    </span>
 )
 
 const TableHeader = ({ children, className, sorted, align, ...props }) => (
@@ -26,14 +26,22 @@ const TableHeader = ({ children, className, sorted, align, ...props }) => (
     scope="col"
     className={classNames(
       className,
-      'py-1.5 cursor-pointer sticky top-0 z-0',
-      'text-xs leading-5 font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider',
-      align === 'right' ? 'text-right' : 'text-left'
+      'py-1 cursor-pointer sticky top-0 z-0 flex items-center',
+      { 'justify-end': align === 'right' }
     )}
   >
-    <span className={classNames('h-full flex items-center select-none leading-4', { 'text-primary font-bold': sorted, 'justify-end': align === 'right' })}>
+    <button
+      className={classNames(
+        'flex items-center select-none leading-4 border border-transparent p-1 -m-1',
+        'text-xs leading-5 uppercase tracking-wider',
+        'outline-none rounded focus-visible:primary-ring focus-visible:border-primary dark:focus-visible:border-dark-primary',
+        sorted ? 'text-primary font-bold' : 'font-medium text-gray-500 dark:text-gray-200',
+        align === 'right' ? 'text-right' : 'text-left'
+      )}
+    >
+      <span className='sr-only'>Sort by</span>
       {children}
-    </span>
+    </button>
   </div>
 )
 
@@ -52,6 +60,7 @@ const MutationsList = props => {
     gene,
     isLarge,
     lineagesForApi,
+    mode,
     pangoClade,
     queryParams,
     selected,
@@ -77,18 +86,20 @@ const MutationsList = props => {
     }
   }, [state.loading])
 
+  const formControlType = mode === 'multi' ? 'checkbox' : 'radio'
+
   return (
     <div className='flex-grow flex flex-col bg-white dark:bg-gray-700'>
       <div className='flex border-b border-solid dark:border-gray-500'>
-        <div className='flex flex-grow space-x-4 lg:space-x-6 px-4 lg:px-6'>
+        <div className='flex flex-grow space-x-4 lg:space-x-6 pl-2 pr-4 lg:pl-3 lg:pr-6'>
           <TableHeader
             key='not-searching'
-            className='mr-auto'
+            className='mr-auto ml-6 lg:ml-7'
             sorted={state.sortColumn === 'name'}
             onClick={() => actions.sortBy('name')}
           >
-            <span className={classNames({ 'mr-1': state.sortColumn !== 'name' })}>Mutation</span>
-            {state.sortColumn === 'name' && <TableSort active ascending={state.sortAscending} /> }
+            <span>Mutation</span>
+            <TableSort active={state.sortColumn === 'name'} ascending={state.sortAscending} />
           </TableHeader>
           <TableHeader
             sorted={state.sortColumn === 'prop'}
@@ -97,9 +108,7 @@ const MutationsList = props => {
             onClick={() => actions.sortBy('prop')}
           >
             <TableSort active={state.sortColumn === 'prop'} ascending={state.sortAscending} />
-            <span className='whitespace-nowrap'>
-              Proportion
-            </span>
+            <span className='whitespace-nowrap'>Proportion</span>
           </TableHeader>
           <TableHeader
             sorted={state.sortColumn === 'change'}
@@ -108,10 +117,7 @@ const MutationsList = props => {
             onClick={() => actions.sortBy('change')}
           >
             <TableSort active={state.sortColumn === 'change'} ascending={state.sortAscending} />
-            <span>
-              {/* Growth */}
-              Recent<br/> Change
-            </span>
+            <span>Recent<br/> Change</span>
           </TableHeader>
         </div>
         <div>
@@ -153,21 +159,27 @@ const MutationsList = props => {
                         const isSelected = selected.includes(row.mutation)
                         // const previous = state.rows[index - 1]
                         return (
-                          <div
-                            style={style}
+                          <label
                             className={classNames(
-                              'px-4 space-x-4 lg:px-6 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
-                              { 'font-bold': isSelected }
+                              'pl-2 pr-4 lg:pl-3 lg:pr-6 space-x-4 lg:space-x-6 flex items-baseline cursor-pointer text-sm leading-9 big:text-base big:leading-9 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-sm',
+                              { 'font-medium': isSelected }
                             )}
-                            onClick={() => selectMutation(row.mutation)}
+                            style={style}
                           >
                             { row &&
                               <>
                                 <span className='flex-grow flex items-baseline'>
+                                  <Checkbox
+                                    className='mr-2 lg:mr-3 text-primary self-center'
+                                    checked={isSelected}
+                                    type={formControlType}
+                                    name="mutation_select"
+                                    id={'mut-select-' + row.mutation}
+                                    onChange={() => selectMutation(row.mutation)}
+                                  />
                                   <span>{row.mutation}</span>
-                                  { isSelected && <BsCheckCircle className='flex-shrink-0 fill-current text-primary w-4 h-4 ml-2 self-center' /> }
                                 </span>
-                                <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge && `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}`}>
+                                <span className='w-1/4 text-right whitespace-nowrap' title={!isLarge ? `${row.count.toLocaleString()} sample${row.count === 1 ? '' : 's'}` : undefined}>
                                   { isLarge && <span className='text-subheading'>{row.count.toLocaleString()}<span className='mx-2'>/</span></span> }
                                   {showFrequency ? `${formatFrequency(row.count / state.denominator)}%` : ''}
                                 </span>
@@ -175,7 +187,7 @@ const MutationsList = props => {
                                   {`${formatFrequency(row.growth)}%`}
                                 </span>
                               </> }
-                          </div>
+                          </label>
                         )
                       }
                       if (state.rows.length > 0 && hasNextPage) {
