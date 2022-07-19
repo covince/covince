@@ -73,7 +73,7 @@ const DynamicUI = ({
 
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
   const setLineagePreset = React.useCallback(preset => updateQuery({ lineagePreset: preset === 'all' ? undefined : preset, lineageFilter: undefined }), [])
-  const setLineageSearch = React.useCallback((search = '') => updateQuery({ lineageSearch: search.length ? search : undefined }), [])
+  const setLineageSearch = React.useCallback((search = '') => updateQuery({ lineageSearch: search.length ? search : undefined }, 'replace'), [])
 
   const showLineageView = React.useMemo(() => !!lineageView, [lineageView])
   const mutationMode = React.useMemo(() => config.dynamic_mode.mutations, [config])
