@@ -30,7 +30,7 @@ const constructLineage = (name, toAlias) => {
   return name
 }
 
-const createNodeWithState = (node, state, parentWho) => {
+const createNodeWithState = (node, state, parentWhos = []) => {
   const { nodeIndex, preset, selectedLineages } = state
   const {
     lineage = constructLineage(node.name, state.toAlias),
@@ -39,15 +39,16 @@ const createNodeWithState = (node, state, parentWho) => {
   } = nodeIndex[node.name] || {}
   const alias = state.toAlias[node.name]
   const who = whoVariants[node.name]
+  const nextParentWhos = who ? [...parentWhos, who] : parentWhos
 
   let childrenWithState = []
   for (const child of node.children) {
-    const newNodes = createNodeWithState(child, state, who || parentWho)
+    const newNodes = createNodeWithState(child, state, nextParentWhos)
     childrenWithState = childrenWithState.concat(newNodes)
   }
   childrenWithState.sort(sortByCladeSize)
 
-  if (preset === 'who' && !(who || parentWho)) {
+  if (preset === 'who' && nextParentWhos.length === 0) {
     return childrenWithState
   }
 
@@ -64,7 +65,7 @@ const createNodeWithState = (node, state, parentWho) => {
     children: preset === 'selected' && (selected && !childIsSelected) ? [] : childrenWithState,
     lineage,
     name: node.name,
-    searchText: [node.name, who || parentWho].join('|').toLowerCase(),
+    searchText: [node.name, ...nextParentWhos].join('|').toLowerCase(),
     selected,
     sum,
     sumOfClade
