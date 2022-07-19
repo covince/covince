@@ -65,10 +65,15 @@ const DynamicUI = ({
 
   const config = useDynamicConfig({ colourPalette, lineages, lineageToColourIndex, staticConfig })
 
-  const [{ lineageView, lineageFilter, area, xMin, xMax }, updateQuery] = useQueryAsState({ lineageView: null, lineageFilter: 'all' })
+  const [{ lineageView, lineageFilter, lineagePreset = lineageFilter, lineageSearch, area, xMin, xMax }, updateQuery] = useQueryAsState({
+    lineageView: null,
+    lineagePreset: 'all',
+    lineageSearch: ''
+  })
 
   const setLineageView = React.useCallback((bool, method) => updateQuery({ lineageView: bool ? '1' : undefined }, method), [])
-  const setLineageFilter = React.useCallback(preset => updateQuery({ lineageFilter: preset === 'all' ? undefined : preset }), [])
+  const setLineagePreset = React.useCallback(preset => updateQuery({ lineagePreset: preset === 'all' ? undefined : preset, lineageFilter: undefined }), [])
+  const setLineageSearch = React.useCallback((search = '') => updateQuery({ lineageSearch: search.length ? search : undefined }), [])
 
   const showLineageView = React.useMemo(() => !!lineageView, [lineageView])
   const mutationMode = React.useMemo(() => config.dynamic_mode.mutations, [config])
@@ -84,9 +89,11 @@ const DynamicUI = ({
     colourPalette,
     lineageToColourIndex,
     mutationMode,
-    preset: lineageFilter,
+    preset: lineagePreset,
     queryParams,
-    setPreset: setLineageFilter,
+    search: lineageSearch,
+    setPreset: setLineagePreset,
+    setSearch: setLineageSearch,
     showLineageView
   })
 

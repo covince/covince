@@ -93,7 +93,9 @@ export default ({
   lineageToColourIndex,
   mutationMode,
   queryParams,
+  search,
   setPreset,
+  setSearch,
   showLineageView
 }) => {
   const [state, dispatch] = useReducer((state, action) => {
@@ -133,13 +135,10 @@ export default ({
       }
       case 'SCROLL_POSITION':
         return { ...state, scrollPosition: action.payload }
-      case 'SEARCH':
-        return { ...state, search: action.payload }
       default:
         return state
     }
   }, {
-    search: '',
     loadedProps: null,
     nodeIndex: null,
     topology: [],
@@ -206,13 +205,13 @@ export default ({
   }, [state.topology, preset, toAlias])
 
   const lineageFilterText = useMemo(() => {
-    if (state.search.length) {
-      const upper = state.search.toUpperCase()
+    if (search.length) {
+      const upper = search.toUpperCase()
       const expanded = expandLineage(upper)
       if (upper !== expanded) return expanded
     }
     return undefined
-  }, [state.search])
+  }, [search])
 
   return useMemo(() => ({
     // props
@@ -224,16 +223,17 @@ export default ({
 
     // state
     ...state,
-    preset,
     isLoading: loadedProps === null,
-    numberSelected,
-    topology,
     lineageFilterText,
+    numberSelected,
+    preset,
+    search,
+    topology,
 
     // actions
-    setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
-    setSearch: text => dispatch({ type: 'SEARCH', payload: text }),
     setPreset,
+    setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
+    setSearch,
     toggleOpen
-  }), [state, numberSelected, topology, colourPalette])
+  }), [state, numberSelected, topology, colourPalette, search])
 }
