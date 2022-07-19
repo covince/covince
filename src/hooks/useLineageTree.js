@@ -3,7 +3,7 @@ import { useReducer, useEffect, useCallback, useMemo } from 'react'
 import LineageTree from '../components/LineageTree'
 import LineageTreeWithMutations from '../components/LineageTreeWithMutations'
 
-import { buildFullTopology, whoVariants } from '../pango'
+import { buildFullTopology, whoVariants, expandLineage } from '../pango'
 import useReverseAliasLookup from './useReverseAliasLookup'
 
 const whoVariantsOrder = Object.keys(whoVariants)
@@ -30,7 +30,7 @@ const constructLineage = (name, toAlias) => {
   return name
 }
 
-const createNodeWithState = (node, state, parentWho) => {
+const createNodeWithState = (node, state, parentWhos = []) => {
   const { nodeIndex, preset, selectedLineages } = state
   const {
     lineage = constructLineage(node.name, state.toAlias),
@@ -39,15 +39,16 @@ const createNodeWithState = (node, state, parentWho) => {
   } = nodeIndex[node.name] || {}
   const alias = state.toAlias[node.name]
   const who = whoVariants[node.name]
+  const nextParentWhos = who ? [...parentWhos, who] : parentWhos
 
   let childrenWithState = []
   for (const child of node.children) {
-    const newNodes = createNodeWithState(child, state, who || parentWho)
+    const newNodes = createNodeWithState(child, state, nextParentWhos)
     childrenWithState = childrenWithState.concat(newNodes)
   }
   childrenWithState.sort(sortByCladeSize)
 
-  if (preset === 'who' && !(who || parentWho)) {
+  if (preset === 'who' && nextParentWhos.length === 0) {
     return childrenWithState
   }
 
@@ -64,7 +65,7 @@ const createNodeWithState = (node, state, parentWho) => {
     children: preset === 'selected' && (selected && !childIsSelected) ? [] : childrenWithState,
     lineage,
     name: node.name,
-    searchText: [node.name, lineage, who || parentWho, alias].join('|').toLowerCase(),
+    searchText: [node.name, ...nextParentWhos].join('|').toLowerCase(),
     selected,
     sum,
     sumOfClade
@@ -93,7 +94,9 @@ export default ({
   lineageToColourIndex,
   mutationMode,
   queryParams,
+  search,
   setPreset,
+  setSearch,
   showLineageView
 }) => {
   const [state, dispatch] = useReducer((state, action) => {
@@ -133,13 +136,10 @@ export default ({
       }
       case 'SCROLL_POSITION':
         return { ...state, scrollPosition: action.payload }
-      case 'SEARCH':
-        return { ...state, search: action.payload }
       default:
         return state
     }
   }, {
-    search: '',
     loadedProps: null,
     nodeIndex: null,
     topology: [],
@@ -205,6 +205,15 @@ export default ({
     return mapStateToNodes(topology, { ...rest, selectedLineages, toAlias, preset })
   }, [state.topology, preset, toAlias])
 
+  const lineageFilterText = useMemo(() => {
+    if (search.length) {
+      const upper = search.toUpperCase()
+      const expanded = expandLineage(upper)
+      if (upper !== expanded) return expanded
+    }
+    return undefined
+  }, [search])
+
   return useMemo(() => ({
     // props
     api_url,
@@ -215,15 +224,17 @@ export default ({
 
     // state
     ...state,
-    preset,
     isLoading: loadedProps === null,
+    lineageFilterText,
     numberSelected,
+    preset,
+    search,
     topology,
 
     // actions
-    setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
-    setSearch: text => dispatch({ type: 'SEARCH', payload: text }),
     setPreset,
+    setScrollPosition: pos => dispatch({ type: 'SCROLL_POSITION', payload: pos }),
+    setSearch,
     toggleOpen
-  }), [state, numberSelected, topology, colourPalette])
+  }), [state, numberSelected, topology, colourPalette, search])
 }

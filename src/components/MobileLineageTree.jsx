@@ -69,7 +69,7 @@ const MobileLineageTree = (props) => {
                     w-48
                     absolute z-20 top-full right-0 mt-2 origin-top-right
                     bg-white rounded-md shadow-xl ring-1 ring-black ring-opacity-5
-                    divide-y divide-gray-200 focus:outline-none 
+                    divide-y divide-gray-200 focus:outline-none
                     dark:bg-gray-600 dark:text-white dark:ring-gray-500 dark:divide-gray-500
                   `}
                 >

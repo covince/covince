@@ -142,22 +142,24 @@ export const LineageTreeBranch = memo(({ node, ...props }) => {
 LineageTreeBranch.displayName = 'LineageTreeBranch'
 
 export const useBranch = (props) => {
-  const { node, index, preset, selectDisabled, search = '', values } = props
+  const { node, index, preset, selectDisabled, lineageFilterText = '', search = '', values } = props
   const { lineage } = node
   const { isOpen = node.childIsSelected } = index[node.name] || {}
 
   const checked = node.lineage in values
   const colour = values[lineage] || null
   const isDisabled = selectDisabled && !checked
-  const inSearch = search.length ? node.searchText.includes(search) : false
+  const matchingFilter =
+    (lineageFilterText.length > 1 && node.name.includes(lineageFilterText)) ||
+    (search.length && node.searchText.includes(search)) ||
+    !search.length
 
   return {
     checked,
     colour,
     isDisabled,
     isOpen,
-    inSearch,
-    skipNode: (search.length && !inSearch) || (preset === 'selected' && !checked)
+    skipNode: !matchingFilter || (preset === 'selected' && !checked)
   }
 }
 
@@ -209,7 +211,7 @@ const LineageTree = (props) => {
     submit,
 
     // external tree state
-    search, setSearch, preset,
+    search, setSearch, lineageFilterText, preset,
     scrollPosition, setScrollPosition,
     isLoading, nodeIndex, topology, toggleOpen
   } = props
@@ -298,6 +300,7 @@ const LineageTree = (props) => {
                 key={node.name}
                 node={node}
                 preset={preset}
+                lineageFilterText={lineageFilterText}
                 search={search.toLowerCase()}
                 selectDisabled={numberSelected >= maxLineages}
                 setColour={setColour}
