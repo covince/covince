@@ -1,0 +1,59 @@
+.covince-min-max {
+  display: grid;
+  width: 100%;
+  padding: 0;
+}
+
+.covince-min-max input,
+.covince-min-max::before {
+  grid-area: 1/1;
+  align-self: center;
+}
+
+.covince-min-max input {
+  pointer-events: none;
+}
+
+.covince-min-max input[type="range"]::-webkit-slider-runnable-track {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.covince-min-max input[type="range"]::-moz-range-track {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.covince-min-max input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+}
+.covince-min-max input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+}
+
+.covince-min-max::before {
+  --bg: theme("colors.gray.100");
+  --fg: theme("colors.primary");
+  --range: calc(var(--max, 0) - var(--min, 100));
+  content: "";
+  margin: 1px 2px;
+  background: linear-gradient(
+    to right,
+    var(--bg),
+    var(--bg) calc((var(--min-v) / var(--range)) * 100%),
+    var(--fg) calc((var(--min-v) / var(--range)) * 100%),
+    var(--fg) calc((var(--max-v) / var(--range)) * 100%),
+    var(--bg) calc((var(--max-v) / var(--range)) * 100%)
+  );
+  @apply h-2 cursor-pointer
+    shadow-inner
+    rounded-full
+    box-content
+    dark:border dark:border-solid dark:border-gray-500;
+}
+
+.dark .covince-min-max::before {
+  --bg: theme("colors.gray.800");
+  --fg: theme("colors.dark.primary");
+}

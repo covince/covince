@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { format } from 'date-fns'
-import classNames from 'classnames'
 
 import { DescriptiveHeading } from './Typography'
 import Button from './Button'
-import Select from './Select'
+import MinMaxSlider from './MinMaxSlider'
 
 import useQueryAsState from '../hooks/useQueryAsState'
 
@@ -17,18 +16,28 @@ const LineageDateFilter = ({ dates = [] }) => {
     : {}
   const [{ xMin, xMax }, updateQuery] = useQueryAsState(defaultValues)
 
-  const options = useMemo(() => {
-    return dates.map(d => ({ value: d, label: format(new Date(d), 'dd MMM y') }))
+  const labels = useMemo(() => {
+    return dates.map(d => format(new Date(d), 'd MMM y'))
   }, [dates])
 
-  const [fromOptions, toOptions] = useMemo(() => {
-    const fromItem = options.find(_ => _.value === xMin)
-    const toItem = options.find(_ => _.value === xMax)
-    return [
-      toItem ? options.slice(0, options.indexOf(toItem) + 1) : options,
-      fromItem ? options.slice(options.indexOf(fromItem)) : options
-    ]
+  const [minValue, setMinValue] = React.useState(dates.indexOf(xMin) || 0)
+  const [maxValue, setMaxValue] = React.useState(dates.indexOf(xMax) || dates.length - 1)
+
+  const commitValues = () => updateQuery({ xMin: dates[minValue], xMax: dates[maxValue] })
+
+  useEffect(() => {
+    setMinValue(dates.indexOf(xMin) || 0)
+    setMaxValue(dates.indexOf(xMax) || dates.length - 1)
   }, [xMin, xMax])
+
+  // const [fromOptions, toOptions] = useMemo(() => {
+  //   const fromItem = options.find(_ => _.value === xMin)
+  //   const toItem = options.find(_ => _.value === xMax)
+  //   return [
+  //     toItem ? options.slice(0, options.indexOf(toItem) + 1) : options,
+  //     fromItem ? options.slice(options.indexOf(fromItem)) : options
+  //   ]
+  // }, [xMin, xMax])
 
   return (
     <div className='h-20'>
@@ -42,34 +51,22 @@ const LineageDateFilter = ({ dates = [] }) => {
           Reset dates
         </Button>
       </header>
-      <form className='mt-3 flex items-baseline text-sm space-x-3'>
-        <div className='w-1/2'>
-          <label className='block font-medium mb-1 sr-only'>
-            From Date
-          </label>
-          <Select
-            className={classNames(xMin === defaultValues.xMin ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
-            value={xMin}
-            name='lineages from date'
-            onChange={e => updateQuery({ xMin: e.target.value === defaultValues.xMin ? undefined : e.target.value })}
-          >
-            {fromOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-          </Select>
+      <form>
+        <div className='flex justify-between items-baseline my-1 font-bold font-heading text-sm'>
+          <label className='h-6 leading-6'>{labels[minValue]}</label>
+          <label className='h-6 leading-6'>{labels[maxValue]}</label>
         </div>
-        <p>to</p>
-        <div className='w-1/2'>
-          <label className='block font-medium mb-1 sr-only'>
-            To Date
-          </label>
-          <Select
-            className={classNames(xMax === defaultValues.xMax ? 'text-gray-600 dark:text-gray-300' : 'font-medium')}
-            value={xMax}
-            name='lineages to date'
-            onChange={e => updateQuery({ xMax: e.target.value === defaultValues.xMax ? undefined : e.target.value })}
-          >
-            {toOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-          </Select>
-        </div>
+        <MinMaxSlider
+          className='h-6'
+          min={0}
+          max={dates.length - 1}
+          minValue={minValue}
+          maxValue={maxValue}
+          onMinChange={e => setMinValue(e.target.value)}
+          onMaxChange={e => setMaxValue(e.target.value)}
+          onMouseUp={commitValues}
+          onKeyUp={commitValues}
+        />
       </form>
     </div>
   )
