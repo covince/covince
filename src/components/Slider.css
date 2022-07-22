@@ -1,25 +1,24 @@
 /* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
 
-input[type=range] {
+input[type="range"] {
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
   background: transparent; /* Otherwise white in Chrome */
-  @apply h-3 rounded-md border-2 border-transparent focus:outline-none no-webkit-tap;
+  @apply h-3 rounded-md focus:outline-none no-webkit-tap;
 }
 
-input[type=range]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
 }
 
-input[type=range]:focus-visible {
+input[type="range"]:focus-visible {
   @apply outline-none border-primary dark:border-dark-primary;
 }
 
 /* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  @apply
-    bg-white dark:bg-gray-600
+  @apply bg-white dark:bg-gray-600
     h-6 w-6
     md:h-5 md:w-5
     box-border
@@ -30,14 +29,17 @@ input[type=range]::-webkit-slider-thumb {
     shadow
     cursor-pointer
     -mt-2 /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-    md:-mt-1.5
-  ;
+    md:-mt-1.5;
+}
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  @apply ring ring-primary ring-opacity-40 border-primary
+    dark:ring-dark-primary dark:ring-opacity-40 dark:border-dark-primary;
 }
 
 /* All the same stuff for Firefox */
-input[type=range]::-moz-range-thumb {
-  @apply
-    bg-white dark:bg-gray-600
+input[type="range"]::-moz-range-thumb {
+  @apply bg-white dark:bg-gray-600
     h-6 w-6
     md:h-5 md:w-5
     box-border
@@ -48,32 +50,30 @@ input[type=range]::-moz-range-thumb {
     shadow
     cursor-pointer
     -mt-2 /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-    md:-mt-1.5
-  ;
+    md:-mt-1.5;
 }
 
-input[type=range]::-webkit-slider-runnable-track {
-  @apply
-    h-2 w-full
+input[type="range"]:focus-visible::-moz-range-thumb {
+  @apply ring ring-primary ring-opacity-40 border-primary
+    dark:ring-dark-primary dark:ring-opacity-40 dark:border-dark-primary;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  @apply h-2 w-full
     cursor-pointer
     shadow-inner
     bg-gray-100 dark:bg-gray-800
     rounded-full
     box-content
-    dark:border dark:border-solid dark:border-gray-500
-  ;
+    dark:border dark:border-solid dark:border-gray-500;
 }
 
-input[type=range]:focus-visible::-webkit-slider-runnable-track {}
-
-input[type=range]::-moz-range-track {
-  @apply
-    h-2 w-full
+input[type="range"]::-moz-range-track {
+  @apply h-2 w-full
     cursor-pointer
     shadow-inner
     bg-gray-100 dark:bg-gray-800
     rounded-full
     box-content
-    dark:border dark:border-solid dark:border-gray-500
-  ;
+    dark:border dark:border-solid dark:border-gray-500;
 }

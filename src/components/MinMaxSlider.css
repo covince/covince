@@ -1,17 +1,28 @@
 .covince-min-max {
+  --thumb-space: 1.25rem;
   display: grid;
   width: 100%;
   padding: 0;
+  z-index: 0;
 }
 
 .covince-min-max input,
-.covince-min-max::before {
+.covince-min-max::before,
+.covince-min-max::after {
   grid-area: 1/1;
   align-self: center;
 }
 
 .covince-min-max input {
   pointer-events: none;
+  z-index: 1;
+}
+
+.covince-min-max input:first-of-type {
+  padding-right: var(--thumb-space);
+}
+.covince-min-max input:last-of-type {
+  padding-left: var(--thumb-space);
 }
 
 .covince-min-max input[type="range"]::-webkit-slider-runnable-track {
@@ -32,28 +43,43 @@
   pointer-events: auto;
 }
 
-.covince-min-max::before {
-  --bg: theme("colors.gray.100");
-  --fg: theme("colors.primary");
-  --range: calc(var(--max, 0) - var(--min, 100));
+.covince-min-max::before,
+.covince-min-max::after {
   content: "";
   margin: 1px 2px;
+  @apply h-2;
+}
+
+.covince-min-max::before {
+  @apply h-2 shadow-inner rounded-full
+    box-content
+    bg-gray-100
+    dark:border
+    dark:border-solid
+    dark:border-gray-500
+    dark:bg-gray-800;
+}
+
+.covince-min-max::after {
+  --bg: transparent;
+  --fg: theme("colors.white");
+  --length: calc(var(--max, 0) - var(--min, 100));
+  --min-pct: calc((var(--min-v) / var(--length)) * 100%);
+  --max-pct: calc((var(--max-v) / var(--length)) * 100%);
+  @apply border border-solid border-gray-200;
+  margin: 2px calc(var(--thumb-space) - 2px);
   background: linear-gradient(
     to right,
     var(--bg),
-    var(--bg) calc((var(--min-v) / var(--range)) * 100%),
-    var(--fg) calc((var(--min-v) / var(--range)) * 100%),
-    var(--fg) calc((var(--max-v) / var(--range)) * 100%),
-    var(--bg) calc((var(--max-v) / var(--range)) * 100%)
+    var(--bg) var(--min-pct),
+    var(--fg) var(--min-pct),
+    var(--fg) var(--max-pct),
+    var(--bg) var(--max-pct)
   );
-  @apply h-2 cursor-pointer
-    shadow-inner
-    rounded-full
-    box-content
-    dark:border dark:border-solid dark:border-gray-500;
+  clip-path: inset(0px calc(100% - var(--max-pct)) 0px var(--min-pct));
 }
 
-.dark .covince-min-max::before {
-  --bg: theme("colors.gray.800");
-  --fg: theme("colors.dark.primary");
+.dark .covince-min-max::after {
+  --fg: theme("colors.gray.700");
+  @apply border-none bg-clip-border;
 }

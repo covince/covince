@@ -23,6 +23,15 @@ const MinMaxSlider = ({
     '--min-v': minValue,
     '--max-v': maxValue
   }))
+
+  const _onMinChange = React.useCallback((e) => {
+    onMinChange(Math.min(e.target.value, maxValue))
+  }, [maxValue, onMinChange])
+
+  const _onMaxChange = React.useCallback((e) => {
+    onMaxChange(Math.max(e.target.value, minValue))
+  }, [minValue, onMaxChange])
+
   return (
     <div
       className={classNames('covince-min-max', className)}
@@ -33,13 +42,13 @@ const MinMaxSlider = ({
         min={min}
         max={max}
         value={minValue}
-        onChange={onMinChange}
+        onChange={_onMinChange}
       />
       <Slider
         min={min}
         max={max}
         value={maxValue}
-        onChange={onMaxChange}
+        onChange={_onMaxChange}
       />
     </div>
   )
