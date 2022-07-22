@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 export const Heading = ({ as = 'h2', className, ...props }) =>
   React.createElement(as, {
-    className: classnames(className, 'text-heading text-xl font-heading font-bold leading-6 font-heading'),
+    className: classnames(className, 'text-heading text-xl font-heading font-bold leading-6'),
     ...props
   })
 
